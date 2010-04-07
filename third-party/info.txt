@@ -1,0 +1,11 @@
+Protocol Buffers - Just Enough RPC
+Copyright 2010 Andrew Kimpton
+http://code.google.com/p/protobuf-jerpc
+
+pugg a c++ framework for plug-in management
+Copyright 2010 Tunç Bahçecioğlu
+http://pugg.sourceforge.net/
+	* updated to 0.5 (nairboon)
+		* linux & mac support
+		* various bug fixes on gcc
+		* now under GPL :D

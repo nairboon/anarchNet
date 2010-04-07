@@ -1,0 +1,13 @@
+message Void { }
+
+message Extension {
+ required string id = 1;
+ optional int32 algorithm_version = 2;
+ optional int32 extension_version = 3;
+ optional string description = 4;
+ enum Type {
+ DigitalSignature = 0;
+ Locating = 1;
+ Streaming = 2;
+ }
+}

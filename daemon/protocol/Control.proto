@@ -1,0 +1,25 @@
+import "Util.proto";
+// Turn off the built-in generation of services classes
+option cc_generic_services = false;
+
+message InfoResponse {
+ optional int32 anVersion = 1;
+ optional int32 anProtocolVersion = 2;
+ optional int32 uptime = 3;
+ enum OperatingSystem {
+ osBSD = 0;
+ osLinux = 1;
+ osMac = 2;
+ osWin = 3;
+ osOther = 4;
+}
+optional OperatingSystem operatingsystem = 4;
+repeated Extension extensions = 5;
+
+}
+
+
+
+service ControlService {
+ rpc getInfo (Void) returns (InfoResponse);
+}
