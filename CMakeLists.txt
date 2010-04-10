@@ -3,7 +3,7 @@
 #
 
 project(anarchNet)
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release." FORCE)
@@ -24,13 +24,11 @@ endif()
 
 find_library(GLOG NAMES libglog.a glog REQUIRED)
 find_package(Protobuf REQUIRED)
-find_library(GCOV NAMES gcov)
 find_package(GTest REQUIRED)
 
 set(Boost_ADDITIONAL_VERSIONS "1.42")
-set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.42 COMPONENTS system thread filesystem program_options REQUIRED)
+find_package(Boost 1.42 COMPONENTS program_options system thread filesystem  REQUIRED)
 
 include_directories( 
 	"${CMAKE_SOURCE_DIR}"
@@ -52,6 +50,11 @@ set( LIB
 	${GTEST_LIBRARIES}
 	${PROTOBUF_LIBRARIES}
 	)
+
+if(UNIX)
+set(PLATFORM_LIB pthread dl)
+endif()
+
 message(STATUS "linked libraries: ${LIB}")
 
 ###################################################################################################
@@ -91,13 +94,13 @@ set(RPC_PLG_SRC "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/file_gene
 		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service_generator.cc"
 		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service.cc")
 add_executable(protoc-gen-rpc ${RPC_PLG_SRC})
-target_link_libraries(protoc-gen-rpc ${PROTOBUF_LIBRARIES} ${PROTOBUF_PROTOC_LIBRARY})
+target_link_libraries(protoc-gen-rpc ${PROTOBUF_LIBRARIES} ${PROTOBUF_PROTOC_LIBRARY} ${PLATFORM_LIB})
 
 ### generate proto files ###
 
 
 set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/Control.proto"
-       		"${CMAKE_SOURCE_DIR}/daemon/protocol/test_service.proto")
+       		)
 generate_protobuf_files(${PROTO_FILES})
 set(PB_DAEMON_FE ${SRCS} ${HDRS})
 
@@ -130,7 +133,7 @@ list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${PB_DAEMON_FE}
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon protoc-rpc-plugin)
-target_link_libraries(anDaemon ${LIB} pb-rpc)
+target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} pb-rpc)
 
 configure_file(${CMAKE_SOURCE_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)

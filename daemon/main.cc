@@ -13,12 +13,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <sys/stat.h>
 #include <iostream>
+#include <cstdio>
 #include "boost/program_options.hpp"
 #include "glog/logging.h"
 #include "daemon.h"
@@ -38,7 +39,7 @@ void onexit()
 
 int main(int argc, char* argv[])
 {
-	
+
 	FLAGS_log_dir=".";
 	FLAGS_stderrthreshold = 0;
 	google::InitGoogleLogging(argv[0]);
@@ -46,14 +47,14 @@ int main(int argc, char* argv[])
 	g_daemon = NULL;
 	atexit(onexit);
 	try {
-		
+
 		po::options_description generic("Generic options");
 		generic.add_options()
 		("version,v", "print version string")
 		("help,h", "produce help message")
 		("daemonize,d","daemonize anDaemon")
-		("directory", po::value<string>()->default_value("~/.anarchNet"), "prefix directory file");  
-		
+		("directory", po::value<string>()->default_value("~/.anarchNet"), "prefix directory file");
+
 
 		po::positional_options_description p;
 		p.add("directory", -1);
@@ -61,9 +62,9 @@ int main(int argc, char* argv[])
 		po::variables_map vm;
 		store(po::command_line_parser(argc, argv).
 					options(generic).positional(p).run(), vm);
-		
-		po::notify(vm);    
-		
+
+		po::notify(vm);
+
 		if (vm.count("help")) {
 			std::cerr << "Usage: anDaemon [Options] directory" << std::endl;
 			std::cerr << generic << std::endl;
@@ -75,12 +76,12 @@ int main(int argc, char* argv[])
 						 ANARCHNET_PROTOCOL_VERSION_MINOR, ANARCHNET_PROTOCOL_VERSION_PATCH);
 			return 0;
 		}
-	
+
 		g_daemon = new an::anDaemon();
 		LOG(INFO) << "initializing daemon";
 		if (!g_daemon->init(vm["directory"].as<string>()))
 			LOG(FATAL) << "init failed";
-		
+
 		//daemonize
 		if (vm.count("daemonize")) {
 			LOG(INFO) << "become daemon";
@@ -88,16 +89,16 @@ int main(int argc, char* argv[])
 		 pid_t pid = fork();
 		 if ( pid < 0)
 			 exit(EXIT_FAILURE);
-		 
+
 		 if (pid > 0)
 			exit(EXIT_SUCCESS);
-		 
+
 		 umask(0);
 		 pid_t sid = setsid();
 		 if ( sid < 0)
 			 exit(EXIT_FAILURE);
 		}
-		
+
 		g_daemon->run();
 	}
 	catch(std::exception& e) {
@@ -108,6 +109,6 @@ int main(int argc, char* argv[])
 		LOG(ERROR) << "Exception of unknown type!\n";
 		return EXIT_FAILURE;
 	}
-	
+
 	return EXIT_SUCCESS;
 }

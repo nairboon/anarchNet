@@ -30,6 +30,7 @@
 
 // Author: awk@awkward.org
 
+#include <cstdio>
 #include <sstream>
 #include "protobuf_rpc_server.h"
 #include "protobuf_rpc.h"

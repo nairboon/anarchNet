@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include <cstdio>
 #include "client.h"
 #include "anarchNet.h"
 

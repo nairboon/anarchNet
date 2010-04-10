@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,7 @@
 #include "glog/logging.h"
 #include "control_service.h"
 #include "version.h"
+#include "anarchNet.h"
 using namespace std;
 namespace an
 {
@@ -34,16 +35,16 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 	identify;
 	response->set_anversion(ANARCHNET_VERSION);
 	response->set_anprotocolversion(ANARCHNET_PROTOCOL_VERSION);
-#if defined (__APPLE__)
+#if ANARCHNET_PLATFORM == ANARCHNET_PLATFORM_APPLE
 	response->set_operatingsystem(InfoResponse::osMac);
-#elif defined (_WIN32)
+#elif ANARCHNET_PLATFORM == ANARCHNET_PLATFORM_WIN
 	response->set_operatingsystem(InfoResponse::osWin);
-#elif defined (__LINUX)
+#elif ANARCHNET_PLATFORM == ANARCHNET_PLATFORM_LINUX
 	response->set_operatingsystem(InfoResponse::osLinux);
 #elif defined (BSD)
 	response->set_operatingsystem(InfoResponse::osBSD);
 #else
-	response->set_operatingsystem(InfoResponse:osOther);
+	response->set_operatingsystem(InfoResponse::osOther);
 #endif
 	if (done)
 		done->Run();

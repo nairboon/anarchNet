@@ -30,6 +30,7 @@
 
 // Author: awk@awkward.org
 
+#include <cstdio>
 #include "protobuf_rpc.h"
 #include "protobuf_rpc_channel.h"
 #include "protobuf_rpc_socket.h"

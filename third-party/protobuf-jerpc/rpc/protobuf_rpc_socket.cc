@@ -120,7 +120,9 @@ bool awk::protobuf::jerpc::socket_address_for_name(struct sockaddr_in *address, 
    }
    address->sin_addr.s_addr = addr;
 #else
+#ifdef HAVE_STRUCT_SOCKADDR_IN_SIN_LEN
    address->sin_len = sizeof *address;
+#endif
    if (inet_aton(name, &address->sin_addr) == 0)  {
       return false;
    }
