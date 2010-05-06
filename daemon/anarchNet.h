@@ -47,6 +47,7 @@
 #ifndef ANARCHNET_H
 #define ANARCHNET_H
 #include <boost/foreach.hpp>
+#include "config.h"
 
 /*!
  *  \namespace an
@@ -54,8 +55,8 @@
  */
 namespace an
 {
-#define RPC_CONTROL_PORT 6788
-#define ANARCHNET_PORT 6789
+#define ANARCHNET_RPC_PORT 6788
+#define ANARCHNET_PORT 39999
 
 #define ANARCHNET_PLATFORM_WIN32 1
 #define ANARCHNET_PLATFORM_LINUX 2

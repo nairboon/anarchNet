@@ -18,7 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Control.pb.h"
+#include "control_service_messages.pb.h"
 
 
 InfoResponse* getInfo(void);

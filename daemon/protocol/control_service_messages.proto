@@ -1,0 +1,39 @@
+import "util.proto";
+
+message InfoResponse {
+ optional int32 anVersion = 1;
+ optional int32 uptime = 3;
+ optional int32 connectedNodes = 4;
+ enum OperatingSystem {
+ osBSD = 0;
+ osLinux = 1;
+ osMac = 2;
+ osWin = 3;
+ osOther = 4;
+}
+optional OperatingSystem operatingsystem = 9;
+repeated Extension extensions = 10;
+
+}
+message Status {
+ required bool ok = 1;
+ optional string message = 2;
+}
+message GetRequest {
+ required string key = 1;
+}
+
+message GetResponse {
+ repeated string values = 1;
+ required Status status = 2;
+}
+
+message PutRequest {
+ required string key = 1;
+ required string value = 2;
+ optional int32 ttl = 3;
+}
+message PutResponse {
+ required Status status = 2;
+
+}

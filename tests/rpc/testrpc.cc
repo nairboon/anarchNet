@@ -9,7 +9,5 @@ TEST(rpc,fgetInfo)
 {
 	InfoResponse* r = getInfo();
 	EXPECT_EQ(r->anversion(),ANARCHNET_VERSION);
-	EXPECT_EQ(r->anprotocolversion(),ANARCHNET_PROTOCOL_VERSION);
-
 	delete r;
 }

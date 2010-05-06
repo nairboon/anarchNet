@@ -30,8 +30,11 @@ class ConfigManager : public Singleton<ConfigManager>
 		friend class Singleton<ConfigManager>;
 public:
 		bool init(const std::string&);
+		std::string kad_config() { return kad_config_; }
+		const boost::program_options::variables_map& config() { return vm_; }
 private:
 		boost::program_options::variables_map vm_;
+		std::string kad_config_;
 	};
 }
 #endif

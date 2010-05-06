@@ -97,7 +97,23 @@ message QueryForServiceResponse {
    required bool registered = 2 [default = false];
 }
 
+message QueryForMethodRequest {
+   // RPC Method full name
+   required string method_name = 1;
+   // RPC Service full name
+   required string service_name = 2;
+}
+
+message QueryForMethodResponse {
+   // RPC Service full name
+   optional string method_name = 1;
+
+   // Method is registered with RPC server
+   required bool registered = 2 [default = false];
+}
+
 service DiscoveryService {
   rpc QueryForService (QueryForServiceRequest) returns (QueryForServiceResponse);
+  rpc QueryForMethod (QueryForMethodRequest) returns (QueryForMethodResponse);
 }
 

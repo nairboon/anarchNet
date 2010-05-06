@@ -120,7 +120,6 @@ namespace pugg
 		*/
 		std::string getEngineName() {return _engineName;}
 	private:
-		//typedef std::map<std::string,DriverType*> DriverMap;
 		DriverMap loadedDrivers;
 
 	};
@@ -130,7 +129,7 @@ namespace pugg
 	{
 		try
 		{
-			return dynamic_cast<Server<DriverType>*>(base);
+			return reinterpret_cast<Server<DriverType>*>(base);
 		}catch (...) {return NULL;}
 	}
 }

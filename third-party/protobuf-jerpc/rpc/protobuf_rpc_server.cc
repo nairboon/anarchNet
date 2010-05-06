@@ -52,7 +52,10 @@ class ConcreteDiscoveryService : public DiscoveryService {
                        const QueryForServiceRequest* request,
                        QueryForServiceResponse* response,
                        Closure* done);
-
+	void QueryForMethod(awk::protobuf::RpcController* controller,
+                       const QueryForMethodRequest* request,
+                       QueryForMethodResponse* response,
+                       Closure* done);
    private:
       Server *mServer;
 };
@@ -158,7 +161,7 @@ void NetServer::RunServer()
    memset(&address, 0, sizeof address);
 
    address.sin_family = AF_INET;
-   address.sin_port = htons(RPC_CONTROL_PORT);
+   address.sin_port = htons(ANARCHNET_RPC_PORT);
    if (!socket_address_for_name(&address, "0.0.0.0")) {
       socket_log_error("Could not convert address");
       socket_close(mServerListeningSocket);
@@ -177,7 +180,7 @@ void NetServer::RunServer()
    }
 
    mSocketSet.insert(mServerListeningSocket);
-
+	fprintf(stderr,"listening on %d",ANARCHNET_RPC_PORT);
    while (!done) {
       fd_set socketDescriptors;
       FD_ZERO(&socketDescriptors);
@@ -281,4 +284,22 @@ void ConcreteDiscoveryService::QueryForService(awk::protobuf::RpcController* con
    } else {
       response->set_registered(false);
    }
+}
+
+void ConcreteDiscoveryService::QueryForMethod(awk::protobuf::RpcController* controller,
+																							 const QueryForMethodRequest* request,
+																							 QueryForMethodResponse* response,
+																							 Closure* done)
+{
+	assert(mServer);
+	printf("query for method %s @ %s\n",request->method_name().c_str(),request->service_name().c_str());
+	awk::protobuf::Service *aService = mServer->ServiceRegisteredForName(request->service_name());
+	const google::protobuf::MethodDescriptor* aMethod = aService->GetDescriptor()->FindMethodByName(request->method_name());
+	
+	if (aMethod) {
+		response->set_registered(true);
+		response->set_method_name(aMethod->full_name());
+	} else {
+		response->set_registered(false);
+	}
 }

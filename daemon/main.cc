@@ -22,8 +22,9 @@
 #include <cstdio>
 #include "boost/program_options.hpp"
 #include "glog/logging.h"
-#include "daemon.h"
+#include "anarchnet.h"
 #include "version.h"
+#include "daemon.h"
 
 namespace po = boost::program_options;
 using std::string;
@@ -71,9 +72,8 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 		if (vm.count("version")) {
-			printf("anDaemon v%d.%d.%d,\tanarchNet v%d.%d.%d\n", ANARCHNET_VERSION_MAJOR,
-						 ANARCHNET_VERSION_MINOR, ANARCHNET_VERSION_PATCH, ANARCHNET_PROTOCOL_VERSION_MAJOR,
-						 ANARCHNET_PROTOCOL_VERSION_MINOR, ANARCHNET_PROTOCOL_VERSION_PATCH);
+			printf("anarchNet v%d.%d.%d\n", ANARCHNET_VERSION_MAJOR,
+						 ANARCHNET_VERSION_MINOR, ANARCHNET_VERSION_PATCH);
 			return 0;
 		}
 

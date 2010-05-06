@@ -42,7 +42,7 @@
 #include <map>
 #include <string>
 
-#define PUGG_VERSION 0.41
+#define PUGG_VERSION 0.42
 
 
 

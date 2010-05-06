@@ -17,23 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef FILE_pugg_DHT_H
-#define FILE_pugg_DHT_H
 
-#include <puggDriver.h>
+#include "puggDriver.h"
+#include "plugin.h"
 
-#define HAT_SERVER_NAME "HatServer"
-#define HAT_CLASS_VERSION 1
+#ifndef DAEMON_PLUGIN_DHT_H
+#define DAEMON_PLUGIN_DHT_H
+namespace an {
 
-class DHTplugin
+#define PLG_DHT_SERVER_NAME "DHTServer"
+#define PLG_DHT_SERVER_VERSION 1
+
+class DHTplugin : public Plugin
 {
 public:
-	virtual std::string getName() {return "generic DHTplugin";}
+	virtual const std::string getName() {return "generic DHTplugin";}
 };
 class DHTpluginDriver : public pugg::Driver
 {
 public:
 	virtual DHTplugin* createPlugin() = 0;
 };
-
+}
 #endif

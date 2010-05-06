@@ -1,0 +1,11 @@
+import "util.proto";
+import "control_service_messages.proto";
+
+// Turn off the built-in generation of services classes
+option cc_generic_services = false;
+
+service ControlService {
+ rpc getInfo (Void) returns (InfoResponse);
+ rpc get (GetRequest) returns (GetResponse);
+ rpc put (PutRequest) returns (PutResponse);
+}

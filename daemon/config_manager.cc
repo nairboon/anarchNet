@@ -46,9 +46,10 @@ bool ConfigManager::init(const string& directory_path)
 
 	po::options_description config_file_options("Configuration");
 	config_file_options.add_options()
-	("control-rpc-port", po::value<int>()->default_value(RPC_CONTROL_PORT))
+	("control-rpc-port", po::value<int>()->default_value(ANARCHNET_RPC_PORT))
 	("anarchnet-port", po::value<int>()->default_value(ANARCHNET_PORT))
-	("plugin",po::value< std::vector<string> >()->composing());
+	("plugin",po::value< std::vector<string> >()->composing())
+	("bs-list",po::value< std::vector<string> >()->composing());
 	
 	std::ifstream ifs(config_file.c_str());
 	if (!ifs) {
@@ -59,6 +60,19 @@ bool ConfigManager::init(const string& directory_path)
 	store(parse_config_file(ifs, config_file_options), vm_);
 	notify(vm_);
 	
+	if(!vm_.count("bs-list")){
+		LOG(ERROR) << "no bs-list";
+		return false;
+	}
+	fs::path kad_path = fs::path(directory) / "kadconfig";
+	kad_config_ = kad_path.file_string();
+	
+	if (!fs::exists( kad_path ) ) {
+		LOG(ERROR) << "kadconfig not found: " << kad_path;
+		return false;
+	}
+	
+	/*
 	fs::path plugin_path;
 	fs::path plugin_data_path;
 
@@ -76,9 +90,8 @@ bool ConfigManager::init(const string& directory_path)
 			}
 		if( !ConnectionManager::instance().loadPlugin(plugin_name,plugin_path.file_string(),plugin_data_path.directory_string())) {
 			LOG(ERROR) << "could not load plugin: " << plugin_name;
-			return false;
 		}
-	}
+	}*/
 	return true;
 }
 }

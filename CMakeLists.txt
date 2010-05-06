@@ -13,10 +13,12 @@ if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin")
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 	set(BIN_DIR "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
+	set(PLG_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/")
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
 	set(BIN_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+	set(PLG_BIN_DIR ${BIN_DIR})
 endif()
 ###################################################################################################
 # Dependencies
@@ -25,6 +27,9 @@ endif()
 find_library(GLOG NAMES libglog.a glog REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
+find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
+find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
+find_library(UDT NAMES udt_d REQUIRED)
 
 set(Boost_ADDITIONAL_VERSIONS "1.42")
 set(Boost_USE_MULTITHREADED ON)
@@ -37,25 +42,28 @@ include_directories(
 	"/usr/local/include"
 	${Boost_INCLUDE_DIRS} 
 	${GTEST_INCLUDE_DIRS}
+	${MAIDSAFE_INCLUDE_DIRS}
 	"${CMAKE_SOURCE_DIR}/daemon/protocol"
-	"${CMAKE_SOURCE_DIR}/daemon/protocol/frontend"
-	"${CMAKE_SOURCE_DIR}/daemon/protocol/backend"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
-	"${CMAKE_SOURCE_DIR}/third-party/pugg/include" )
+	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
+ )
 set( LIB
 	${Boost_LIBRARIES}
 	${GLOG}
 	${GCOV}
 	${GTEST_LIBRARIES}
 	${PROTOBUF_LIBRARIES}
+	${MAIDSAFE}
+	${UDT}
+	${CRYPTOPP}
 	)
 
 if(UNIX)
 set(PLATFORM_LIB pthread dl)
 endif()
 
-message(STATUS "linked libraries: ${LIB}")
+message(STATUS "(all) linked libraries: ${LIB}")
 
 ###################################################################################################
 # Protobuf
@@ -98,14 +106,10 @@ target_link_libraries(protoc-gen-rpc ${PROTOBUF_LIBRARIES} ${PROTOBUF_PROTOC_LIB
 
 ### generate proto files ###
 
-
-set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/Control.proto"
-       		)
-generate_protobuf_files(${PROTO_FILES})
-set(PB_DAEMON_FE ${SRCS} ${HDRS})
-
-set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/Util.proto"
-       		"${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.proto")
+set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/util.proto"
+       		"${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.proto"
+		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.proto"
+		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.proto")
 generate_protobuf_files(${PROTO_FILES})
 set(PB_DAEMON_G ${SRCS} ${HDRS})
 
@@ -113,7 +117,12 @@ file(GLOB PB-RPC_C "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc/*.c*")
 file(GLOB PB-RPC_H "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc/*.h*")
 list(APPEND PB-RPC_SRC ${PB-RPC_C} ${PB-RPC_H}
 		   "${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.pb.cc"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/Util.pb.cc"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/util.pb.cc"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/util.pb.h"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.pb.cc"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.pb.h"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.pb.cc"
+		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.pb.h"
 		   "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service.cc"
 )
 
@@ -125,7 +134,7 @@ add_library(pb-rpc ${PB-RPC_SRC})
 
 file(GLOB DAEMON_C "daemon/*.c*")
 file(GLOB DAEMON_H "daemon/*.h*")
-list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${PB_DAEMON_FE}
+list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H}
 "${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggDriver.h"
 "${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggKernel.h"
 "${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggPlugin.h"
@@ -149,12 +158,44 @@ file(GLOB LIBRARY_C "library/*.c*")
 file(GLOB LIBRARY_H "library/*.h*")
 list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
-add_library(liban ${LIBRARY_SRC})
-add_dependencies(liban protoc-rpc-plugin)
+file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
+file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
+list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
+
+add_library(liban ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
+add_dependencies(liban pb-rpc protoc-rpc-plugin)
 target_link_libraries(liban ${LIB} pb-rpc)
-###################################################################################################
-# Python library search (style check)                                                             #
-###################################################################################################
+################################################################################
+# browser
+################################################################################
+
+file(GLOB BROWSER_C "browser/*.c*")
+file(GLOB BROWSER_H "browser/*.h*")
+file(GLOB BROWSER_HTTP_C "browser/http/*.c*")
+file(GLOB BROWSER_HTTP_H "browser/http/*.h*")
+list(APPEND BROWSER_SRC ${BROWSER_C} ${BROWSER_H} ${BROWSER_HTTP_C} ${BROWSER_HTTP_H})
+
+add_executable(anBrowser ${BROWSER_SRC})
+add_dependencies(anBrowser liban protoc-rpc-plugin)
+target_link_libraries(anBrowser ${LIB} pb-rpc liban)
+
+add_custom_command(TARGET anBrowser POST_BUILD
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
+################################################################################
+# plugins
+################################################################################
+function(copy_plugin NAME)
+if(UNIX)
+	add_custom_command(TARGET ${NAME} POST_BUILD
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${BIN_DIR}/lib${NAME}.dylib" "${CMAKE_SOURCE_DIR}/daemon/config/plugins/${NAME}")
+endif()
+endfunction(copy_plugin)
+
+add_subdirectory(daemon/plugins ${PLG_BIN_DIR})
+add_dependencies(anDaemon maidsafe-dht)
+################################################################################
+# Python library search (style check)                                          #
+################################################################################
 unset(PYTHON_EXECUTABLE CACHE)
 include(FindPythonInterp)
 include(FindPythonLibs)
@@ -182,7 +223,7 @@ add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
 add_dependencies(TESTbase anDaemon)
 add_dependencies(TESTrpc anDaemon)
 
-target_link_libraries(TESTbase ${LIB})
+target_link_libraries(TESTbase ${LIB} pb-rpc liban)
 target_link_libraries(TESTrpc ${LIB} pb-rpc liban)
 
 enable_testing()

@@ -78,7 +78,24 @@ bool SocketRpcChannel::QueryForService(awk::protobuf::Service* aService)
 bool SocketRpcChannel::QueryForMethod(awk::protobuf::Service* aService, const google::protobuf::MethodDescriptor* method)
 {
    bool isAvailable = false;
-
+	
+  QueryForMethodRequest request;
+	QueryForMethodResponse response;
+	SocketRpcController aController;
+	DiscoveryService *discoveryService = new DiscoveryService::Stub(this);
+	
+	// Set up the request.
+	request.set_method_name(method->name());
+	request.set_service_name(method->service()->name());
+	// Execute the RPC.
+	discoveryService->QueryForMethod(&aController, &request, &response, NULL /*NewCallback(&Done)*/);
+	
+	if (!aController.Failed()) {
+		// Print the result
+		isAvailable = response.registered();
+	}
+	delete discoveryService;
+	
    return isAvailable;
 }
 

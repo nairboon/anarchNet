@@ -18,17 +18,62 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cstdio>
+#include <glog/logging.h>
+#include <google/protobuf/descriptor.h>
+#include "protobuf_rpc_channel.h"
+#include "protobuf_rpc.h"
+#include "control_service.pb.h"
 #include "client.h"
 #include "anarchNet.h"
 
 namespace an {
 bool anClient::init()
 {
+	if(init_) //avoid double init
+		return true;
+	
 	awk::protobuf::jerpc::socket_initialize();
 	channel_ = new awk::protobuf::jerpc::SocketRpcChannel();
-  if (!channel_->Connect("127.0.0.1", RPC_CONTROL_PORT)) {
-		fprintf(stderr, "%s: Unable to connect to remote server\n", __FUNCTION__);
+  if (!channel_->Connect("127.0.0.1", ANARCHNET_RPC_PORT)) {
+		LOG(ERROR)<<"init(): Unable to connect to anDaemon: "<< ANARCHNET_RPC_PORT;
   }
+	init_ = true;
 	return true;
 }
+	
+	google::protobuf::Message* Query(const std::string& name, const google::protobuf::Message*req)
+	{
+		ControlService* service;
+		awk::protobuf::jerpc::SocketRpcController aController;
+		service = new ControlService::Stub(an::anClient::instance().getChannel());
+		const google::protobuf::MethodDescriptor* method = service->GetDescriptor()->FindMethodByName(name);
+		
+		if(method != NULL)		
+			LOG(INFO) << "method: " << method->full_name();
+		else 
+			return NULL;
+		
+		google::protobuf::Message* res;
+		if(method->name() == "getInfo")
+			res = new InfoResponse;
+		else if (method->name() == "get")
+			res = new GetResponse;
+		else if (method->name() == "put")
+			res = new PutResponse;
+		else {
+			LOG(FATAL) << "unregistered method @liban";
+			return NULL;
+		}
+		if(anClient::instance().getChannel()->QueryForMethod(service,method)) {
+			 //method found
+			 anClient::instance().getChannel()->CallMethod(method,&aController,req,res,NULL);
+			 delete service;
+			 return res;
+		}
+		else {
+			 delete service;
+			 LOG(WARNING) << "RPC-call to undefined method: " << name;
+			 return NULL;
+		}
+	}
 }

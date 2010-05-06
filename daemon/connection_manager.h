@@ -20,9 +20,8 @@
 
 #include <vector>
 #include "singleton.h"
-#include "puggKernel.h"
-#include "puggServer.h"
-#include "plugin_dht.h"
+#include "maidsafe/maidsafe-dht.h"
+
 
 #ifndef DAEMON_CONNECTION_MANAGER_H_
 #define DAEMON_CONNECTION_MANAGER_H_
@@ -33,11 +32,51 @@ class ConnectionManager : public Singleton<ConnectionManager>
 		friend class Singleton<ConnectionManager>;
 public:
 		bool init();
-		bool loadPlugin(const std::string&,const std::string&,const std::string&);
+		
+		bool bootstrapp_from_cache();
+		bool bootstrapp_from_server();
+		
+		// once the network is big enough (serveral thousend nodes)
+		// we could bootstrapp with a random ip search/dns profile *gnunet
+		//bool bootstrapp_from_randomsearch();
+		~ConnectionManager() {if(chmanager_ != NULL) delete chmanager_; if(node_ != NULL) delete node_;}
+		kad::KNode *node() { return node_;}
+		
+		static bool http_request(std::string url,std::string& response);
+protected:
+		ConnectionManager() : chmanager_(NULL), node_(NULL) {}
 private:
-		pugg::Kernel plugin_kernel_;
-		pugg::Server<DHTpluginDriver>* dhtServer_;
-		std::vector<DHTplugin*> dhtPlugins_;
+		class JoinCallback {
+		public:
+			JoinCallback() : result_arrived_(false), success_(false) {}
+			void Callback(const std::string &result) {
+				base::GeneralResponse msg;
+				if (!msg.ParseFromString(result))
+					success_ = false;
+				else if (msg.result() == kad::kRpcResultSuccess)
+					success_ = true;
+				else
+					success_ = false;
+				result_arrived_ = true;
+			}
+			bool result_arrived() const { return result_arrived_; }
+			bool success() const { return success_; }
+		private:
+			bool result_arrived_, success_;
+		};
+		
+		bool kad_init();
+		bool kad_shutdown();
+		void create_network(JoinCallback* cb);
+		bool kadconfig_empty(const std::string &path);
+		bool write_to_kadconfig(const std::string &path, const std::string &node_id,
+														const std::string &ip, const boost::uint16_t &port,
+														const std::string &local_ip, const boost::uint16_t &local_port);
+		
+		transport::TransportHandler trans_handler_;
+		rpcprotocol::ChannelManager *chmanager_;
+		kad::KNode *node_;
+		boost::int16_t trans_id_;
 	};
 }
 #endif

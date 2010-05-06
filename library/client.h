@@ -39,5 +39,10 @@ private:
 	awk::protobuf::jerpc::SocketRpcChannel* channel_;
 	bool init_;
 };
+	/**
+	 * @brief generic rpc request
+	 * @param name name of the rpc method
+	 */
+	google::protobuf::Message* Query(const std::string& name, const google::protobuf::Message* request);
 }
 #endif  // LIBRARY_CLIENT_H_

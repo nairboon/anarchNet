@@ -22,6 +22,7 @@
 #include "protobuf_rpc.h"
 #include "protobuf_rpc_channel.h"
 #include "protobuf_rpc_socket.h"
+#include "control_service.h"
 
 #include "info.h"
 

@@ -20,9 +20,11 @@
 
 #include <iostream>
 #include "glog/logging.h"
-#include "control_service.h"
+#include "maidsafe/protobuf/kademlia_service_messages.pb.h"
 #include "version.h"
 #include "anarchNet.h"
+
+#include "control_service.h"
 using namespace std;
 namespace an
 {
@@ -34,7 +36,6 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 {
 	identify;
 	response->set_anversion(ANARCHNET_VERSION);
-	response->set_anprotocolversion(ANARCHNET_PROTOCOL_VERSION);
 #if ANARCHNET_PLATFORM == ANARCHNET_PLATFORM_APPLE
 	response->set_operatingsystem(InfoResponse::osMac);
 #elif ANARCHNET_PLATFORM == ANARCHNET_PLATFORM_WIN
@@ -49,4 +50,89 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 	if (done)
 		done->Run();
 }
+	
+	
+	void anControlService::get(awk::protobuf::RpcController* controller,
+					 const GetRequest* request,
+					 GetResponse* response,
+					 google::protobuf::Closure* done)
+	{
+		identify;
+		
+		kad::KadId key;
+		try {
+			key = kad::KadId(request->key(), true);
+		}
+		catch(const kad::KadIdException&) {
+			key = kad::KadId(cryobj_.Hash(request->key().c_str(), "", crypto::STRING_STRING,
+																		false), false);
+		}
+		node_->FindValue(key, false,
+										 boost::bind(&anControlService::getCallback, this, _1, response, done));
+		
+	}
+	void anControlService::getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done)
+	{
+		kad::FindResponse msg;
+		if (!msg.ParseFromString(result)) {
+			printf("ERROR.  Invalid response. Kademlia Load Value key \n");
+			
+			response->mutable_status()->set_message("ERROR.  Invalid response.");
+			response->mutable_status()->set_ok(false);
+		}
+		else if (msg.result() != kad::kRpcResultSuccess || msg.values_size() == 0) {
+			printf("There is no value stored under key");
+			response->mutable_status()->set_message("There is no value stored under key");
+			response->mutable_status()->set_ok(false);
+		}
+		else {
+			response->mutable_status()->set_ok(true);	
+			
+			/*
+			 * \todo no iterating?
+			 */
+			for (int i = 0; i < msg.values_size(); ++i)
+        response->add_values( msg.values(i) );
+		}
+		if(done)
+			done->Run();
+	}
+	void anControlService::put(awk::protobuf::RpcController* controller,
+					 const PutRequest* request,
+					 PutResponse* response,
+					 google::protobuf::Closure* done)
+	{
+		identify;
+
+		kad::KadId key;
+		try {
+			key = kad::KadId(request->key(), true);
+		}
+		catch(const kad::KadIdException&) {
+			key = kad::KadId(cryobj_.Hash(request->key().c_str(), "", crypto::STRING_STRING,
+																		false), false);
+		}
+			node_->StoreValue(key, request->value(),request->ttl(), boost::bind(
+																											 &anControlService::putCallback, this, _1, response,done));
+			}
+	void anControlService::putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done)
+	{
+	
+		
+		kad::StoreResponse msg;
+		if (!msg.ParseFromString(result)) {
+						 response->mutable_status()->set_message("ERROR.  Invalid response.");
+						 response->mutable_status()->set_ok(false);
+		}
+		else if (msg.result() != kad::kRpcResultSuccess) {
+						 response->mutable_status()->set_message("Failed to store n copies of values");
+						 response->mutable_status()->set_ok(false);
+		} else {
+			
+				response->mutable_status()->set_ok(false);
+		}
+						 if(done)
+						 done->Run();
+	}
+
 }

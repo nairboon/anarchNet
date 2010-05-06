@@ -20,19 +20,24 @@
 
 #include "service.h"
 #include "protobuf_rpc_server.h"
+#include "maidsafe/protobuf/general_messages.pb.h"
 
 #ifndef DAEMON_DAEMON_H
 #define DAEMON_DAEMON_H
 namespace an {
 
+	
 class anDaemon
 {
 public:
+	anDaemon(): control_service_(NULL)  {}
+	~anDaemon() { if(control_service_ != NULL) delete control_service_; }
 	bool init(const std::string&);
 	void run();
 private:
 	awk::protobuf::Service* control_service_; 
 	awk::protobuf::jerpc::NetServer server_;
+	
 };
 }
 #endif

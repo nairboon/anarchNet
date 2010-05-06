@@ -22,9 +22,12 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <glog/logging.h>
 
 #include "protobuf_rpc_socket.h"
+#include "maidsafe/transport/transportudt.h"
+#include "maidsafe/protobuf/contact_info.pb.h"
 
 #include "anarchNet.h"
 #include "daemon.h"
@@ -37,12 +40,16 @@ namespace fs = boost::filesystem;
 using std::string;
 
 namespace an {
+	
+
+	
 bool anDaemon::init(const string& directory)
 {
-	if(!ConnectionManager::instance().init())
-		return false;
 	
 	if(!ConfigManager::instance().init(directory))
+		return false;
+	
+	if(!ConnectionManager::instance().init())
 		return false;
 	
 	awk::protobuf::jerpc::socket_initialize();
@@ -50,9 +57,10 @@ bool anDaemon::init(const string& directory)
 }
 void anDaemon::run()
 {
-	control_service_ = new anControlService();
+	control_service_ = new anControlService(ConnectionManager::instance().node());
 	server_.RegisterService(control_service_);
 	LOG(INFO) << "main run";
 	server_.RunServer();
 }
+
 }

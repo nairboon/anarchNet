@@ -18,7 +18,10 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Control.pb.h"
+#include "control_service.pb.h"
+#include "maidsafe/maidsafe-dht.h"
+#include "maidsafe/base/crypto.h"
+
 
 #ifndef DAEMON_CONTROL_SERVICE_H
 #define DAEMON_CONTROL_SERVICE_H
@@ -29,11 +32,28 @@ namespace an {
 	
 	class anControlService : public ControlService {
 	public:
+		anControlService(	kad::KNode *n) : node_(n) { cryobj_.set_hash_algorithm(crypto::SHA_512); }
 		void getInfo(awk::protobuf::RpcController* controller,
 								 const Void* request,
 								 InfoResponse* response,
 								 google::protobuf::Closure* done);
-		
-		};
+		void get(awk::protobuf::RpcController* controller,
+								 const GetRequest* request,
+								 GetResponse* response,
+								 google::protobuf::Closure* done);
+		void put(awk::protobuf::RpcController* controller,
+						 const PutRequest* request,
+						 PutResponse* response,
+						 google::protobuf::Closure* done);
+
+private:
+	
+	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
+	void putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done);
+
+	kad::KNode *node_;
+	crypto::Crypto cryobj_;
+
+};
 }
 #endif
