@@ -1,10 +1,13 @@
 "use strict";
-/* Namespace: Frontend */
-
-/*
-    Class: AppInfo
-        provides information about the author, designer, license
-*/
+/**
+ * The frontend module provides methods for interacting with the GUI
+ * @module frontend
+ */
+/**
+ * provides information about the author, designer, license
+ * @class AppInfo
+ * @namespace an
+ */
 an.AppInfo = new Class({
     initialize: function() {
         this.author = "Immanuel Goldstein";
@@ -12,12 +15,13 @@ an.AppInfo = new Class({
         this.license = "GPL";
     }
 });
-/*
-    Class: App
-    
-    Arguments: 
-        name - (string) Application name
-*/
+/**
+ * Application base class from which all anBrowser apps are derived
+ * @class App
+ * @namespace an
+ * @constructor
+ * @param name {string} Application name
+ */
     an.App = new Class({
         Implements: Events,
         initialize: function(name) {
@@ -56,9 +60,19 @@ an.AppInfo = new Class({
             var w = new UI.Window(arg);
             this.windows.push(w);
             return w;
-        }
+        },
+        newDialog: function(url,arg) {
+                    arg.contentURL= this.dir + url;
+                    return new UI.Dialog(arg);
+                }
         });
         
+/**
+ * "kernel" manages the apps
+ * @class Manager
+ * @namespace an
+ * @static
+ */
 an.Manager = (function(){
             this.apps = [];
             this.currentApp = null;
@@ -117,13 +131,17 @@ an.Manager = (function(){
                 setActiveApp(currentApp);
                 
                 if(!currentApp.isRunning) {
-                    currentApp.fireEvent("onSetup");
+                  //  currentApp.fireEvent("onSetup");
                     currentApp.isRunning = true;
                 }
                 
                 currentApp.fireEvent("onRun");
         },
-                    // "callback" the apps register themselfe
+        /**
+         * applications must register themselves
+         * @method registerApp
+         * @param app {object} the application object
+         */
         registerApp: function(app) {
                 apps.push(app);
                 refreshMenu();
@@ -271,17 +289,9 @@ window.addEvent('domready', function() {
     quoteChanger.periodical(7000, qc_context);        
 });
 
-function _unimplemented(name) { alert("unimplemented method: "+name); }
-
-// mocha UI stuff
-
 	// Deactivate menu header links
 	$$('a.returnFalse').each(function(el){
 		el.addEvent('click', function(e){
 			new Event(e).stop();
 		});
 	});
-    
-window.addEvent('unload', function(){
-	if (MochaUI) MochaUI.garbageCleanUp();
-});

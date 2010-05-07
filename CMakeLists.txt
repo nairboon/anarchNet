@@ -30,6 +30,7 @@ find_package(GTest REQUIRED)
 find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 find_library(UDT NAMES udt_d REQUIRED)
+find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 
 set(Boost_ADDITIONAL_VERSIONS "1.42")
 set(Boost_USE_MULTITHREADED ON)
@@ -57,6 +58,7 @@ set( LIB
 	${MAIDSAFE}
 	${UDT}
 	${CRYPTOPP}
+	${SQLITE}
 	)
 
 if(UNIX)

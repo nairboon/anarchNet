@@ -28,13 +28,13 @@
 var chatApp = an.Manager.getApp("chat");
 $('chat_send').addEvent('click', function(e){
 			new Event(e).stop();
-			chatApp.sendMessage($('chat_message').value);
+		//	chatApp.sendMessage($('chat_message').value);
 			return false;
 		});
 		
-		an.get("abc",function(r) {
+/*		an.rpc.get("abc",function(r) {
 			an.printJSON($('chat_messages'),r);
-			});
+			});*/
 			
  var leftResize = new Resizable('left_handle',{
                                 limit: {x: [20,null]},
@@ -50,26 +50,5 @@ $('chat_send').addEvent('click', function(e){
 
     ResizableLimits.attach();
     
-    	
-			var graphite = new UI.ListView({
-				//skin : 'BlueTouch',
-				width : 260,
-				height : 400,
-				resizable:true,
-				styles : {
-					margin : '40px 20px 0 40px',
-					backgroundColor : '#e8e8e8'
-				},
-				items : [
-					{
-						title : "UI",
-						desc	: "Core/UI.js"
-					},
-					{
-						title : "UI.Canvas",
-						desc	: "Core/Canvas.js"
-					}
-		
-				]
-			}).inject($('left'));
+ 
 </script>

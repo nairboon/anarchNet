@@ -136,7 +136,7 @@ UI.Window = new Class({
         //ajax
         loadMethod: 'ajax',
         contentURL: '',
-        onContentLoaded: $empty,
+        onContentLoaded: null,
         empty: false
 	},
 
@@ -170,7 +170,8 @@ UI.Window = new Class({
 		ui.controller.window.register(this);
 		ui.controller.window.focus(this);
         
-        this.view.addEvent('loadComplete',options.onContentLoaded);
+    if(this.options.onContentLoaded !== null)
+        this.view.addEvent('loadComplete',this.options.onContentLoaded);
         if(!this.options.empty)
     this.view.setContent(this.options.loadMethod,this.options.contentURL);
 	},
