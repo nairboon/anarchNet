@@ -20,7 +20,7 @@ var UI = {
 var ui = {
 	'version': '0.2',
  	'build': '%build%',
-	'defaultSkin': 'AquaGraphite'
+	'defaultSkin': 'TouchBlue'
 };
 
 ui.controller = {};

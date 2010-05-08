@@ -1,0 +1,8 @@
+doc/api_html
+doc/api_js
+CMakeCache.txt
+CMakeScripts
+CMakeFiles
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake

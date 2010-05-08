@@ -17,6 +17,7 @@ var ChatApp = new Class({
                     });
                     
                 win.buildToolbar({
+                    skin: "abc",
                     openOnRollover: true,
                     closeOnRollout: true,
                     menu: [{

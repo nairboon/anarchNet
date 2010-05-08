@@ -9,3 +9,7 @@ http://pugg.sourceforge.net/
 		* linux & mac support
 		* various bug fixes on gcc
 		* now under GPL :D
+
+JSON Spirit: A C++ JSON Parser/Generator Implemented with Boost Spirit
+Copyright 2010 John W. Wilkinson
+http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
