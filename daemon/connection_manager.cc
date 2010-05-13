@@ -62,7 +62,8 @@ bool ConnectionManager::init()
 		std::string res;
 		foreach (string server_url, ConfigManager::instance().config()["bs-list"].as< std::vector<string> >()) {
 			try {
-				http_request(server_url,res);
+				if(!http_request(server_url,res))
+					continue;
 			
 			
 			std::stringstream in(res);
@@ -292,6 +293,7 @@ bool ConnectionManager::init()
   catch (std::exception& e)
   {
     LOG(ERROR) << "http: Exception: " << e.what() << "\n";
+		return false;
 		}
 
 	_response = out.str();

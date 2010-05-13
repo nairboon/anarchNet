@@ -32,6 +32,7 @@ var UvumiDock = new Class({
 	options:{
 		position:'bottom',
 		captionClassName:'dock-caption',
+        offset: -32,
 		minHeight:64,
 		maxHeight:128,
 		openDuration:'normal',
@@ -39,8 +40,9 @@ var UvumiDock = new Class({
 		IEfixer:"css/blank.gif"
 	},
 
-	initialize:function(container,options){
+	initialize:function(container,options,domcontainer){
 		this.el = container;
+        this.domcontainer = domcontainer;
 		this.setOptions(options);
 		this.margin=(this.options.minHeight/2).toInt();
 		window.addEvents({
@@ -52,6 +54,11 @@ var UvumiDock = new Class({
 	domReady:function(){
 		this.el = $(this.el);
 		
+        if(this.domcontainer === null)
+            this.domcontainer = document.body;
+        else
+            this.domcontainer = $(this.domcontainer);
+            
 		//check if we're dealing with a ul element
 		if(this.el.get('tag')!='ul'){
 			window.removeEvents('resize');
@@ -120,51 +127,8 @@ var UvumiDock = new Class({
 			link:'cancel'
 		});
 
-		//the big IE6 hack. We create an element that will wraps everything in the document (yes everything) except the the dock
-		//this way, when you'll scroll, in this wrapper it will give the illusion you're scrolling the whole document while you'll be scrolling a div only
-		//In the meantime, the dock is position absolutly, not fixed, outside this wrapper, in the document body, which never scrolls. It will look like it's fixed.
-		//you must be aware this if you generate any new element positioned absolutely, il must be injected in the wrapper and not the document body (in IE6 only), or this new element will look fixed
-		//That's why this plugin might conflict with other plugins that generate new elements.
-		if(Browser.Engine.trident){
-			var body = $$('body')[0];
-			if(Browser.Engine.trident4){
-				//we duplicate the body style. This includes margin, padding and background,
-				var bodyStyle = body.getStyles('padding','margin','backgroundColor','backgroundImage','backgroundRepeat');
-				var backPosX = body.currentStyle.backgroundPositionX; //only way to get background position if it's set with CSS
-				var backPosY = body.currentStyle.backgroundPositionY; //only way to get background position if it's set with CSS
-				body.setStyles({
-					overflow:'hidden',
-					margin:0,
-					padding:0,
-					height:'100%'
-				});
-				var padding = bodyStyle.padding.split(" ");
-				var margin = bodyStyle.margin.split(" ");
-				wrapperStyle = {
-					paddingLeft: padding[3].toInt()+margin[3].toInt(),
-					paddingRight: padding[1].toInt()+margin[1].toInt(),
-					background:bodyStyle.backgroundColor+" "+bodyStyle.backgroundImage+" "+bodyStyle.backgroundRepeat+" "+backPosY+" "+backPosX,
-					position:'relative',
-					height:'100%',
-					overflow:'auto'
-				};
-				var children = body.getChildren();
-				var wrapper = new Element('div',{
-					styles:wrapperStyle
-				}).adopt(children).inject(body);
-				this.dock.inject(body).setStyle("position",'absolute').adopt(this.el);
-			}else{
-				this.dock.setStyle('position','fixed');
-			}
-			//We also fix PNG transparency
-			this.dock.inject(body).setStyle('backgroundImage','url('+this.options.IEfixer+')').adopt(this.el);
-			this.images.each(function(image){
-				image.setStyle('filter','progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\''+image.getProperty("src")+'\', sizingMethod=\'scale\')');
-				image.setProperty("src",this.options.IEfixer);
-			},this);
-		}else{
-			this.dock.inject(document.body).setStyle('position','fixed').adopt(this.el);
-		}
+		
+        this.dock.inject(this.domcontainer).setStyle('position','fixed').adopt(this.el);
 		
 		this.size = this.dock.getSize();
 		this.updatePosition();
@@ -184,7 +148,7 @@ var UvumiDock = new Class({
 		var anim = {0:{
 			opacity:this.options.hiddenOpacity
 		}};
-		anim[0][this.animationParam]=-this.size.y+this.margin;
+		anim[0][this.animationParam]=-this.size.y+this.margin+this.options.offset;
 		for(var i=1;i<=this.images.length;i++){
 			anim[i]={height:this.options.minHeight};
 		}
@@ -196,7 +160,7 @@ var UvumiDock = new Class({
 		switch(this.options.position){
 			case 'top':
 				var coords={
-					top:-this.size.y+this.margin,
+					top:-this.size.y+this.margin+this.options.offset,
 					left:0,
 					width:'100%'
 				};
