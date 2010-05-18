@@ -6,3 +6,11 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 CTestTestfile.cmake
+daemon/protocol/control_service.pb.cc
+daemon/protocol/control_service.pb.h
+daemon/protocol/control_service_messages.pb.cc
+daemon/protocol/control_service_messages.pb.h
+daemon/protocol/protorpc.pb.cc
+daemon/protocol/protorpc.pb.h
+daemon/protocol/util.pb.cc
+daemon/protocol/util.pb.h

@@ -1,96 +1,43 @@
 digraph anarchNet
 {
-
-//style=filled;
-
-        //color=lightgrey;
-       label = "\n\nThe anarchNetwork\nRevision 0.1";
-subgraph cluster_structure
+subgraph cluster_an
 {
+label="anarchnet";
+node ad[label="anDaemon"];
+node al[label="an Library"];
 
-       label = "structure";
-width=2;
-size="2,4";
-
-	id[label="identity \n multiple signatures"];
-	fn[[label="finding nodes"];
-	td[label="transmitting data"];
-
-	id -> RSA;
-	id -> DSS;
-	id -> Schnorr;
-	id -> elgamal;
-	fn -> Chord;
-	fn -> Kademlia;
-	fn -> Pastry;
-	fn -> CAN;
-	fn -> "P-Grid";
-	
-
-	td -> DHT;
-	td -> Gnutella;
-	td -> Tapestry;
-	td -> GIA;
-}
-subgraph cluster {
-	label ="flow";
-	
-HELLO -> hi;
-HELLO -> "hi dude";
- 	node[label=hi] hi;
-	node[label="i've RSA & DSS"] a2;
-	node[label="nice, here's my RSA ...."] a3;
-
-
-	node[label="hi dude"] "hi dude";
-	node[label="here RSA & elgamal"] b2;	
-	node[label="thx, here mine: ..."] b3;	
-
-
-	{rank=same; hi "hi dude"}
-	{rank=same; b2 a2}
-	{rank=same; a3 b3}
-
-
-	
-	hi -> a2 -> a3;
-	"hi dude" -> b2 -> b3;
-
-	node[label=JOIN] JOIN;
-b3 -> JOIN;
-a3 -> JOIN;
-	node[label="i've that: kademliaV2.3, chordV1.2 and pastryV2.4\n now  give me some nodes"] aj1;
-node[label="i've @kademliaV2.3 those... \n dont support chord and @pastryV1.2 this one"] bj1;
-JOIN -> aj1;
-JOIN -> bj1;
-}
-subgraph cluster_internet
+subgraph cluster_core
 {
-	label="inter - network"
-subgraph cluster_internet_structure{
-	label ="structure";
-A -> chordNodeA;
-A -> kademliaNodeA;
-B -> nodeB;
-C -> nodeC;
-subgraph cluster_chord { 
-label="chord"; 
-nodeX -> chordNodeA -> nodeC;
-nodeC -> nodeX;
-}
-subgraph cluster_kademlia { 
-label="kademlia"; 
-nodeZ -> kademliaNodeA;
-kademliaNodeA ->  nodeB -> nodeZ;
-}
+	label = "core";
+	ad -> al [label="rpc"];
+	al -> ad;
 }
 
-subgraph cluster_internet_flow{
-	label="flow";
-p1 -> "i need to send this..\n to B, but he's @ kademlia" -> p2;
-p2 -> "no problem, i'll forward the message" ;
-}
-
-
+subgraph cluster_applications
+{
+	label = "applications";
+	node ab[label="an Browser"];
+	node xapp1[label="?-app"];
+	al -> ab [label="c++ library"];
+	ab -> al;
+	al -> xapp1 [label="c++ library"];
+	xapp1 -> al;
+  subgraph cluster_ab_applications
+  {
+	label="anBrowser applications";
+	node xapp2[label="?-app"];
+	node jslib[label="js library"];
+	subgraph cluster_anb_cappuccino
+	{
+		label = "cappuccino apps";
+		node chat[label="chat"];
+	}
+	{rank=same; chat xapp2}
+  }
+	ab -> jslib [label="json-rpc/http"];
+	jslib -> ab;
+	jslib -> xapp2 -> jslib;
+	jslib -> chat [label="objective-j"];
+	chat ->jslib;
 }
 }
