@@ -7,25 +7,37 @@
  */
 
 @import <Foundation/CPObject.j>
-@import "ChatViewController.j"
+//@import "ChatViewController.j"
 
 
 @implementation AppController : CPObject
 {
-	@outlet CPWindow            theWindow;
+		@outlet CPWindow					theWindow;
+		@outlet CPTextField	   	  inputbox;
+    @outlet CPScrollView		  messages;
+    @outlet CPTableView	      rooms;
 }
 
 - (void)awakeFromCib
 {
 }
 
--(@action)tessdsdt:(id)s
+- (@action)sendMessage:(id)sender
+{
+	alert("bal" + [inputbox stringValue]);
+}
+
+-(@action)switchRoom:(id)sender
+{
+	alert("switch");
+}
+-(@action)ups:(id)s
 {
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
 {
-//    [theWindow setFullBridge:YES];
+    [theWindow setFullBridge:YES];
 
 /*var cib = [[CPCib alloc] initWithContentsOfURL: [[CPBundle mainBundle] pathForResource:@"MainMenu.cib"]];
 [cib instantiateCibWithExternalNameTable:[CPDictionary dictionaryWithObject:self forKey:CPCibOwner]];
@@ -60,7 +72,7 @@
 
         */
     // Uncomment the following line to turn on the standard menu bar.
-   // [CPMenu setMenuBarVisible:YES];
+    [CPMenu setMenuBarVisible:YES];
 }
 
 @end

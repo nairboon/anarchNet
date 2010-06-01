@@ -62,7 +62,7 @@ bool ConnectionManager::init()
 		std::string res;
 		foreach (string server_url, ConfigManager::instance().config()["bs-list"].as< std::vector<string> >()) {
 			try {
-				if(!http_request(server_url,res))
+				if(!http_request(server_url,&res))
 					continue;
 			
 			
@@ -208,10 +208,8 @@ bool ConnectionManager::init()
 		return boost::filesystem::exists(path);
 	}
 	
-	bool ConnectionManager::http_request(std::string _url,std::string& _response)
+	bool ConnectionManager::http_request(const std::string& _url,std::string *_response)
 	{
-		
-		
     std::size_t index = _url.find_first_of('/');
     std::string url_server = _url.substr(0,index);
 		std::string url_file = _url.substr(index);
@@ -290,13 +288,13 @@ bool ConnectionManager::init()
     if (error != boost::asio::error::eof)
       throw boost::system::system_error(error);
   }
-  catch (std::exception& e)
+  catch (const std::exception& e)
   {
     LOG(ERROR) << "http: Exception: " << e.what() << "\n";
 		return false;
 		}
 
-	_response = out.str();
+	*_response = out.str();
 return true;
 }
 }

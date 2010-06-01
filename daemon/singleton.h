@@ -20,8 +20,8 @@
 
 // Thread-safe lazy singleton template class - http://www.boostcookbook.com/Recipe:/1235044
 // written by Port4l, public domain?
-#ifndef DAEMON_SINGLETON_H
-#define DAEMON_SINGLETON_H
+#ifndef DAEMON_SINGLETON_H_
+#define DAEMON_SINGLETON_H_
 
 #include <boost/utility.hpp>
 #include <boost/thread/once.hpp>
@@ -64,4 +64,4 @@ namespace an
 template<class T> boost::scoped_ptr<T> an::Singleton<T>::t(0);
 template<class T> boost::once_flag an::Singleton<T>::flag = BOOST_ONCE_INIT;
 
-#endif
+#endif  // DAEMON_SINGLETON_H_

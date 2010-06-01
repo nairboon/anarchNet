@@ -44,8 +44,8 @@
  *  \brief standard plugins distributed with anarchNet
  */
 
-#ifndef ANARCHNET_H
-#define ANARCHNET_H
+#ifndef DAEMON_ANARCHNET_H_
+#define DAEMON_ANARCHNET_H_
 #include <boost/foreach.hpp>
 #include "config.h"
 
@@ -73,4 +73,4 @@ namespace an
 
 #define foreach BOOST_FOREACH
 }
-#endif
+#endif  // DAEMON_ANARCHNET_H_

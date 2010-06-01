@@ -19,12 +19,13 @@
  */
 
 #include "control_service.pb.h"
+#include "config.h"
 #include "maidsafe/maidsafe-dht.h"
 #include "maidsafe/base/crypto.h"
 
 
-#ifndef DAEMON_CONTROL_SERVICE_H
-#define DAEMON_CONTROL_SERVICE_H
+#ifndef DAEMON_CONTROL_SERVICE_H_
+#define DAEMON_CONTROL_SERVICE_H_
 
 #define identify LOG(INFO) << __FUNCTION__ << " request"
 
@@ -32,7 +33,7 @@ namespace an {
 	
 	class anControlService : public ControlService {
 	public:
-		anControlService(	kad::KNode *n) : node_(n) { cryobj_.set_hash_algorithm(crypto::SHA_512); }
+		explicit anControlService(kad::KNode *n) : node_(n) { cryobj_.set_hash_algorithm(crypto::SHA_512); }
 		void getInfo(awk::protobuf::RpcController* controller,
 								 const Void* request,
 								 InfoResponse* response,
@@ -56,4 +57,4 @@ private:
 
 };
 }
-#endif
+#endif  // DAEMON_CONTROL_SERVICE_H_

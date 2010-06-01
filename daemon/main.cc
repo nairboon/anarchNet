@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
 		g_daemon->run();
 	}
-	catch(std::exception& e) {
+	catch(const std::exception& e) {
 		LOG(ERROR) << "Exception: " << e.what() << "\n";
 		return EXIT_FAILURE;
 	}

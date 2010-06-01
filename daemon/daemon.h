@@ -22,8 +22,8 @@
 #include "protobuf_rpc_server.h"
 #include "maidsafe/protobuf/general_messages.pb.h"
 
-#ifndef DAEMON_DAEMON_H
-#define DAEMON_DAEMON_H
+#ifndef DAEMON_DAEMON_H_
+#define DAEMON_DAEMON_H_
 namespace an {
 
 	
@@ -40,4 +40,4 @@ private:
 	
 };
 }
-#endif
+#endif  // DAEMON_DAEMON_H_

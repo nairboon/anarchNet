@@ -18,14 +18,14 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "control_service.h"
+#include <glog/logging.h>
 #include <iostream>
-#include "glog/logging.h"
 #include "maidsafe/protobuf/kademlia_service_messages.pb.h"
 #include "version.h"
 #include "anarchNet.h"
 
-#include "control_service.h"
-using namespace std;
+
 namespace an
 {
 
@@ -79,13 +79,11 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 			
 			response->mutable_status()->set_message("ERROR.  Invalid response.");
 			response->mutable_status()->set_ok(false);
-		}
-		else if (msg.result() != kad::kRpcResultSuccess || msg.values_size() == 0) {
+		} else if (msg.result() != kad::kRpcResultSuccess || msg.values_size() == 0) {
 			printf("There is no value stored under key");
 			response->mutable_status()->set_message("There is no value stored under key");
 			response->mutable_status()->set_ok(false);
-		}
-		else {
+		} else {
 			response->mutable_status()->set_ok(true);	
 			
 			/*

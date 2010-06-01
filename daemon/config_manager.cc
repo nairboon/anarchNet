@@ -18,13 +18,14 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config_manager.h"
+#include <glog/logging.h>
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <vector>
-#include <glog/logging.h>
 #include "boost/filesystem.hpp"
 #include "anarchNet.h"
-#include "config_manager.h"
 #include "connection_manager.h"
 
 using std::string;

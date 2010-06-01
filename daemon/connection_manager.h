@@ -42,7 +42,7 @@ public:
 		~ConnectionManager() {if(chmanager_ != NULL) delete chmanager_; if(node_ != NULL) delete node_;}
 		kad::KNode *node() { return node_;}
 		
-		static bool http_request(std::string url,std::string& response);
+		static bool http_request(const std::string& url,std::string* response);
 protected:
 		ConnectionManager() : chmanager_(NULL), node_(NULL) {}
 private:
@@ -79,4 +79,4 @@ private:
 		boost::int16_t trans_id_;
 	};
 }
-#endif
+#endif  // DAEMON_CONNECTION_MANAGER_H_

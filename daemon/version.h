@@ -18,8 +18,8 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_VERSION_H
-#define DAEMON_VERSION_H
+#ifndef DAEMON_VERSION_H_
+#define DAEMON_VERSION_H_
 //  X_VERSION % 100 is the patch level
 //  X_VERSION / 100 % 1000 is the minor version
 //  X_VERSION / 100000 is the major version

@@ -18,8 +18,8 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_CONFIG_H
-#define DAEMON_CONFIG_H
+#ifndef DAEMON_CONFIG_H_
+#define DAEMON_CONFIG_H_
 
 #define HAVE_GLOG 1
 

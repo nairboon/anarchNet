@@ -136,11 +136,7 @@ add_library(pb-rpc ${PB-RPC_SRC})
 
 file(GLOB DAEMON_C "daemon/*.c*")
 file(GLOB DAEMON_H "daemon/*.h*")
-list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H}
-"${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggDriver.h"
-"${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggKernel.h"
-"${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggPlugin.h"
-"${CMAKE_SOURCE_DIR}/third-party/pugg/include/puggServer.h")
+list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H})
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon protoc-rpc-plugin)
@@ -184,18 +180,6 @@ target_link_libraries(anBrowser ${LIB} pb-rpc liban)
 add_custom_command(TARGET anBrowser POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
 ################################################################################
-# plugins
-################################################################################
-function(copy_plugin NAME)
-if(UNIX)
-	add_custom_command(TARGET ${NAME} POST_BUILD
-		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${BIN_DIR}/lib${NAME}.dylib" "${CMAKE_SOURCE_DIR}/daemon/config/plugins/${NAME}")
-endif()
-endfunction(copy_plugin)
-
-add_subdirectory(daemon/plugins ${PLG_BIN_DIR})
-add_dependencies(anDaemon maidsafe-dht)
-################################################################################
 # Python library search (style check)                                          #
 ################################################################################
 unset(PYTHON_EXECUTABLE CACHE)
@@ -235,7 +219,7 @@ add_test(RPC ${BIN_DIR}/TESTrpc)
 add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
 
 if (PYTHONINTERP_FOUND)
-  set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line")
+  set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line,-build/include,-readability/streams")
   if (UNIX)
     add_test(STYLE_CHECK_DAEMON ${CMAKE_SOURCE_DIR}/cpplint.py ${CPPLINTOPS} ${DAEMON_SRC})
     set_property(TEST STYLE_CHECK_DAEMON PROPERTY LABELS Functional Daemon CodingStyle)

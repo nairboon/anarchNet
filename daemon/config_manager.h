@@ -18,8 +18,9 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "singleton.h"
+#include <string>
 #include <boost/program_options.hpp>
+#include "singleton.h"
 
 #ifndef DAEMON_CONFIG_MANAGER_H_
 #define DAEMON_CONFIG_MANAGER_H_
@@ -37,4 +38,4 @@ private:
 		std::string kad_config_;
 	};
 }
-#endif
+#endif  // DAEMON_CONFIG_MANAGER_H_
