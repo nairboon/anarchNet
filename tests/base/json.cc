@@ -12,6 +12,6 @@ TEST(json,write)
 	e1->set_id("ABCDERD");
 	e1->set_extension_version(100);
 	
-	EXPECT_EQ( an::JSONInterface::write(ir), "{\"anVersion\": 5,\"uptime\": 23,\"connectedNodes\": 0,\"operatingsystem\": \"InfoResponse.osBSD\",\"extensions\": [{\"id\": \"ABCDERD\",\"algorithm_version\": 0,\"extension_version\": 100,\"description\": \"\"}]}");
+	EXPECT_EQ( an::JSONInterface::write(ir), "{\"anVersion\": 5,\"uptime\": 23,\"connectedNodes\": 0,\"operatingsystem\": \"osBSD\",\"extensions\": [{\"id\": \"ABCDERD\",\"algorithm_version\": 0,\"extension_version\": 100,\"description\": \"\"}]}");
 
 }

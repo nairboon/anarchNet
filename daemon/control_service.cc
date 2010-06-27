@@ -24,6 +24,7 @@
 #include "maidsafe/protobuf/kademlia_service_messages.pb.h"
 #include "version.h"
 #include "anarchNet.h"
+#include "db_manager.h"
 
 
 namespace an
@@ -133,4 +134,23 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 						 done->Run();
 	}
 
+	void anControlService::storeObject(awk::protobuf::RpcController* controller,
+									 const StoreObjectRequest* request,
+									 CRUDResponse* response,
+									 google::protobuf::Closure* done)
+	{
+		DBManager::instance().store_object(request);
+		if (done)
+			done->Run();
+	}
+	
+	void anControlService::deleteObject(awk::protobuf::RpcController* controller,
+										const DeleteObjectRequest* request,
+										CRUDResponse* response,
+										google::protobuf::Closure* done)
+	{
+		DBManager::instance().delete_object(request);
+		if (done)
+			done->Run();
+	}
 }

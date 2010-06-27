@@ -25,6 +25,7 @@
 #include "anarchnet.h"
 #include "version.h"
 #include "daemon.h"
+#include "CppSQLite3.h"
 
 namespace po = boost::program_options;
 using std::string;
@@ -79,7 +80,15 @@ int main(int argc, char* argv[])
 
 		g_daemon = new an::anDaemon();
 		LOG(INFO) << "initializing daemon";
-		if (!g_daemon->init(vm["directory"].as<string>()))
+		
+		std::string directory;
+		std::string directory_path = vm["directory"].as<string>();
+		if (directory_path[0] == '~') 
+			directory = string(getenv("HOME")) + directory_path.substr(1);
+		else
+			directory = directory_path;
+		
+		if (!g_daemon->init(directory))
 			LOG(FATAL) << "init failed";
 
 		//daemonize
@@ -101,12 +110,16 @@ int main(int argc, char* argv[])
 
 		g_daemon->run();
 	}
+	catch(CppSQLite3Exception& e) {
+		LOG(ERROR) << "DBException: " << e.errorCode()<< ": " << e.errorMessage();
+		return EXIT_FAILURE;
+	}
 	catch(const std::exception& e) {
-		LOG(ERROR) << "Exception: " << e.what() << "\n";
+		LOG(ERROR) << "Exception: " << e.what();
 		return EXIT_FAILURE;
 	}
 	catch(...) {
-		LOG(ERROR) << "Exception of unknown type!\n";
+		LOG(ERROR) << "Exception of unknown type!";
 		return EXIT_FAILURE;
 	}
 

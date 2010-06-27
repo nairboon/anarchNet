@@ -11,7 +11,24 @@
 an.Object = new Class({
         Implements: Events,
         initialize: function() {
-            this.data = new Hash();
+            this._an_meta = { data: new Hash(), public: true, key : "",
+                            app: "genApp", protocol: "genP"};
+        },
+        addProperty: function(name) {
+            if (typeof(this[name]) === "function") 
+                throw "Can't add property: "+name+" function already exist!";
+                this["set"+name] = function(value) {
+                    this._an_meta.data.set(name,value);
+                }.bind(this);
+                this[name] = function() {
+                    return this._an_meta.data.get(name);
+                }.bind(this);
+        },
+        save: function() {
+            an.storeObject(this._an_meta);
+        },
+        remove: function() {
+            an.deleteObject(this._an_meta);
         }
 });
 
@@ -26,6 +43,39 @@ an.Index = new Class({
         }
 });
 
+
+/**
+ * dht-db interface
+ * @class DHTInterface
+ * @namespace an
+ * @constructor
+ * @param app {string} the used application identifier
+ * @param p {string} the used protocol identifier
+ */
+an.DHTInterface = new Class({
+        initialize: function(app,p) {
+            this.application = app;
+            this.protocol = p;
+        },
+        /**
+         * Searchs the tag in the DHT
+         * @method searchTag
+         * @param tag {string} tagtype defined by the protocol
+         * @param tag {string} tag to search for
+         * @param cb {function} callback with result
+         * @return {null} cb is called with [{string}tagname,{array}keys]
+        */
+        searchTag: function(tagtype, tag,cb) {
+                an.get("T$_"+this.protocol+"_"+tagtype+"_"+tag+"%",function(res) {
+                    for(var key in res.values) {
+                        tmp = key.split(":");
+                        an.get(tmp[1],function(res) {
+                            arguments[2](arguments[1],res.values);
+                        }.pass([tmp[0],this.cb]));
+                    }
+                }.bind(this));
+        }
+});
 /**
  * generic tag class
  * @class Tags
@@ -54,6 +104,7 @@ an.Tags = new Class({
                 }.bind(this));
         }
 }); 
+
 /**
  * rpc functions
  * @class rpc
@@ -61,6 +112,7 @@ an.Tags = new Class({
  * @namespace an
  */
 an.rpc = { };
+
 /**
  * low-level daemon query, executes a RPC
  * @method call
@@ -94,6 +146,7 @@ an.printJSON = function(el,data) {
     }
     el.append(out);
 }
+
 /**
  * DHT put/store
  * @method put
@@ -106,6 +159,7 @@ an.printJSON = function(el,data) {
 an.rpc.put = function(k,data,t,cb) {
     an.rpc.call("put",{key: k, value: data, ttl: t},cb);
 }
+
 /**
  * DHT get
  * @method get
@@ -123,6 +177,7 @@ an.rpc.get = function(key,cb) {
     this.c(data);
     }.bind(this));
 }
+
 /**
  * stats/general info about the network/host
  * @method getInfo
@@ -131,4 +186,27 @@ an.rpc.get = function(key,cb) {
  */
 an.rpc.getInfo = function(cb) {
     an.rpc.call("getInfo",{},cb);
+}
+
+/**
+ * store in the object in the db
+ * @method storeObject
+ * @namespace an.rpc
+ * @param object {Object} the object to store
+ * @param callback {function} the callback when the rpc is executed
+ */
+an.rpc.storeObject = function(object,cb) {
+    var o = object._an_meta;
+    an.rpc.call("storeObject",{key: o.key, value: o.data, app: o.app, protocol: o.protocol, public: o.public},cb);
+}
+
+/**
+ * delete the object from the db
+ * @method deleteObject
+ * @namespace an.rpc
+ * @param o {Object} the object to store
+ * @param callback {function} the callback when the rpc is executed
+ */
+an.rpc.deleteObject = function(o,cb) {
+    an.rpc.call("deleteObject",{key: o._an_meta.key},cb);
 }

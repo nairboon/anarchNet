@@ -8,8 +8,12 @@ http://pugg.sourceforge.net/
 	* updated to 0.5 (nairboon)
 		* linux & mac support
 		* various bug fixes on gcc
-		* now under GPL :D
+	       !* changes under GPL
 
 JSON Spirit: A C++ JSON Parser/Generator Implemented with Boost Spirit
 Copyright 2010 John W. Wilkinson
 http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
+
+CppSQLite3 - C++ Wrapper for SQLite
+Copyright 2004 Rob Groves
+http://www.codeproject.com/KB/database/CppSQLite.aspx

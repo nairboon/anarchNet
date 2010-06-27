@@ -34,6 +34,7 @@
 #include "control_service.h"
 #include "config_manager.h"
 #include "connection_manager.h"
+#include "db_manager.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -47,6 +48,9 @@ bool anDaemon::init(const string& directory)
 {
 	
 	if(!ConfigManager::instance().init(directory))
+		return false;
+
+	if(!DBManager::instance().init(directory))
 		return false;
 	
 	if(!ConnectionManager::instance().init())

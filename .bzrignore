@@ -14,3 +14,4 @@ daemon/protocol/protorpc.pb.cc
 daemon/protocol/protorpc.pb.h
 daemon/protocol/util.pb.cc
 daemon/protocol/util.pb.h
+Testing

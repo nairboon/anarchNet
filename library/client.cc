@@ -60,6 +60,8 @@ bool anClient::init()
 			res = new GetResponse;
 		else if (method->name() == "put")
 			res = new PutResponse;
+		else if (method->name() == "storeObject" || method->name() == "deleteObject")
+			res = new CRUDResponse;
 		else {
 			LOG(FATAL) << "unregistered method @liban";
 			return NULL;

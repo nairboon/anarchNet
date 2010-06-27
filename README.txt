@@ -1,5 +1,14 @@
 
 
-maidsafe-dht:
+Dependencies:
+ * google-glog
+ * google-gtest
+ * google-protobuf >= 2.3
+ * boost >= 1.42
+ * maidsafe_dht	! requires gcc >= 4.3
+ 
 
-svn checkout http://maidsafe-dht.googlecode.com/svn/trunk/ maidsafe-dht-read-only
+cd third-party
+sh install-dependencies.sh
+
+This will install all the dependencies

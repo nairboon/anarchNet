@@ -46,7 +46,14 @@ namespace an {
 						 const PutRequest* request,
 						 PutResponse* response,
 						 google::protobuf::Closure* done);
-
+		void storeObject(awk::protobuf::RpcController* controller,
+						 const StoreObjectRequest* request,
+						 CRUDResponse* response,
+						 google::protobuf::Closure* done);
+		void deleteObject(awk::protobuf::RpcController* controller,
+						 const DeleteObjectRequest* request,
+						 CRUDResponse* response,
+						 google::protobuf::Closure* done);
 private:
 	
 	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);

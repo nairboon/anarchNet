@@ -26,12 +26,16 @@ namespace json_spirit
 	return i->value_;
 }
 
-	int find_int( const Object& obj, const std::string& name )
+int find_int( const Object& obj, const std::string& name )
 {
 	return find_value( obj, name ).get_int();
 }
-
-	std::string find_str( const Object& obj, const std::string& name )
+	
+bool find_bool( const Object& obj, const std::string& name )
+{
+	return find_value( obj, name ).get_bool();
+}
+std::string find_str( const Object& obj, const std::string& name )
 {
 	return find_value( obj, name ).get_str();
 }

@@ -48,9 +48,9 @@ window.addEvent('domready', function() {
 	});
 if(geturlparam("app")  != "")
 	if(geturlparam("debug") == "")
-		$('an_frame').src = "apps/active/" + geturlparam("app") + "/index.html";
+		$('an_frame').src = "apps/active/" + geturlparam("app") + "/bin/index.html";
 	else
-		$('an_frame').src = "apps/active/" + geturlparam("app") + "/index-debug.html";
+		$('an_frame').src = "apps/active/" + geturlparam("app") + "/bin/index-debug.html";
 });
 </script>
 <script type="application/javascript" src="lib/launcher.js"></script>

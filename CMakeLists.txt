@@ -47,7 +47,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/daemon/protocol"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
-	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
+	"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3"
  )
 set( LIB
 	${Boost_LIBRARIES}
@@ -136,7 +136,9 @@ add_library(pb-rpc ${PB-RPC_SRC})
 
 file(GLOB DAEMON_C "daemon/*.c*")
 file(GLOB DAEMON_H "daemon/*.h*")
-list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H})
+list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H}
+"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
+"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3/CppSQLite3.h")
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon protoc-rpc-plugin)

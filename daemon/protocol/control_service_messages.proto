@@ -35,5 +35,18 @@ message PutRequest {
 }
 message PutResponse {
  required Status status = 2;
-
+}
+message CRUDResponse {
+ required Status status = 1;
+}
+message StoreObjectRequest {
+ required string key = 1;
+ required string value = 2;
+ optional int32 time =3;
+ optional string app = 4;
+ optional string protocol = 5;
+ optional bool public = 6;
+}
+message DeleteObjectRequest {
+ required string key = 1;
 }

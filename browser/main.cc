@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
@@ -18,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <pthread.h>
 #include <signal.h>
 #include <iostream>
@@ -90,6 +90,21 @@ void rpc_gateway(const http::server4::request& req, http::server4::reply& rep)
 				pr->set_key(json_spirit::find_str(object,"key"));
 				pr->set_value(json_spirit::find_str(object,"value"));
 				pr->set_ttl(json_spirit::find_int(object,"ttl"));
+				m = static_cast<google::protobuf::Message*>(pr);
+			}
+			else if(mname == "deleteObject") {
+				DeleteObjectRequest *pr = new DeleteObjectRequest();
+				pr->set_key(json_spirit::find_str(object,"key"));
+				m = static_cast<google::protobuf::Message*>(pr);
+			}
+			else if(mname == "storeObject") {
+				StoreObjectRequest *pr = new StoreObjectRequest();
+				pr->set_key(json_spirit::find_str(object,"key"));
+				pr->set_value(json_spirit::find_str(object,"value"));
+				pr->set_time(time(0));
+				pr->set_app(json_spirit::find_str(object,"app"));
+				pr->set_protocol(json_spirit::find_str(object,"protocol"));
+				pr->set_public_(json_spirit::find_bool(object,"public"));
 				m = static_cast<google::protobuf::Message*>(pr);
 			}
 			else if(mname == "getInfo") {

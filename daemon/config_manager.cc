@@ -35,13 +35,8 @@ namespace fs = boost::filesystem;
 namespace an
 {
 
-bool ConfigManager::init(const string& directory_path)
+bool ConfigManager::init(const string& directory)
 {
-	string directory;
-	if (directory_path[0] == '~') 
-		directory = string(getenv("HOME")) + directory_path.substr(1);
-	else
-		directory = directory_path;
 	
 	string config_file = directory + "/config.cfg";
 
@@ -50,6 +45,8 @@ bool ConfigManager::init(const string& directory_path)
 	("control-rpc-port", po::value<int>()->default_value(ANARCHNET_RPC_PORT))
 	("anarchnet-port", po::value<int>()->default_value(ANARCHNET_PORT))
 	("plugin",po::value< std::vector<string> >()->composing())
+	("db",po::value<string>()->default_value("data.db"))
+	("db-recheck", po::value<int>()->default_value(10))
 	("bs-list",po::value< std::vector<string> >()->composing());
 	
 	std::ifstream ifs(config_file.c_str());

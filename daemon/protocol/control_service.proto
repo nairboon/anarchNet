@@ -8,4 +8,6 @@ service ControlService {
  rpc getInfo (Void) returns (InfoResponse);
  rpc get (GetRequest) returns (GetResponse);
  rpc put (PutRequest) returns (PutResponse);
+ rpc storeObject (StoreObjectRequest) returns (CRUDResponse);
+ rpc deleteObject (DeleteObjectRequest) returns (CRUDResponse);
 }

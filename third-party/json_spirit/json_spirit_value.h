@@ -143,6 +143,7 @@ namespace json_spirit
 
 	const Value& find_value( const Object& obj, const std::string& name );
 	int find_int( const Object& obj, const std::string& name );
+	bool find_bool( const Object& obj, const std::string& name );
 	std::string find_str( const Object& obj, const std::string& name );
 	
     // typedefs for Unicode
