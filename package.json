@@ -1,0 +1,35 @@
+{
+   "name": "parannus",
+   "version": "0.0.1",
+   "description": "Core package",
+   "keywords": [
+       "collaborative",
+       "framework" 
+   ],
+   "maintainers": [
+       {
+           "name": "Nairboon",
+           "email": "nairboon@rbose.org",
+           "web": "http://nairboon.rbose.org" 
+       } 
+   ],
+   "licenses": [
+       {
+           "type": "GPLv2",
+           "url": "http://www.gnu.org/licenses/gpl-2.0.html" 
+       } 
+   ],
+   "repositories": [
+       {
+           "type": "git",
+           "url": "git://github.com/nairboon/parannus.git" 
+       } 
+   ],
+   "dependencies": {
+       "mongodb": "0.9.3",
+       "jade": "0.10.4",
+       "express": "2.2.2",
+       "express-session-mongo": "0.0.1",
+       "express-resource": "0.2.0"
+   }
+}
