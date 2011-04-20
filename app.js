@@ -8,8 +8,8 @@ var mongoose = require('mongoose');
 var MongoStore = require('express-session-mongo');
 require('express-resource');
 
-//var DataProvider = require('./db.js').DataProvider;
-//var dp = new DataProvider();
+var DataProvider = require('./db.js').DataProvider;
+var dp = new DataProvider();
 	
 var app = module.exports = express.createServer();
 
@@ -21,7 +21,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
- // app.use(express.session({ secret: 'your secret here', store: new MongoStore({db: 'test'}) }));
+  //app.use(express.session({ secret: 'your secret here', store: new MongoStore({db: 'test'}) }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -37,17 +37,13 @@ app.configure('production', function(){
 });
 
 var db = mongoose.connect(app.set('db-url'));
-//console.log(db);
-
 
 // Routes
 
 app.get('/', function(req, res){
-console.log("index");
-/*  res.render('index', {
+  res.render('index', {
     title: 'Express'
-  });*/
-  console.log("ll");
+  });
 });
 
 app.get('/app/:id', function(req, res){
@@ -56,15 +52,20 @@ app.get('/app/:id', function(req, res){
   });
 });
 
-app.get('/data/:id', function(req, res){
- // res.send(dp.getData(req.params.id));
+app.get('/file/:id/:rev', function(req, res){
+  res.send(dp.getData(req.params.id,req.params.rev).content)
 });
 
+app.get('/data/:id/:rev?', function(req, res,next){
+	next();
+  //res.send(dp.getData(req.params.id,req.params.rev));
+});
 
+app.get('/data',function(req,res) {
+	res.send("HHH");
+});
 
 //app.resource("edit",require("./editor"));
-
-// Only listen on $ node app.js
 
 if (!module.parent) {
   app.listen(3000);
