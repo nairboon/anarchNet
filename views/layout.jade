@@ -8,11 +8,11 @@ html
         #app_topmenu
         nav
            ul
-             - if(session.auth)
+             - if(session && session.auth)
                   li 
                    a(href='/auth/logout') logout
                   li
-                   a(href='/editor') editor
+                   a(href='/edit/') editor
              - else
                   li
                    a(href='/auth/login') login
@@ -23,5 +23,5 @@ html
              
     
       != body
-    footer test
+    footer Parannus 0.0.1
            

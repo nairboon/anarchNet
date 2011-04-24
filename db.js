@@ -3,6 +3,7 @@
 var mongoose = require('mongoose');
 var hashlib = require('hashlib');
 
+
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
 
 var User = new Schema({
@@ -27,6 +28,7 @@ var Data = new Schema({
 	id: String,
 	type: String,
 	owner: String,
+	access: {type:String, default: 'public'},
 	head: Schema.ObjectId,
 	revisions: [Revision],
 });
@@ -62,8 +64,9 @@ DataProvider.prototype = {
 	},
 	getData: function(id,rev,cb) { 
 		Data.findOne({'id': id},function(err,res) {
-			if(err) 
-				return next(new Error('Could not load Document'));
+				
+			if(err || !res) 
+				return cb(new Error('Could not load Document'));
 				
 			if(rev) //specific revision
 					cb("not implemented");//RawData.findById();
@@ -76,21 +79,27 @@ DataProvider.prototype = {
 			}
 		});		
 	},
+	getAll: function(cb) {
+		Data.find({'access':'public'}, function(err,res) {
+			cb(res);
+		});
+	},
 	setData: function(id,newcontent) {},
-	addData: function(param) {
+	addData: function(param,cb) {
 		var data = new RawData();
 		data.content = param.content;
 		data.save();
 		
 		var ins = new Data();
 		ins.type = param.type;
-		ins.id = hashlib.sha512(new Date() + app.set('servername')); // TODO: + username, +usercount
+		ins.id = hashlib.sha512(new Date()+param.owner); // TODO: + username, +usercount+ servername
 		ins.owner = param.owner;
 		ins.revisions.push({dataid: data._id});
 		ins.head = ins.revisions[0]._id;
 		ins.save();
 		console.log("new data: "+ins._id);
+		cb(ins);
 	}
 };
 
-exports.DataProvider = DataProvider;
+module.exports = DataProvider;

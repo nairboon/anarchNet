@@ -11,8 +11,9 @@ var express = require('express'),
 	filter = form.filter,
 	validate = form.validate,
 	namespace = require('express-namespace'),
-	DataProvider = require('./db.js').DataProvider;
-	
+	dp = require('./db.js');
+var db = new dp();
+
 var app = module.exports = express.createServer();
 
 // Configuration
@@ -38,8 +39,7 @@ app.configure(function(){
   app.use(express.static(__dirname + '/public'));
 });
 
-var db = mongoose.connect(app.set('db-url'));
-var dp = new DataProvider();
+mongoose.connect(app.set('db-url'));
 
 app.get('/', function(req, res){
   res.render('index', {
@@ -61,13 +61,14 @@ app.get('/app/:id', function(req, res){
 });
 
 app.get('/rawdata/:id/:rev', function(req, res){
-  res.send(dp.getData(req.params.id,req.params.rev).content)
+  res.send(db.getData(req.params.id,req.params.rev).content)
 });
 
 app.get('/data/:id?/:rev?', function(req, res,next){
 	var id = req.params.id;
+	console.log(db);
 	if(id)
-		dp.getData(id,req.params.rev,function(data){
+		db.getData(id,req.params.rev,function(data){
 			res.send(data);
 		});
 	else
@@ -75,11 +76,11 @@ app.get('/data/:id?/:rev?', function(req, res,next){
 });
 
 app.get('/adddata',function(req,res) {
-	dp.addData({type:"xx", owner: "ll",content:"hallo world",id:"p"});
+	db.addData({type:"xx", owner: "ll",content:"hallo world",id:"p"});
 	res.send("ok");
 });
 
-//app.resource("edit",require("./editor"));
+app.resource("edit",require("./editor"));
 
 app.namespace('/auth', function() {
 	app.get('register',function(req,res){
@@ -100,7 +101,7 @@ app.namespace('/auth', function() {
 				console.log(req.form.errors);
 			}
 			else {
-				dp.registerUser(req.form, function(error) {
+				db.registerUser(req.form, function(error) {
 					if(error)
 						console.log(error);
 						
@@ -121,21 +122,22 @@ app.namespace('/auth', function() {
 		validate("password").required()
 		),
 		function(req,res){
-			dp.authorizeUser(req.form,function(error,r){
+			db.authorizeUser(req.form,function(error,r){
 				if(!r)
 					res.send("login failed");
 				else {
 					req.session.auth = true;
-					req.session.user = r;
+					req.session.userid = r._id;
 				res.send("authenticated");
 			}
 			});
 		
 	});
 	app.get('logout',function(req,res){
-		req.session.dextroy();
+		req.session.destroy();
 		res.render('index', {
-		    title: 'logedout'
+		    title: 'logedout',
+			session: req.session
 		  });
 	});
 });

@@ -1,23 +1,37 @@
+	dp = require('./db.js');
+var db = new dp();
+
 exports.index = function(req, res){
-console.log(config);
-  res.send('forum index');
+  db.getAll(function(r){
+	res.render('editor/list',{data:r,title:'List',session:req.session});
+});
 };
 
 exports.new = function(req, res){
-  res.send('new forum');
+	if(!req.session.auth)
+		res.send("please log in!");
+  res.render('editor/new',{title:'New',session:req.session});
 };
 
 exports.create = function(req, res){
-  res.send('create forum');
+	if(!req.session.auth)
+		res.send("please log in!");
+		
+		req.body.owner = req.session.userid;
+		console.log(req.body);
+		db.addData(req.body,function(r){
+			res.send("your data:"+r._id);
+		});
 };
 
 exports.show = function(req, res){
-  res.send('show forum ' + req.params.id);
+	db.getData(req.params.id,null,function(r){
+		res.send(r);
+	});
 };
 
 exports.edit = function(req, res){
-	console.log(req);
-  res.send('edit forum ' + req.params.x);
+  res.send('edit forum ' + req.params.id);
 };
 
 exports.update = function(req, res){
@@ -27,3 +41,5 @@ exports.update = function(req, res){
 exports.destroy = function(req, res){
   res.send('destroy forum ' + req.params.id);
 };
+
+exports.id = 'id';
