@@ -1,39 +1,96 @@
 
 
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema, ObjectId = Schema.ObjectId;
+var hashlib = require('hashlib');
 
-var UserSchema = new Schema({
-	id: ObjectId,
+var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
+
+var User = new Schema({
 	username: String,
-	password: String,
-	registered: Date
+	password: {type:String, set: function(inp){ return hashlib.sha256(inp);}},
+	email: {type:String, set: function(inp){ return inp.toLowerCase();}},
+	registered: {type: Date, default: Date.now},
+	count: {type:Number, default: 0}
 });
 
-var DataSchema = new Schema({
-	type: String,
-	owner: String,
+var RawData = new Schema({
 	content: String
 });
-mongoose.model('users',UserSchema);
-mongoose.model('data',DataSchema);
+
+var Revision = new Schema({
+	dataid: Schema.ObjectId,
+	date: {type: Date, default: Date.now},
+	prev: {type: Schema.ObjectId, default: null}
+});
+
+var Data = new Schema({
+	id: String,
+	type: String,
+	owner: String,
+	head: Schema.ObjectId,
+	revisions: [Revision],
+});
+
+
+mongoose.model('user',User);
+mongoose.model('data',Data);
+mongoose.model('rawdata',RawData);
+mongoose.model('revision',Revision);
+
 
 var DataProvider = function(){
-		User = mongoose.model('users');
-		Data  = mongoose.model('data');
-		
-		this.authorizeUser = function(user) {}
-		this.getData = function(id,rev) { return {msg: "no data for" + id}; }
-		this.setData = function(id,newcontent) {}
-		this.addData = function(param) {
-			var ins = new Data();
-			ins.type = param.type;
-			ins.owner = param.owner;
-			ins.content = param.content;
-			ins.save();
-		}
-		 
+		User = mongoose.model('user');
+		Data  = mongoose.model('data');	 
+		RawData = mongoose.model('rawdata');
 };
 
+DataProvider.prototype = {
+	registerUser: function(param,cb) {
+		var user = new User(param);		
+		user.save();
+		console.log(user);
+		cb();
+	},
+	authorizeUser: function(param,cb) {
+		User.findOne({'username': param.username, 'password': hashlib.sha256(param.password)},function(err,res){
+			console.log("login:",param.username,param.password);
+			if(err)
+				console.log(err);
+				
+			cb(err,res);
+		});
+	},
+	getData: function(id,rev,cb) { 
+		Data.findOne({'id': id},function(err,res) {
+			if(err) 
+				return next(new Error('Could not load Document'));
+				
+			if(rev) //specific revision
+					cb("not implemented");//RawData.findById();
+			else // HEAD 
+			{
+				console.log("get: " + res.head);
+				RawData.findById(res.revisions.id(res.head).dataid,function(err,res){
+					cb(res);
+				});
+			}
+		});		
+	},
+	setData: function(id,newcontent) {},
+	addData: function(param) {
+		var data = new RawData();
+		data.content = param.content;
+		data.save();
+		
+		var ins = new Data();
+		ins.type = param.type;
+		ins.id = hashlib.sha512(new Date() + app.set('servername')); // TODO: + username, +usercount
+		ins.owner = param.owner;
+		ins.revisions.push({dataid: data._id});
+		ins.head = ins.revisions[0]._id;
+		ins.save();
+		console.log("new data: "+ins._id);
+	}
+};
 
 exports.DataProvider = DataProvider;

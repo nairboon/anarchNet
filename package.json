@@ -31,7 +31,8 @@
        "jade": ">=0.10",
        "less": ">=1.0",
        "express": ">=2.2.2",
-       "express-session-mongo": ">=0.0.1",
-       "express-resource": ">=0.2.0"
+       "connect-mongo": ">=0.1.1",
+       "express-resource": ">=0.2.0",
+       "hashlib": ">1.0.0"
    }
 }
