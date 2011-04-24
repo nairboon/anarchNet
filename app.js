@@ -1,6 +1,6 @@
-
 /**
- * Module dependencies.
+ * Parannus
+ * http://rbose.org/wiki/Parannus
  */
 
 var express = require('express'),
@@ -9,10 +9,9 @@ var express = require('express'),
 	resource = require('express-resource'),
 	form = require('express-form'),
 	filter = form.filter,
-	validate = form.validate;
-
-require('express-namespace');
-var DataProvider = require('./db.js').DataProvider;
+	validate = form.validate,
+	namespace = require('express-namespace'),
+	DataProvider = require('./db.js').DataProvider;
 	
 var app = module.exports = express.createServer();
 
@@ -39,15 +38,13 @@ app.configure(function(){
   app.use(express.static(__dirname + '/public'));
 });
 
-
-
 var db = mongoose.connect(app.set('db-url'));
 var dp = new DataProvider();
 
-// Routes
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'Parannus'
+    title: 'Parannus',
+    session: req.session
   });
 });
 
@@ -63,7 +60,7 @@ app.get('/app/:id', function(req, res){
   });
 });
 
-app.get('/file/:id/:rev', function(req, res){
+app.get('/rawdata/:id/:rev', function(req, res){
   res.send(dp.getData(req.params.id,req.params.rev).content)
 });
 
@@ -87,7 +84,8 @@ app.get('/adddata',function(req,res) {
 app.namespace('/auth', function() {
 	app.get('register',function(req,res){
 		res.render('auth/register', {
-		    title: 'Express'
+		    title: 'Register',
+			session: req.session
 		  });
 	});
 	app.post('register',
@@ -114,7 +112,8 @@ app.namespace('/auth', function() {
 		if(req.session.auth)
 			res.redirect("/");
 		res.render('auth/login', {
-		    title: 'Express'
+		    title: 'Login',
+			session: req.session
 		  });
 	});
 	app.post('login',form(

@@ -3,4 +3,25 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+  body
+     header
+        #app_topmenu
+        nav
+           ul
+             - if(session.auth)
+                  li 
+                   a(href='/auth/logout') logout
+                  li
+                   a(href='/editor') editor
+             - else
+                  li
+                   a(href='/auth/login') login
+                  li
+                   a(href='/auth/register') register
+             li
+                a(href='#') myaccount
+             
+    
+      != body
+    footer test
+           
