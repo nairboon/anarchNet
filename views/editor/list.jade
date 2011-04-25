@@ -1,6 +1,25 @@
-- if (data.length)
-  ul
-    - data.forEach(function(item){
-      li 
-        a(href=item.id+"/edit") owner: #{item.owner} type: #{item.type}
-    - })
+- if (items.length)
+	table
+		thead
+			tr
+				th Type
+				th Owner
+				th Edit
+				th Delete
+				th Content
+				th Id
+		tbody
+			-each item in items
+				tr
+					td= item.type
+					td= item.owner
+					td 
+						a(href=item.id+"/edit") [edit]
+					td
+						a(href=item.id+"/del")	[del]
+					td
+						a(href="/rawdata/"+item.id) content
+					td
+						a(href="/data/"+item.id)	#{item.id}
+p
+	a(href="new") new document

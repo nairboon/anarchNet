@@ -62,7 +62,7 @@ DataProvider.prototype = {
 			cb(err,res);
 		});
 	},
-	getData: function(id,rev,cb) { 
+	getRawData: function(id,rev,cb) { 
 		Data.findOne({'id': id},function(err,res) {
 				
 			if(err || !res) 
@@ -79,12 +79,49 @@ DataProvider.prototype = {
 			}
 		});		
 	},
+	getData: function(id,rev,cb) {
+		Data.findOne({'id': id},function(err,res) {
+				
+			if(err || !res) 
+				return cb(new Error('Could not load Document'));
+				
+				// get content
+				DataProvider.prototype.getRawData(id,rev,function(r){
+					console.log(r);
+					res.content = r.content;
+					cb(res);
+				});
+		});
+	},
 	getAll: function(cb) {
 		Data.find({'access':'public'}, function(err,res) {
 			cb(res);
 		});
 	},
-	setData: function(id,newcontent) {},
+	update: function(id,newcontent,session,cb) {
+		console.log(session);
+		//check ownership
+		Data.findOne({'id': id},function(err,res) {
+			if(res.owner == session.userid) {
+				var data = new RawData();
+				data.content = newcontent.content;
+				data.save();
+				
+				res.type = newcontent.type;
+				res.revisions.push({dataid: data._id,prev:res.head});
+				res.head = res.revisions[res.revisions.length-1]._id;
+				res.save();
+				console.log("updated: ",id);
+				console.log("new revision: ",res.head);
+				cb("success");
+			}
+			else {
+				console.log("access denied",id);
+				cb("access denied");
+			}
+		});
+		
+	},
 	addData: function(param,cb) {
 		var data = new RawData();
 		data.content = param.content;
@@ -92,7 +129,7 @@ DataProvider.prototype = {
 		
 		var ins = new Data();
 		ins.type = param.type;
-		ins.id = hashlib.sha512(new Date()+param.owner); // TODO: + username, +usercount+ servername
+		ins.id = hashlib.sha256(new Date()+param.owner); // TODO: + username, +usercount+ servername
 		ins.owner = param.owner;
 		ins.revisions.push({dataid: data._id});
 		ins.head = ins.revisions[0]._id;

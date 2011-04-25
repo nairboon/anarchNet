@@ -1,9 +1,9 @@
 	dp = require('./db.js');
 var db = new dp();
 
-exports.index = function(req, res){
+exports.list = function(req, res){
   db.getAll(function(r){
-	res.render('editor/list',{data:r,title:'List',session:req.session});
+	res.render('editor/list',{items:r,title:'List',session:req.session});
 });
 };
 
@@ -31,11 +31,19 @@ exports.show = function(req, res){
 };
 
 exports.edit = function(req, res){
-  res.send('edit forum ' + req.params.id);
+	db.getData(req.params.id,null,function(r){
+		console.log("edit doc:",req.params.id);
+		res.render('editor/edit',{title:'Edit',session:req.session,item:r});
+	});
 };
 
 exports.update = function(req, res){
-  res.send('update forum ' + req.params.id);
+	console.log(req.params,req.body);
+	db.update(req.params.id,req.body,req.session,function(r){
+		res.send(r);
+	});
+	
+ // res.redirect('editor/list');
 };
 
 exports.destroy = function(req, res){

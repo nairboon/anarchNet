@@ -1,9 +1,10 @@
-form(method="post",action="/edit")
+form(method="post",action="update")
         p
           label(for="type") Type:
-             input(type="text", name="type")
+             input(type="text", name="type", value=item.type)
         p
          label(for="content") Data:
             textarea(type="text",rows="20", name="content")
+                #{item.content}
         p.buttons
           input(type="submit", value="Save")

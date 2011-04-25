@@ -7,20 +7,18 @@ var express = require('express'),
 	mongoose = require('mongoose'),
 	MongoStore = require('connect-mongo'),
 	resource = require('express-resource'),
-	form = require('express-form'),
-	filter = form.filter,
-	validate = form.validate,
 	namespace = require('express-namespace'),
-	dp = require('./db.js');
+	dp = require('./db.js'),
+	editor = require('./editor.js'),
+	auth = require('./auth.js'),
+	config = require('./config.js').conf;
+	
 var db = new dp();
-
+mongoose.connect(config.dburl);
 var app = module.exports = express.createServer();
 
-// Configuration
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  app.set('db-url', 'mongodb://localhost/test');
-  app.set('servername','rbose.org');
 });
 
 app.configure('production', function(){
@@ -33,35 +31,24 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'your secret here', store: new MongoStore({db: 'test'}) }));
+  app.use(express.session({ secret: config.sessionsecret, store: new MongoStore({db: config.db}) }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
 
-mongoose.connect(app.set('db-url'));
 
-app.get('/', function(req, res){
+app.get('/', function(req, res){  
   res.render('index', {
     title: 'Parannus',
     session: req.session
   });
 });
 
-
-app.get('/users', function(req, res){
-    // do something else
-res.send("hallo");
-});
-
-app.get('/app/:id', function(req, res){
-  res.render('index', {
-    title: 'Express'
-  });
-});
-
-app.get('/rawdata/:id/:rev', function(req, res){
-  res.send(db.getData(req.params.id,req.params.rev).content)
+app.get('/rawdata/:id/:rev?', function(req, res){
+	db.getData(req.params.id,req.params.rev,function(data){
+		res.send(data.content);
+	});
 });
 
 app.get('/data/:id?/:rev?', function(req, res,next){
@@ -75,74 +62,26 @@ app.get('/data/:id?/:rev?', function(req, res,next){
 		next();
 });
 
-app.get('/adddata',function(req,res) {
-	db.addData({type:"xx", owner: "ll",content:"hallo world",id:"p"});
-	res.send("ok");
+
+app.namespace('/edit',function(){
+	app.get('list',editor.list);
+	app.get(':id/show', editor.show);
+	app.get(':id/edit', editor.edit);
+	app.get('new', editor.new);
+	app.post('create', editor.create);
+	app.post(':id/update', editor.update);
+	app.get(':id/del', editor.destroy);
 });
 
-app.resource("edit",require("./editor"));
-
-app.namespace('/auth', function() {
-	app.get('register',function(req,res){
-		res.render('auth/register', {
-		    title: 'Register',
-			session: req.session
-		  });
-	});
-	app.post('register',
-		form(
-			filter("username").trim(),
-			validate("username").required(),
-			validate("password").required(),
-			validate("email").required().isEmail()
-		),
-		function(req,res,next){
-			if(!req.form.isValid) {
-				console.log(req.form.errors);
-			}
-			else {
-				db.registerUser(req.form, function(error) {
-					if(error)
-						console.log(error);
-						
-					res.send("reg successful");
-				});
-			}
-	});
-	app.get('login',function(req,res){
-		if(req.session.auth)
-			res.redirect("/");
-		res.render('auth/login', {
-		    title: 'Login',
-			session: req.session
-		  });
-	});
-	app.post('login',form(
-		validate("username").required(),
-		validate("password").required()
-		),
-		function(req,res){
-			db.authorizeUser(req.form,function(error,r){
-				if(!r)
-					res.send("login failed");
-				else {
-					req.session.auth = true;
-					req.session.userid = r._id;
-				res.send("authenticated");
-			}
-			});
-		
-	});
-	app.get('logout',function(req,res){
-		req.session.destroy();
-		res.render('index', {
-		    title: 'logedout',
-			session: req.session
-		  });
-	});
+app.namespace('/auth', function() {	
+	app.get('login',auth.login);
+	app.get('register',auth.register);
+	app.post('register',auth.register_form,auth.register_post);
+	app.post('login',auth.login_form,auth.login_post);
+	app.get('logout',auth.logout);
 });
 
 if (!module.parent) {
-  app.listen(3000);
+  app.listen(config.port);
   console.log("Express server listening on port %d", app.address().port);
 }
