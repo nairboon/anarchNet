@@ -19,13 +19,13 @@ exports.create = function(req, res){
 		
 		req.body.owner = req.session.userid;
 		console.log(req.body);
-		db.addData(req.body,function(r){
+		db.store(req.body,function(r){
 			res.send("your data:"+r._id);
 		});
 };
 
 exports.show = function(req, res){
-	db.getData(req.params.id,null,function(r){
+	db.get(req.params.id,function(r){
 		res.send(r);
 	});
 };

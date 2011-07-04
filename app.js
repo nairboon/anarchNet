@@ -46,8 +46,8 @@ app.get('/', function(req, res){
 });
 
 app.get('/rawdata/:id/:rev?', function(req, res){
-	db.getData(req.params.id,req.params.rev,function(data){
-		res.send(data.content);
+	db.get(req.params.id,null,req.params.rev,true,function(data){
+		res.send(data);
 	});
 });
 
@@ -55,7 +55,7 @@ app.get('/data/:id?/:rev?', function(req, res,next){
 	var id = req.params.id;
 	console.log(db);
 	if(id)
-		db.getData(id,req.params.rev,function(data){
+		db.get(id,null,null,false,function(data){
 			res.send(data);
 		});
 	else
