@@ -45,17 +45,16 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/rawdata/:id/:rev?', function(req, res){
-	db.get(req.params.id,null,req.params.rev,true,function(data){
+app.get('/rawdata/:id/:branch?/:rev?', function(req, res){
+	db.get(req.params.id,req.params.branch,req.params.rev,true,function(data){
 		res.send(data);
 	});
 });
 
-app.get('/data/:id?/:rev?', function(req, res,next){
+app.get('/data/:id?/:branch?/:rev?', function(req, res,next){
 	var id = req.params.id;
-	console.log(db);
 	if(id)
-		db.get(id,null,null,false,function(data){
+		db.get(id,req.params.branch,req.params.rev,false,function(data){
 			res.send(data.content);
 		});
 	else

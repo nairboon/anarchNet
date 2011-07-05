@@ -33,7 +33,6 @@ exports.show = function(req, res){
 exports.edit = function(req, res){
 	db.getHead(req.params.id,function(r){
 		console.log("edit doc:",req.params.id);
-		console.log(r);
 		res.render('editor/edit',{title:'Edit',session:req.session,item:r});
 	});
 };
@@ -42,13 +41,14 @@ exports.update = function(req, res){
 	console.log(req.params,req.body);
 	db.update(req.params.id,req.body.content,req.body.branch,req.session,function(r){
 		res.send(r);
-	});
-	
- // res.redirect('editor/list');
+	});	
 };
 
 exports.destroy = function(req, res){
-  res.send('destroy forum ' + req.params.id);
+  
+	db.delete(req.params.id,req.session,function(r){
+		res.send('destroy' + req.params.id);
+	});	
 };
 
 exports.id = 'id';

@@ -84,48 +84,12 @@ LocalDatabase.prototype = {
 			cb(err,res);
 		});
 	},
-	getRawData: function(id,rev,cb) { 
-		Data.findOne({'id': id},function(err,res) {
-				
-			if(err || !res) 
-				return cb(new Error('Could not load Document'));
-				
-			if(rev) //specific revision
-					cb("not implemented");//RawData.findById();
-			else // HEAD 
-			{
-				console.log("get: " + res.head);
-				RawData.findById(res.revisions.id(res.head).dataid,function(err,res){
-					cb(res);
-				});
-			}
-		});		
-	},
-	getData: function(id,rev,cb) {
-		Data.findOne({'id': id},function(err,res) {
-				
-			if(err || !res) 
-				return cb(new Error('Could not load Document'));
-				
-				// get content
-				DataProvider.prototype.getRawData(id,rev,function(r){
-					console.log(r);
-					res.content = r.content;
-					cb(res);
-				});
-		});
-	},
 	getAll: function(cb) {
 		Data.find({'access':'public'}, function(err,res) {
 			cb(res);
 		});
 	},
 	getHead: function(id,cb) { return this.get(id,null,null,false,cb); },
-	getHeadforDoc: function(doc,branch_id) {
-		branch = doc.branches.id(branch_id);
-		snapshot = branch.snapshots.id(branch.head);
-		return snapshot.content;
-	},
 	get: function(id,branch,rev,completeDocument,cb) {
 		Data.findOne({'id': id},function(err,res) {
 			if(err || !res) 
@@ -148,7 +112,6 @@ LocalDatabase.prototype = {
 			var newc = snap;
 			var patch;
 			console.log("applying patches: ",res.branch.diffs.length);
-		//	for (var i = res.branch.diffs.length-1, l = 0; i >= l; i--) {
 			for (var i = 0, l =res.branch.diffs.length; i < l; i++) {
 			    if (ObjectId.toString(res.branch.diffs[i].snapshot) == ObjectId.toString(res.snapshot._id)) {
 			      patch = dmp.patch_fromText(res.branch.diffs[i].content);
@@ -160,24 +123,16 @@ LocalDatabase.prototype = {
 			  }
 				
 			res.content = newc;
-				return cb(res);
-					
-
-			
+			return cb(res);
 			}
 		});
 	},
 	update: function(id,newcontent,branch,session,cb) {
-		//check ownership
+		//FIXME: check ownership
 		this.get(id,branch,null,false,function(res) {
 				if(!res) 
 					return cb(new Error('Could not update Document'));
-				
-					console.log("res.contentUPDATE");
-				
-			console.log(branch,res.content);		
-			//var diff = dmp.diff_main(res.content,newcontent);
-			//dmp.diff_cleanupSemantic(diff);
+			
 			var patch = dmp.patch_make(res.content,newcontent);
 			var diff = dmp.patch_toText(patch);
 			console.log(diff);
@@ -188,32 +143,8 @@ LocalDatabase.prototype = {
 			
 			res.branches.id(branch).diffs.push(dobj);
 			res.save();
-			console.log(res);
 			cb("success");
 			return;
-		});
-		
-		return;
-		Data.findOne({'id': id},function(err,res) {
-			if(res.owner == session.userid) {
-				var data = new RawData();
-				data.content = newcontent.content;
-				data.save();
-				
-				res.type = newcontent.type;
-				
-				var diff = diff_main()
-				//res.revisions.push({dataid: data._id,prev:res.head});
-				res.head = res.revisions[res.revisions.length-1]._id;
-				res.save();
-				console.log("updated: ",id);
-				console.log("new revision: ",res.head);
-				cb("success");
-			}
-			else {
-				console.log("access denied",id);
-				cb("access denied");
-			}
 		});
 		
 	},
@@ -236,6 +167,15 @@ LocalDatabase.prototype = {
 		ins.save();
 		console.log("new data: "+ins._id);
 		cb(ins);
+	},
+	delete: function(id,session,cb) {
+			Data.findOne({'id': id, owner: session.userid},function(err,res) {
+				if(err || !res) 
+					return cb(new Error('Could not remove Document: non existent or not owner'));
+					
+				res.remove();
+				cb("success");
+			});
 	}
 };
 
