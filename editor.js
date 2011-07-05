@@ -31,15 +31,16 @@ exports.show = function(req, res){
 };
 
 exports.edit = function(req, res){
-	db.getData(req.params.id,null,function(r){
+	db.getHead(req.params.id,function(r){
 		console.log("edit doc:",req.params.id);
+		console.log(r);
 		res.render('editor/edit',{title:'Edit',session:req.session,item:r});
 	});
 };
 
 exports.update = function(req, res){
 	console.log(req.params,req.body);
-	db.update(req.params.id,req.body,req.session,function(r){
+	db.update(req.params.id,req.body.content,req.body.branch,req.session,function(r){
 		res.send(r);
 	});
 	

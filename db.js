@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose');
 var hashlib = require('hashlib');
+var dmp = require('./lib/diff_match_patch.js');
 
 
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
@@ -119,6 +120,12 @@ LocalDatabase.prototype = {
 			cb(res);
 		});
 	},
+	getHead: function(id,cb) { return this.get(id,null,null,false,cb); },
+	getHeadforDoc: function(doc,branch_id) {
+		branch = doc.branches.id(branch_id);
+		snapshot = branch.snapshots.id(branch.head);
+		return snapshot.content;
+	},
 	get: function(id,branch,rev,completeDocument,cb) {
 		Data.findOne({'id': id},function(err,res) {
 			if(err || !res) 
@@ -133,26 +140,60 @@ LocalDatabase.prototype = {
 				else
 					branch_id = res.head;
 					
-			branch = res.branches.id(branch_id);
-			snapshot = branch.snapshots.id(branch.head);
+			res.branch = res.branches.id(branch_id);
+			res.snapshot = res.branch.snapshots.id(res.branch.head);
 
-			var diffs;
-			for (var i = 0, l = branch.diffs.length; i < l; i++) {
-			    if (branch.diffs[i].snapshot == snapshot._id)
-			      diffs.push_back(branch.diffs[i]);
+			var diffs = new Array();
+			var snap = res.snapshot.content;
+			var newc = snap;
+			var patch;
+			console.log("applying patches: ",res.branch.diffs.length);
+		//	for (var i = res.branch.diffs.length-1, l = 0; i >= l; i--) {
+			for (var i = 0, l =res.branch.diffs.length; i < l; i++) {
+			    if (ObjectId.toString(res.branch.diffs[i].snapshot) == ObjectId.toString(res.snapshot._id)) {
+			      patch = dmp.patch_fromText(res.branch.diffs[i].content);
+					console.log("apply",i,res.branch.diffs[i].content);
+					newc = dmp.patch_apply(patch,newc)[0];
+					console.log(newc,patch);
+					
+				}				
 			  }
 				
-							
-				return cb(snapshot.content);
+			res.content = newc;
+				return cb(res);
 					
 
 			
 			}
 		});
 	},
-	update: function(id,newcontent,session,cb) {
-		console.log(session);
+	update: function(id,newcontent,branch,session,cb) {
 		//check ownership
+		this.get(id,branch,null,false,function(res) {
+				if(!res) 
+					return cb(new Error('Could not update Document'));
+				
+					console.log("res.contentUPDATE");
+				
+			console.log(branch,res.content);		
+			//var diff = dmp.diff_main(res.content,newcontent);
+			//dmp.diff_cleanupSemantic(diff);
+			var patch = dmp.patch_make(res.content,newcontent);
+			var diff = dmp.patch_toText(patch);
+			console.log(diff);
+			
+			dobj = new Diff();
+			dobj.snapshot = res.snapshot._id;
+			dobj.content = diff;
+			
+			res.branches.id(branch).diffs.push(dobj);
+			res.save();
+			console.log(res);
+			cb("success");
+			return;
+		});
+		
+		return;
 		Data.findOne({'id': id},function(err,res) {
 			if(res.owner == session.userid) {
 				var data = new RawData();
@@ -160,7 +201,9 @@ LocalDatabase.prototype = {
 				data.save();
 				
 				res.type = newcontent.type;
-				res.revisions.push({dataid: data._id,prev:res.head});
+				
+				var diff = diff_main()
+				//res.revisions.push({dataid: data._id,prev:res.head});
 				res.head = res.revisions[res.revisions.length-1]._id;
 				res.save();
 				console.log("updated: ",id);

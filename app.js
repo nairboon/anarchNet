@@ -56,7 +56,7 @@ app.get('/data/:id?/:rev?', function(req, res,next){
 	console.log(db);
 	if(id)
 		db.get(id,null,null,false,function(data){
-			res.send(data);
+			res.send(data.content);
 		});
 	else
 		next();

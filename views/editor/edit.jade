@@ -1,7 +1,8 @@
 form(method="post",action="update")
         p
-          label(for="type") Type:
-             input(type="text", name="type", value=item.type)
+         label(for="type") Branch:
+            input(type="text", name="branch", value=item.head)
+            
         p
          label(for="content") Data:
             textarea(type="text",rows="20", name="content")
