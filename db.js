@@ -1,23 +1,12 @@
 
-
 var mongoose = require('mongoose'),
 	hashlib = require('hashlib'),
 	config = require('./config.js').conf,
-	dmp = require('./lib/diff_match_patch.js');
-
+	dmp = require('./lib/diff_match_patch.js'),
+	common = require('models/common.js');
 
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
 
-
-
-var User = new Schema({
-	username: String,
-	password: {type:String, set: function(inp){ return hashlib.sha256(inp);}},
-	email: {type:String, set: function(inp){ return inp.toLowerCase();}},
-	registered: {type: Date, default: Date.now},
-	count: {type:Number, default: 0},
-	repo: Schema.ObjectId
-});
 
  /*  db */
 var Snapshot = new Schema({
@@ -53,13 +42,10 @@ var Data = new Schema({
 });
 
 
-mongoose.model('user',User);
 mongoose.model('data',Data);
 mongoose.model('snapshot',Snapshot);
 mongoose.model('diff',Diff);
 mongoose.model('branch',Branch);
-
-
 
 var LocalDatabase = function(){
 		User = mongoose.model('user');

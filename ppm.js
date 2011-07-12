@@ -1,63 +1,24 @@
-	//require('./models/ppm.js');
-var jade = require("jade");
-	dp = require('./db.js');
-var db = new dp.db();
-var async = require("async");
 
 var mongoose = require('mongoose'),
 	hashlib = require('hashlib'),
 	config = require('./config.js').conf,
-	dmp = require('./lib/diff_match_patch.js');
+	dmp = require('./lib/diff_match_patch.js'),
+	dp = require('./db.js'),
+	async = require("async"),
+	jade = require("jade");
+	require('./models/common.js');
+	require('./models/ppm.js');
+var db = new dp.db();
 
-	var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
 
-	var User = new Schema({
-		username: String,
-		password: {type:String, set: function(inp){ return hashlib.sha256(inp);}},
-		email: {type:String, set: function(inp){ return inp.toLowerCase();}},
-		registered: {type: Date, default: Date.now},
-		count: {type:Number, default: 0},
-		repo: Schema.ObjectId
-	});
+var ObjectId = mongoose.Types.ObjectId;
 
-	/*   pkg   */
-	var Dependency = new Schema({
-		name: String,
-		version: String
-	});
-
-	var Package = new Schema({
-		name: String,
-		version: String,
-		code: String,
-		resources: String,
-		depends: [Dependency]
-	});
-
-	var Repository = new Schema({
-		sources: [String],
-		branch: {type:String, default: "trunk"},
-		revid: {type:String, default: ""},
-		packages: [Package]
-	});
-
-	var Appcache = new Schema({
-		name: String,
-		revid: Schema.ObjectId,
-		content: String
-	});
-
-	mongoose.model('user',User);
-	mongoose.model('package',Package);
-	mongoose.model('dependency',Dependency);
-	mongoose.model('repository',Repository);
-
-var PPM = function(){
+var PPM = function() {
 		Repository = mongoose.model('repository');
 		Package = mongoose.model('package');
 		Dependency = mongoose.model('dependency');
+		Appcache = mongoose.model('appcache');
 		User = mongoose.model('user');
-		
 };
 
 PPM.prototype = {
@@ -152,7 +113,6 @@ PPM.prototype = {
 						cq.drain = function() {
 						    console.log('programm code processed');
 							
-							
 							appinfo.depends.forEach(function(item){
 								var dep = new Dependency();
 								dep.name = item[0];
@@ -177,13 +137,12 @@ PPM.prototype = {
 				    console.log('all items have been processed');
 					repo.save();
 					return cb(null,repo);
-				
 				}
 				
 				masterlist.forEach(function(item){
 					console.log("(masterlist) add",item);
 					q.push(item,function (err) {
-					    console.log('finished processing bar');
+					    console.log('finished processing masterlist entry');
 					});
 					});
 			
@@ -193,14 +152,6 @@ PPM.prototype = {
 		
 	},
 	cacheApp: function(id,repo,cb) {
-			/*Repository.findOne({'_id': ObjectId(session.user.repo)}, function(err,res) {
-					if(err || !res) 
-						cb(new Error("user repo not found!: "+session.user.repo));
-						
-					console.log("caching...");
-					cb(null,"haha");	
-					
-				});*/
 				console.log("repo: ", repo);
 				console.log("caching...");
 				repo.packages.forEach(function(item) {
@@ -208,9 +159,15 @@ PPM.prototype = {
 						console.log("app found!");
 						console.log("code: ",item.code);
 						jade.renderFile('./views/app.jade',{locals:{name:id, code:item.code}},function(err, html){
-						        cb(err,html);
-						    });
-						
+						        
+							var ac = new Appcache();
+							ac.name = id;
+							ac.revid = repo.revid;
+							ac.code = html;
+							ac.save();
+								cb(err,html);
+							
+						    });					
 						
 						//FIXME dependencies
 					}
