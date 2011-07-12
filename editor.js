@@ -1,5 +1,5 @@
 	dp = require('./db.js');
-var db = new dp();
+var db = new dp.db();
 
 exports.list = function(req, res){
   db.getAll(function(r){
@@ -17,7 +17,7 @@ exports.create = function(req, res){
 	if(!req.session.auth)
 		res.send("please log in!");
 		
-		req.body.owner = req.session.userid;
+		req.body.owner = req.session.user.id;
 		console.log(req.body);
 		db.store(req.body,function(r){
 			res.send("your data:"+r._id);
@@ -31,7 +31,7 @@ exports.show = function(req, res){
 };
 
 exports.edit = function(req, res){
-	db.getHead(req.params.id,function(r){
+	db.getHead(req.params.id,function(err,r){
 		console.log("edit doc:",req.params.id);
 		res.render('editor/edit',{title:'Edit',session:req.session,item:r});
 	});

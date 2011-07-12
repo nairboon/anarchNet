@@ -3,7 +3,7 @@ var form = require('express-form'),
 	validate = form.validate,
 	dp = require('./db.js');
 	
-var db = new dp();
+var db = new dp.db();
 
 
 exports.login = function(req,res){
@@ -59,7 +59,7 @@ exports.login_post = function(req,res){
 			res.send("login failed");
 		else {
 			req.session.auth = true;
-			req.session.userid = r._id;
+			req.session.user = {id: r._id, repo: r.repo};
 		res.redirect("/");
 	}
 	});

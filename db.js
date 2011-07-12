@@ -1,24 +1,25 @@
 
 
-var mongoose = require('mongoose');
-var hashlib = require('hashlib');
-var dmp = require('./lib/diff_match_patch.js');
+var mongoose = require('mongoose'),
+	hashlib = require('hashlib'),
+	config = require('./config.js').conf,
+	dmp = require('./lib/diff_match_patch.js');
 
 
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
+
+
 
 var User = new Schema({
 	username: String,
 	password: {type:String, set: function(inp){ return hashlib.sha256(inp);}},
 	email: {type:String, set: function(inp){ return inp.toLowerCase();}},
 	registered: {type: Date, default: Date.now},
-	count: {type:Number, default: 0}
+	count: {type:Number, default: 0},
+	repo: Schema.ObjectId
 });
 
-var RawData = new Schema({
-	content: String
-});
-
+ /*  db */
 var Snapshot = new Schema({
 	dataid: Schema.ObjectId,
 	name: String,
@@ -36,6 +37,7 @@ var Diff = new Schema({
 });
 
 var Branch = new Schema({
+	name: {type:String, default: "trunk"},
 	head: Schema.ObjectId,
 	snapshots: [Snapshot],
 	diffs: [Diff]
@@ -53,10 +55,10 @@ var Data = new Schema({
 
 mongoose.model('user',User);
 mongoose.model('data',Data);
-mongoose.model('rawdata',RawData);
 mongoose.model('snapshot',Snapshot);
 mongoose.model('diff',Diff);
 mongoose.model('branch',Branch);
+
 
 
 var LocalDatabase = function(){
@@ -65,7 +67,6 @@ var LocalDatabase = function(){
 		Diff  = mongoose.model('diff');	 
 		Branch  = mongoose.model('branch');	 
 		Snapshot  = mongoose.model('snapshot');	 
-		RawData = mongoose.model('rawdata');
 };
 
 LocalDatabase.prototype = {
@@ -96,7 +97,7 @@ LocalDatabase.prototype = {
 				return cb(new Error('Could not load Document'));
 			
 			if(completeDocument)
-				cb(res);
+				cb(null,res);
 			else
 			{
 				if(branch)
@@ -115,22 +116,22 @@ LocalDatabase.prototype = {
 			for (var i = 0, l =res.branch.diffs.length; i < l; i++) {
 			    if (ObjectId.toString(res.branch.diffs[i].snapshot) == ObjectId.toString(res.snapshot._id)) {
 			      patch = dmp.patch_fromText(res.branch.diffs[i].content);
-					console.log("apply",i,res.branch.diffs[i].content);
+				//	console.log("apply",i,res.branch.diffs[i].content);
 					newc = dmp.patch_apply(patch,newc)[0];
-					console.log(newc,patch);
+				//	console.log(newc,patch);
 					
 				}				
 			  }
 				
 			res.content = newc;
-			return cb(res);
+			return cb(null,res);
 			}
 		});
 	},
 	update: function(id,newcontent,branch,session,cb) {
 		//FIXME: check ownership
-		this.get(id,branch,null,false,function(res) {
-				if(!res) 
+		this.get(id,branch,null,false,function(err,res) {
+				if(err || !res) 
 					return cb(new Error('Could not update Document'));
 			
 			var patch = dmp.patch_make(res.content,newcontent);
@@ -169,7 +170,7 @@ LocalDatabase.prototype = {
 		cb(ins);
 	},
 	delete: function(id,session,cb) {
-			Data.findOne({'id': id, owner: session.userid},function(err,res) {
+			Data.findOne({'id': id, owner: session.user.id},function(err,res) {
 				if(err || !res) 
 					return cb(new Error('Could not remove Document: non existent or not owner'));
 					
@@ -179,4 +180,5 @@ LocalDatabase.prototype = {
 	}
 };
 
-module.exports = LocalDatabase;
+
+module.exports = {db: LocalDatabase};

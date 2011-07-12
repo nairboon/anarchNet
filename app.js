@@ -11,9 +11,10 @@ var express = require('express'),
 	dp = require('./db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
+	apploader = require('./pkg/apploader.js'),
 	config = require('./config.js').conf;
 	
-var db = new dp();
+var db = new dp.db();
 mongoose.connect(config.dburl);
 var app = module.exports = express.createServer();
 
@@ -45,8 +46,10 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/app/:id', apploader.load);
+
 app.get('/rawdata/:id/:branch?/:rev?', function(req, res){
-	db.get(req.params.id,req.params.branch,req.params.rev,true,function(data){
+	db.get(req.params.id,req.params.branch,req.params.rev,true,function(err,data){
 		res.send(data);
 	});
 });
@@ -54,13 +57,19 @@ app.get('/rawdata/:id/:branch?/:rev?', function(req, res){
 app.get('/data/:id?/:branch?/:rev?', function(req, res,next){
 	var id = req.params.id;
 	if(id)
-		db.get(id,req.params.branch,req.params.rev,false,function(data){
+		db.get(id,req.params.branch,req.params.rev,false,function(err,data){
 			res.send(data.content);
 		});
 	else
 		next();
 });
 
+app.error(function(err, req, res){
+  /*res.render('500.jade', {
+     error: err
+  });*/
+  res.send(err);
+});
 
 app.namespace('/edit',function(){
 	app.get('list',editor.list);
