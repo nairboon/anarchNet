@@ -1,6 +1,7 @@
 /**
  * Parannus
  * http://rbose.org/wiki/Parannus
+ * Copyright 2011 nairboon - Licensed under: GNU Public License 3 or later 
  */
 
 var express = require('express'),
@@ -8,10 +9,10 @@ var express = require('express'),
 	MongoStore = require('connect-mongo'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
-	dp = require('./db.js'),
+	dp = require('lib/db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
-	apploader = require('./pkg/apploader.js'),
+	apploader = require('lib/apploader.js'),
 	config = require('./config.js').conf;
 	
 var db = new dp.db();

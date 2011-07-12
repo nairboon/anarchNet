@@ -1,21 +1,28 @@
 
-// Run $ expresso
+// Run $ expresso -I lib (-c)
 
-/**
- * Module dependencies.
- */
-
-var app = require('../app')
-  , assert = require('assert');
-
-
-module.exports = {
-  'GET /': function(){
-    assert.response(app,
-      { url: '/' },
-      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' }},
-      function(res){
-        assert.includes(res.body, '<title>Express</title>');
-      });
-  }
+var assert = require('assert'),
+	mongoose = require('mongoose'),
+	DatabaseCleaner = require('database-cleaner'); 
+var databaseCleaner = new DatabaseCleaner('mongodb');
+var p = require("ppm.js");
+var _db;
+exports = module.exports;
+exports.setup = function() {
+	// test setup
+	_db = mongoose.connect(config.testingdburl);
+	
 };
+
+exports.test = function() {
+	// tests here
+}
+
+
+
+////////////////////
+exports.teardown = function(){
+	databaseCleaner.clean(db);
+	mongoose.disconnect();
+};
+

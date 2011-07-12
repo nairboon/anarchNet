@@ -1,7 +1,7 @@
 var form = require('express-form'),
 	filter = form.filter,
 	validate = form.validate,
-	dp = require('./db.js');
+	dp = require('lib/db.js');
 	
 var db = new dp.db();
 
