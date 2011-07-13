@@ -1,5 +1,4 @@
-	dp = require('lib/db.js');
-var db = new dp.db();
+	db = require('lib/db.js');
 
 exports.list = function(req, res){
   db.getAll(function(r){

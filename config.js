@@ -1,5 +1,5 @@
 exports.conf = {
-	db: 'test'
+	db: 'parannus'
 	,dburl: 'mongodb://localhost/parannus'
 	,testingdburl: 'mongodb://localhost/testing'
 	,sessionsecret: 'your secret here'

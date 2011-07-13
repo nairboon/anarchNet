@@ -9,13 +9,12 @@ var express = require('express'),
 	MongoStore = require('connect-mongo'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
-	dp = require('lib/db.js'),
+	db = require('lib/db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
 	apploader = require('lib/apploader.js'),
 	config = require('./config.js').conf;
 	
-var db = new dp.db();
 mongoose.connect(config.dburl);
 var app = module.exports = express.createServer();
 

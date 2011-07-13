@@ -1,13 +1,16 @@
 
 // Run $ expresso -I lib (-c)
-
+var TEST = true;
 var assert = require('assert'),
 	mongoose = require('mongoose'),
-	DatabaseCleaner = require('database-cleaner'); 
+	config = require('../config.js').conf,
+	setup = require('../setup.js'),
+	DatabaseCleaner = require('database-cleaner'),
+	ppm = require("ppm.js");
 var databaseCleaner = new DatabaseCleaner('mongodb');
-var p = require("ppm.js");
 var _db;
 exports = module.exports;
+
 exports.setup = function() {
 	// test setup
 	_db = mongoose.connect(config.testingdburl);
@@ -16,8 +19,15 @@ exports.setup = function() {
 
 exports.test = function() {
 	// tests here
+	setup.UserCreation(function(err){
+		assert.isNull(err);
+	});
+	
+	/*
+	TODO: db.get,update,store
+		ppm.appcacheload, updaterepo, cacheapp
+	*/
 }
-
 
 
 ////////////////////
