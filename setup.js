@@ -6,8 +6,8 @@
 var mongoose = require('mongoose'),
 	config = require('./config.js').conf,
 	common = 
-	db = require('lib/db.js'),
-	ppm = require('lib/ppm.js');
+	db = require('./lib/db.js'),
+	ppm = require('./lib/ppm.js');
 
 var Setup = function () {
 	

@@ -1,7 +1,7 @@
 var form = require('express-form'),
 	filter = form.filter,
 	validate = form.validate,
-	db = require('lib/db.js');
+	db = require('./lib/db.js');
 
 
 exports.login = function(req,res){

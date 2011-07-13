@@ -9,10 +9,10 @@ var express = require('express'),
 	MongoStore = require('connect-mongo'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
-	db = require('lib/db.js'),
+	db = require('./lib/db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
-	apploader = require('lib/apploader.js'),
+	apploader = require('./lib/apploader.js'),
 	config = require('./config.js').conf;
 	
 mongoose.connect(config.dburl);
