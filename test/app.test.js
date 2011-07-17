@@ -1,34 +1,52 @@
 
 /* Run $ expresso -I lib (-c) -s
- * current coverage 46.72%
+ * current coverage 72.2%
  */
 var assert = require('assert'),
 	mongoose = require('mongoose'),
 	config = require('../config.js'),
 	db = require('db.js'),
 	setup = require('setup.js'),
-	DatabaseCleaner = require('database-cleaner'),
 	ppm = require("ppm.js");
 	
-var databaseCleaner = new DatabaseCleaner('mongodb');
 var _db = mongoose.connect(config.testingdburl);
 
 var userid = "000000000000";
+var workingrepo = "";
 
 exports.test_setup = function(next) {
-	// tests here
 
 	setup.UserCreation(function(err,res){
 		assert.isNull(err);
 		assert.isNotNull(res._id);
-		//userid = res._id;
-		next();
-	});
-	
-	setup.ScanLocalPackages(function(err){
+		//userid = res._id;		
+			
+	setup.ScanLocalPackages(function(err,mlid){
 		assert.isNull(err);
-	});
+		setup.createDefaultRepo(mlid,function(err,res){
+			assert.isNull(err);
+			
+			db.getSettings('defaultRepo',function(err,repoid){
+				assert.isNull(err);
+				assert.equal(res,repoid);
+				workingrepo = repoid;
 
+				ppm.appcacheLoad("nonexistingAPP",repoid,function(err,ac){
+					assert.isNotNull(err);
+				});
+				
+				ppm.updateRepo(repoid,function(err,res){
+					assert.isNull(err);
+					
+					ppm.cacheApp("todoapp",res,function(err,res){
+						assert.isNull(err);
+						next();
+					});
+				});
+			});
+		});
+	});
+});
 	/*
 	TODO: db.get,update,store
 		ppm.appcacheload, updaterepo, cacheapp

@@ -57,7 +57,13 @@ exports.login_post = function(req,res){
 			res.send("login failed");
 		else {
 			req.session.auth = true;
-			req.session.user = {id: r._id, repo: r.repo};
+			db.getSettings('defaultRepo',function(err,res){
+				if(err)
+					res.send(err.message);
+				req.session.user = {id: r._id, userRepo: r.repo, defaultRepo:res};
+				console.log(req.session.user);
+				req.session.save(function(err){});
+			});
 		res.redirect("/");
 	}
 	});

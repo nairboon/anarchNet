@@ -14,7 +14,7 @@ var User = new Schema({
 });
 
 var Settings = new Schema({
-	key: String,
+	key: {type:String, unique: true},
 	value: String
 });
 

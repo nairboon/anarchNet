@@ -12,6 +12,7 @@ var Dependency = new Schema({
 var Package = new Schema({
 	name: String,
 	version: String,
+	repo: String, // to which repo it belongs
 	code: String,
 	resources: String,
 	depends: [Dependency]
@@ -26,7 +27,7 @@ var Repository = new Schema({
 
 var Appcache = new Schema({
 	name: String,
-	revid: Schema.ObjectId,
+	revid: String,
 	content: String
 });
 
