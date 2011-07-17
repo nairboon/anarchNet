@@ -1,4 +1,4 @@
-exports.conf = {
+module.exports = {
 	db: 'parannus'
 	,dburl: 'mongodb://localhost/parannus'
 	,testingdburl: 'mongodb://localhost/testing'

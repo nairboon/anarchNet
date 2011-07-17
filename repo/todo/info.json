@@ -1,0 +1,9 @@
+{
+   "name": "todoapp",
+   "version": "0.0.1",
+	"code": [
+		"todo.js"
+	]
+}
+
+

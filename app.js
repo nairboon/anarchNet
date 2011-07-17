@@ -13,7 +13,7 @@ var express = require('express'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
 	apploader = require('./lib/apploader.js'),
-	config = require('./config.js').conf;
+	config = require('./config.js');
 	
 var db_handle = mongoose.connect(config.dburl).db;
 

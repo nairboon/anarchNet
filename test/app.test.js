@@ -3,7 +3,7 @@
 var TEST = true;
 var assert = require('assert'),
 	mongoose = require('mongoose'),
-	config = require('../config.js').conf,
+	config = require('../config.js'),
 	setup = require('../setup.js'),
 	DatabaseCleaner = require('database-cleaner'),
 	ppm = require("ppm.js");

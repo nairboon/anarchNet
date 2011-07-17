@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
 	hashlib = require('hashlib'),
-	config = require('../config.js').conf;
+	config = require('../config.js');
 
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
 
