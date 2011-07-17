@@ -35,23 +35,28 @@ exports.test_setup = function(next) {
 
 exports.test_db = function(next) {
 	var toStore = "Hello World!";
+	var updated = "Abllo Worldo!";
 	db.store({content: toStore, owner:userid}, function(err,res){
 		assert.isNull(err);
 
 		db.getHead(res.id,function(err,res){
 			assert.isNull(err);
 			assert.equal(toStore,res.content);
-
-			db.delete(res.id,userid,function(err,id){
+			
+			db.update(res.id,updated,res.head,null,function(err,res){
 				assert.isNull(err);
-				assert.equal(id,res.id);
-				db.getHead(id,function(err,res){
-					assert.isNull(res);
-					next();
+				assert.equal(updated,res.content);
+				
+				db.delete(res.id,userid,function(err,id){
+					assert.isNull(err);
+					assert.equal(id,res.id);
+					db.getHead(id,function(err,res){
+						assert.isNull(res);
+						next();
+					});
 				});
 			});
 		});
-		
 	});
 };
 
