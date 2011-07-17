@@ -25,7 +25,13 @@ Settings  = mongoose.model('settings');
 			s.save(function(err){
 				if(err)
 					throw new Error("could not save settings");
-				mongoose.disconnect();	
+					
+				setup.createDefaultRepo(mlid,function(err,res){
+					if(err)
+						throw new Error("could not create a repo");
+						
+					mongoose.disconnect();	
+				});
 			});
 		});
 	});

@@ -1,5 +1,7 @@
 
-// Run $ expresso -I lib (-c) -s
+/* Run $ expresso -I lib (-c) -s
+ * current coverage 46.72%
+ */
 var assert = require('assert'),
 	mongoose = require('mongoose'),
 	config = require('../config.js'),
