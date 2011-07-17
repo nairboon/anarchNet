@@ -45,7 +45,7 @@ exports.update = function(req, res){
 
 exports.destroy = function(req, res){
   
-	db.delete(req.params.id,req.session,function(r){
+	db.delete(req.params.id,req.session.user.id,function(r){
 		res.send('destroy' + req.params.id);
 	});	
 };
