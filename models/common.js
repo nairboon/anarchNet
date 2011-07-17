@@ -13,4 +13,10 @@ var User = new Schema({
 	repo: Schema.ObjectId
 });
 
+var Settings = new Schema({
+	key: String,
+	value: String
+});
+
 mongoose.model('user',User);
+mongoose.model('settings',Settings);

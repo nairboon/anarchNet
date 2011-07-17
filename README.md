@@ -16,6 +16,9 @@ Or from source:
 
 ## Run
 
+set 'dburl' in config.js
 <pre>
-	nodejs app.js
+	node setup.js
+	node app.js
 </pre>
+point your browser to http://localhost:3000 and login with admin/admin

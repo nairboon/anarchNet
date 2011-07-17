@@ -1,6 +1,5 @@
 module.exports = {
-	db: 'parannus'
-	,dburl: 'mongodb://localhost/parannus'
+	dburl: 'mongodb://localhost/parannus'
 	,testingdburl: 'mongodb://localhost/testing'
 	,sessionsecret: 'your secret here'
 	,port: 3000

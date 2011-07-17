@@ -12,10 +12,12 @@ var express = require('express'),
 	db = require('./lib/db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
+	common = require('./models/common.js'),
 	apploader = require('./lib/apploader.js'),
 	config = require('./config.js');
 	
 var db_handle = mongoose.connect(config.dburl).db;
+
 
 var app = module.exports = express.createServer();
 
@@ -92,6 +94,12 @@ app.namespace('/auth', function() {
 });
 
 if (!module.parent) {
+  	Settings  = mongoose.model('settings');	
+	Settings.findOne({key:"masterlist"},function(err,res){
+		if(err || !res)
+			throw new Error("No masterlist, run setup.js!");
+	});
+	
   app.listen(config.port);
   console.log("Express server listening on port %d", app.address().port);
 }
