@@ -6,7 +6,7 @@
 
 var express = require('express'),
 	mongoose = require('mongoose'),
-	MongoStore = require('connect-mongo'),
+	MongoStore = require('connect-mongodb'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
 	db = require('./lib/db.js'),
@@ -15,7 +15,8 @@ var express = require('express'),
 	apploader = require('./lib/apploader.js'),
 	config = require('./config.js').conf;
 	
-mongoose.connect(config.dburl);
+var db_handle = mongoose.connect(config.dburl).db;
+
 var app = module.exports = express.createServer();
 
 app.configure('development', function(){
@@ -32,7 +33,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: config.sessionsecret, store: new MongoStore({db: config.db}) }));
+  app.use(express.session({ secret: config.sessionsecret, store: new MongoStore({handle: db_handle})}));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -68,7 +69,8 @@ app.error(function(err, req, res){
   /*res.render('500.jade', {
      error: err
   });*/
-  res.send(err);
+  console.log(err.message);
+  res.send(err.message);
 });
 
 app.namespace('/edit',function(){
