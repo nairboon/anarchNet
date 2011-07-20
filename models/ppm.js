@@ -13,6 +13,7 @@ var Package = new Schema({
 	name: String,
 	version: String,
 	repo: String, // to which repo it belongs
+	revid: String,
 	code: String,
 	resources: String,
 	depends: [Dependency]

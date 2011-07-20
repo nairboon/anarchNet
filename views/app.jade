@@ -2,5 +2,10 @@
 html
   head
     title= name
+    - if (deps.length)
+      - deps.forEach(function(item){
+        - var url = "/lib/"+item.name+".js";
+        script(type='text/javascript',src=url)
+      - })
     script(type='text/javascript')= code
   body

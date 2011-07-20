@@ -1,9 +1,10 @@
 {
    "name": "todoapp",
    "version": "0.0.1",
-	"code": [
-		"todo.js"
-	]
+	"dependencies": {
+		"uki" : ">=0.3.8"
+	},
+	"code": {
+		"todo":"todo.js"
+	}
 }
-
-

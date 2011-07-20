@@ -49,7 +49,8 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/app/:id', apploader.load);
+app.get('/app/:id', apploader.loadApp);
+app.get('/lib/:id', apploader.loadLib);
 
 app.get('/rawdata/:id/:branch?/:rev?', function(req, res){
 	db.get(req.params.id,req.params.branch,req.params.rev,true,function(err,data){
