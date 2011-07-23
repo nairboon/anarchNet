@@ -1,0 +1,18 @@
+anarchNet Package - Fileformat
+
+packet type: 	* certificates
+		* packages index
+		* core, signed binaries
+		* addons
+
+tar
+	-> ap-info | info file
+	-> signature.gpg
+	-> data.tar.xz
+
+
+ap-info file
+Name: example
+Version: 2.3
+Type: [CA | PL | CO | AO]
+Signature: [RSA | NONE]

@@ -31,10 +31,12 @@ find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 find_library(UDT NAMES udt_d REQUIRED)
 find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
+find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 
-set(Boost_ADDITIONAL_VERSIONS "1.42")
+
+set(Boost_ADDITIONAL_VERSIONS "1.41")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.42 COMPONENTS program_options system thread filesystem  REQUIRED)
+find_package(Boost 1.41 COMPONENTS system program_options thread filesystem  REQUIRED)
 
 include_directories( 
 	"${CMAKE_SOURCE_DIR}"
@@ -59,6 +61,7 @@ set( LIB
 	${UDT}
 	${CRYPTOPP}
 	${SQLITE}
+	${ARCHIVE}
 	)
 
 if(UNIX)
@@ -112,7 +115,10 @@ set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/util.proto"
        		"${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.proto"
 		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.proto"
 		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.proto")
+if(${REGENERATE})
 generate_protobuf_files(${PROTO_FILES})
+endif()
+
 set(PB_DAEMON_G ${SRCS} ${HDRS})
 
 file(GLOB PB-RPC_C "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc/*.c*")
@@ -162,9 +168,9 @@ file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
 file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
 list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
 
-add_library(liban ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
-add_dependencies(liban pb-rpc protoc-rpc-plugin)
-target_link_libraries(liban ${LIB} pb-rpc)
+add_library(an ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
+add_dependencies(an pb-rpc protoc-rpc-plugin)
+target_link_libraries(an ${LIB} pb-rpc)
 ################################################################################
 # browser
 ################################################################################
@@ -177,7 +183,7 @@ list(APPEND BROWSER_SRC ${BROWSER_C} ${BROWSER_H} ${BROWSER_HTTP_C} ${BROWSER_HT
 
 add_executable(anBrowser ${BROWSER_SRC})
 add_dependencies(anBrowser liban protoc-rpc-plugin)
-target_link_libraries(anBrowser ${LIB} pb-rpc liban)
+target_link_libraries(anBrowser ${LIB} pb-rpc an)
 
 add_custom_command(TARGET anBrowser POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
@@ -211,8 +217,8 @@ add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
 add_dependencies(TESTbase anDaemon)
 add_dependencies(TESTrpc anDaemon)
 
-target_link_libraries(TESTbase ${LIB} pb-rpc liban)
-target_link_libraries(TESTrpc ${LIB} pb-rpc liban)
+target_link_libraries(TESTbase ${LIB} pb-rpc an)
+target_link_libraries(TESTrpc ${LIB} pb-rpc an)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
@@ -232,3 +238,21 @@ if (PYTHONINTERP_FOUND)
     set_property(TEST STYLE_CHECK PROPERTY LABELS Functional CodingStyle)
   endif ()
 endif ()
+
+
+ MACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY _dir )
+    GET_FILENAME_COMPONENT(_fullPath ${_dir} ABSOLUTE)
+   IF(EXISTS "${_fullPath}/CMakeLists.txt")
+       IF(DISABLE_ALL_OPTIONAL_SUBDIRECTORIES)
+          SET(_DEFAULT_OPTION_VALUE FALSE)
+         ELSE()
+                    SET(_DEFAULT_OPTION_VALUE TRUE)
+       ENDIF()
+	OPTION(BUILD_${_dir} "Build directory ${_dir}" TRUE)
+       IF(BUILD_${_dir})
+          ADD_SUBDIRECTORY(${_dir})
+       ENDIF()
+   ENDIF()
+ ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
+
+add_subdirectory(ap/core)

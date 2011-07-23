@@ -104,7 +104,8 @@ boost::tribool request_parser::consume(request& req, char c)
     if (req.uri.empty()) return false;
 
 		// url-arguments
-		size_t d_pos = req.uri.find_first_of("?");
+		size_t d_pos;
+		d_pos= req.uri.find_first_of("?");
 		if( d_pos != std::string::npos) {
 			std::string b = req.uri.substr(0,d_pos);
 			req.content = url_decode(req.uri.substr(d_pos+1));
