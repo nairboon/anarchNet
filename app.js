@@ -49,7 +49,16 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/app/:id', apploader.loadApp);
+app.get('/app/:id/js/:package.js',apploader.loadCode);
+
+app.get('/app/*', function(req, res,next){
+	if(req.params[0].search("index.html") > 0) 
+		next();
+	else	// resource request
+		apploader.loadResource(req,res); 
+});
+
+app.get('/app/:id/index.html', apploader.loadApp);
 app.get('/lib/:id', apploader.loadLib);
 
 app.get('/rawdata/:id/:branch?/:rev?', function(req, res){

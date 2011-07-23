@@ -11,7 +11,9 @@ var Dependency = new Schema({
 
 var Map = new Schema({
 	key: String,
-	value: String
+	value: String,
+	packid: String,
+	filestore: {type:Boolean, default: false} // true: value=path for filestore, false value=id for db
 });
 
 var Package = new Schema({
@@ -19,7 +21,7 @@ var Package = new Schema({
 	version: String,
 	repo: String, // to which repo it belongs
 	revid: String,
-	code: String,
+	code: String, // combined js files
 	html: String,
 	resources: [Map],
 	depends: [Dependency]
@@ -35,7 +37,7 @@ var Repository = new Schema({
 var Appcache = new Schema({
 	name: String,
 	revid: String,
-	content: String
+	content: String // the whole html page
 });
 
 mongoose.model('dependency', Dependency);
