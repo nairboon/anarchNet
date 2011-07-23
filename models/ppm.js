@@ -9,13 +9,19 @@ var Dependency = new Schema({
 	version: String
 });
 
+var Map = new Schema({
+	key: String,
+	value: String
+});
+
 var Package = new Schema({
 	name: String,
 	version: String,
 	repo: String, // to which repo it belongs
 	revid: String,
 	code: String,
-	resources: String,
+	html: String,
+	resources: [Map],
 	depends: [Dependency]
 });
 
@@ -32,7 +38,8 @@ var Appcache = new Schema({
 	content: String
 });
 
-mongoose.model('package',Package);
-mongoose.model('dependency',Dependency);
-mongoose.model('repository',Repository);
-mongoose.model('appcache',Appcache);
+mongoose.model('dependency', Dependency);
+mongoose.model('map', Map);
+mongoose.model('package', Package);
+mongoose.model('repository', Repository);
+mongoose.model('appcache', Appcache);
