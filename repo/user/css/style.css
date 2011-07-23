@@ -20,7 +20,9 @@ background: rgba(136,136,136,0.40);
 #ssl-yes {
 	color: green;
 	display: none;
+	font-weight: bold;
 }
+
 #ssl-no { color: red;
 	display: none;
 }

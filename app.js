@@ -6,6 +6,8 @@
 
 var express = require('express'),
 	mongoose = require('mongoose'),
+	crypto = require('crypto'),
+	fs = require("fs"),
 	MongoStore = require('connect-mongodb'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
@@ -18,8 +20,15 @@ var express = require('express'),
 	
 var db_handle = mongoose.connect(config.dburl).db;
 
+var options = {
+  key: fs.readFileSync(config.ssl_key),
+  cert: fs.readFileSync(config.ssl_cert)
+};
 
-var app = module.exports = express.createServer();
+if(config.use_ssl)
+	var app = module.exports = express.createServer(options);
+else
+	var app = module.exports = express.createServer();
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -109,7 +118,7 @@ if (!module.parent) {
 		if(err || !res)
 			throw new Error("No masterlist, run setup.js!");
 	});
-	
+
   app.listen(config.port);
   console.log("Express server listening on port %d", app.address().port);
 }
