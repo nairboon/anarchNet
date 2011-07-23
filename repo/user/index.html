@@ -1,0 +1,84 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title></title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+<script src="js/jquery.js" type="text/javascript"></script>
+<script src="js/main.js"></script>
+
+</head>
+<body>
+
+  <div id="container">
+
+	<div id="login" class="box">
+		<h3>Login<h3/>
+		<form class="form">
+			<p class="username">
+				<input type="text" name="username" id="username"/>
+				<label for="name">Username</label>
+			</p>
+
+			<p class="pwd">
+				<input type="password" name="pwd" id="pwd" />
+				<label for="pwd">Password</label>
+			</p>
+
+			<p class="pin">
+				<input type="password" name="pin" id="pin" />
+				<label for="pin">PIN</label>
+			</p>
+
+			<p class="submit">
+				<input type="submit" value="Login" onclick="login();return false;"/>
+			</p>
+		</form>
+	</div>
+	<div id="register" class="box">
+		<h3>Register</h3>
+		<form class="form">
+			<p class="username">
+				<input type="text" name="username" id="username" />
+				<label for="name">Username</label>
+			</p>
+
+			<p class="pwd">
+				<input type="password" name="pwd1" id="pwd1" />
+				<label for="pwd1">Password</label>
+			</p>
+			
+			<p class="pwd">
+				<input type="password" name="pwd2" id="pwd2" />
+				<label for="pwd2">Repeat Password</label>
+			</p>
+			
+			<p class="pin">
+				<input type="password" name="pin" id="pin" />
+				<label for="pin">PIN</label>
+			</p>
+			
+			<p class="pin">
+				<input type="password" name="pin2" id="pin2" />
+				<label for="pin2">Repeat PIN</label>
+			</p>
+			
+			<p class="submit">
+				<input type="submit" value="Register" onclick="register();return false;"/>
+			</p>
+		</form>
+	</div>
+	<div id="about" class="box">
+		<h3>About</h3>
+		<p>AnarchNet is a fully decentralized p2p system. You're about to enter the Parannus Frontend.</p>
+		
+		You are using the thin-client connecting to: <span id="location"></span></br>
+		SSL: <span id="ssl-yes">Yes</span><span id="ssl-no">No!</span>
+	</div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+   "name": "jquery",
+   "version": "1.5.1",
+	"code": {
+		"jquery": "jquery-1.5.1.min.js"
+	}
+}
+
+
