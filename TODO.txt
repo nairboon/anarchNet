@@ -1,0 +1,24 @@
+
+
+daemon
+ * confMgr
+ * moduleMgr
+	* loads Modules
+	* async workers
+	* 
+
+
+
+
+
+
+
+
+
+
+
+
+Deployment
+* deb package
+* mac application
+* windows installer

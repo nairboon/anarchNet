@@ -1,0 +1,90 @@
+Anarchnet provides the following interfaces:
+
+low level:
+
+- bootstrap(peer)
+- bootstrap(list)
+- bootstrapBT(BT-masterlist)
+- BFbootstrap()
+
+- store(key,data,meta,priority,ttl,pkey)
+- get(key)
+- search(keyword)
+
+- createSession(type) => session_handle (session_id,network)
+	* plain text
+	* streaming (video/audio)
+- joinSession(sessionKey)
+- stream(sessionKey)
+- sendMessage(sessionKey)
+
+
+- createStream
+- joinStream(streamid)
+
+
+
+anarchDB
+	diffs - update to an document
+clients can pull them -> slow
+
+for realtime communication
+	-> create/join a session
+	-> stream your changes
+	-> missing pieces are pulled from slow dht db
+
+
+
+high level:
+
+docdb:
+
+createDocument
+	- automatically watches document
+updateDocument
+	- add a new revision
+getDocument
+watchDocument
+	- periodicaly search for updates
+	- restore document if lost in the network
+unwatchDocument
+deleteDocument
+	- unwatches and deletes from local filesystem, not a remote operation
+searchDocument(keywords,searchspace)
+	- searchspace is the "field" to search, i.e. tag, category, owner, system, etc.
+
+startEditing
+stopEditing
+	- when editing a document
+
+binaryFiles:
+File.{add,delete,watch,unwatch}
+Directory.{add,delete,watch,unwatch}
+mountDirectory(mountpoint)
+	- mount FUSE
+unmount
+
+messaging:
+sendMessage(peerid)
+	- send a message to a peer
+	- direct and indirect (push&pull)
+startPeerSession(audio,video) ~ channel
+	- create a new session
+	- session types: text, +audio, +video (1-3 channels)
+leavePeerSession
+
+
+buddymanagement:
+addBuddy(friendshipleve/trustlevel)
+editBuddy
+
+
+
+settings:
+dht-cache
+	how data stored from the dht
+friend-cache
+	your friends "get" space acording their friend/trust level, when you drive by their content
+	and you "secretly" watch these documents
+normal-cache
+	drive-by cache

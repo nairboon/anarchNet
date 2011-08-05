@@ -1,20 +1,8 @@
-Anarchnet provides the following interfaces:
+see doc/API.txt, TODO.txt
 
-- bootstrap(peer)
-- bootstrap(list)
-- bootstrapBT([BT-masterlist])
-- BFbootstrap()
-
-- store(key,data,meta,priority,ttl,pkey)
-- get(key)
-- search(keyword)
-
-- createSession(type)
-	* plain text
-	* streaming (video/audio)
-- joinSession(sessionKey)
-- stream(sessionKey)
-- sendMessage(sessionKey)
+== How to build == 
+cd build/<your os>
+cmake ../..
 
 Dependencies:
  * google-glog
