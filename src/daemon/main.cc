@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 		("version,v", "print version string")
 		("help,h", "produce help message")
 		("daemonize,d","daemonize anDaemon")
-		("directory", po::value<string>()->default_value("~/.anarchNet"), "prefix directory file");
+		("directory", po::value<string>()->default_value("."), "prefix directory file");
 
 
 		po::positional_options_description p;

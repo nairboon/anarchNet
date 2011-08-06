@@ -13,14 +13,14 @@ set(ROOT_DIR  ${CMAKE_SOURCE_DIR})
 set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
 
 if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin")
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-	set(BIN_DIR "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
-#	set(PLG_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/..")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
+	set(BIN_DIR "${CMAKE_BINARY_DIR}")
+	set(PLG_BIN_DIR ${BIN_DIR})
 else()
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR})
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-	set(BIN_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/bin")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+	set(BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 	set(PLG_BIN_DIR ${BIN_DIR})
 endif()
 
@@ -31,16 +31,18 @@ endif()
 find_library(GLOG NAMES libglog.a glog REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
-find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
+#find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 find_library(UDT NAMES udt_d REQUIRED)
 find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 
 
-set(Boost_ADDITIONAL_VERSIONS "1.47")
+set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.47 COMPONENTS system program_options thread filesystem  REQUIRED)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_NO_SYSTEM_PATHS TRUE)
+find_package(Boost 1.47 COMPONENTS system program_options thread filesystem REQUIRED)
 
 include_directories( 
 	"${SOURCE_DIR}"
@@ -49,7 +51,7 @@ include_directories(
 	"/usr/local/include"
 	${Boost_INCLUDE_DIRS} 
 	${GTEST_INCLUDE_DIRS}
-	${MAIDSAFE_INCLUDE_DIRS}
+	#${MAIDSAFE_INCLUDE_DIRS}
 	"${SOURCE_DIR}/daemon/protocol"
 	"${ROOT_DIR}/third-party/protobuf-jerpc/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
@@ -62,7 +64,6 @@ set( LIB
 	${GCOV}
 	${GTEST_LIBRARIES}
 	${PROTOBUF_LIBRARIES}
-	${MAIDSAFE}
 	${UDT}
 	${CRYPTOPP}
 	${SQLITE}
@@ -73,7 +74,7 @@ if(UNIX)
 set(PLATFORM_LIB pthread dl)
 endif()
 
-message(STATUS "(all) linked libraries: ${LIB}")
+message(STATUS "linked libraries: ${LIB}")
 
 ###################################################################################################
 # Protobuf
@@ -161,10 +162,12 @@ target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} pb-rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
-add_custom_command(TARGET anDaemon POST_BUILD 
-		   COMMAND ${COMMAND} -E copy_directory "${SOURCE_DIR}/daemon/config" "${BIN_DIR}/daemontest")
+#add_custom_command(TARGET anDaemon POST_BUILD 
+#		   COMMAND ${COMMAND} -E copy_directory "${SOURCE_DIR}/daemon/config" "${BIN_DIR}/daemontest")
+#add_custom_command(TARGET anDaemon POST_BUILD 
+#		   COMMAND ${COMMAND} -E create_directory "~/.anarchNet")
 add_custom_command(TARGET anDaemon POST_BUILD
-		   COMMAND ${COMMAND} -E create_symlink "${BIN_DIR}/daemontest" "~/.anarchNet")
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/anarchnet.conf" "${BIN_DIR}/anarchnet.conf")
 ################################################################################
 # Library
 ################################################################################

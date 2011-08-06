@@ -1,8 +1,8 @@
 see doc/API.txt, TODO.txt
 
 == How to build == 
-cd build/<your os>
-cmake ../..
+cd build/<your os>/<Debug|Release>
+cmake ../../..
 
 Dependencies:
  * google-glog
