@@ -18,7 +18,30 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "control_service_messages.pb.h"
+#include <vector>
+#include "singleton.h"
 
 
-InfoResponse* getInfo(void);
+#ifndef DAEMON_CONNECTION_MANAGER_H_
+#define DAEMON_CONNECTION_MANAGER_H_
+namespace an {
+	
+class ModuleManager : public Singleton<ModuleManager>
+	{
+		friend class Singleton<ModuleManager>;
+public:
+		bool init();
+		
+			~ModuleManager() {}
+		
+		static bool http_request(const std::string& url,std::string* response);
+protected:
+		ModuleManager() {}
+private:
+			
+	//	transport::TransportHandler trans_handler_;
+	//	rpcprotocol::ChannelManager *chmanager_;
+		boost::int16_t trans_id_;
+	};
+}
+#endif  // DAEMON_CONNECTION_MANAGER_H_

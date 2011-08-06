@@ -18,26 +18,26 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "service.h"
-#include "protobuf_rpc_server.h"
-#include "maidsafe/protobuf/general_messages.pb.h"
+#include <vector>
+#include "singleton.h"
+#include "puggKernel.h"
+#include "puggServer.h"
+#include "plugins/plugin_dht.h"
 
-#ifndef DAEMON_DAEMON_H_
-#define DAEMON_DAEMON_H_
+#ifndef DAEMON_PLUGIN_MANAGER_H_
+#define DAEMON_PLUGIN_MANAGER_H_
 namespace an {
-
 	
-class anDaemon
-{
-public:
-	anDaemon(): control_service_(NULL)  {}
-	~anDaemon() { if(control_service_ != NULL) delete control_service_; }
-	bool init(const std::string&);
-	void run();
-private:
-	awk::protobuf::Service* control_service_; 
-	awk::protobuf::jerpc::NetServer server_;
-	
-};
+	class PluginManager : public Singleton<PluginManager>
+	{
+		friend class Singleton<PluginManager>;
+	public:
+		bool init();
+		bool loadPlugin(const std::string&,const std::string&,const std::string&);
+	private:
+		pugg::Kernel plugin_kernel_;
+		pugg::Server<DHTpluginDriver>* dhtServer_;
+		std::vector<DHTplugin*> dhtPlugins_;
+	};
 }
-#endif  // DAEMON_DAEMON_H_
+#endif

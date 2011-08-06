@@ -18,28 +18,30 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "client.h"
-#include "protobuf_rpc.h"
-#include "protobuf_rpc_channel.h"
-#include "protobuf_rpc_socket.h"
-#include "control_service.h"
+#include <sqlite3.h>
+#include <map>
+#include <vector>
+#include "CppSQLite3.h"
+#include "singleton.h"
 
-#include "info.h"
-
-InfoResponse* getInfo(void)
-{
-	ControlService* service;
-	Void request;
-	InfoResponse *response = new InfoResponse;
-	awk::protobuf::jerpc::SocketRpcController aController;
-	
-  service = new ControlService::Stub(an::anClient::instance().getChannel());
+#ifndef DAEMON_DB_MANAGER_H_
+#define DAEMON_DB_MANAGER_H_
+namespace an {
 		
-  // Execute the RPC.
-  service->getInfo(&aController, &request, response, NULL);
+class DBManager : public Singleton<DBManager>
+	{
+		friend class Singleton<DBManager>;
+public:
+		bool init(const std::string&);
+		
+	//	bool store_object(const StoreObjectRequest* req);
+//		bool delete_object(const DeleteObjectRequest* req);
 
-	// printf("%s: response.anversion = %d\n", __FUNCTION__, response->anversion());
-	
-  delete service;
-	return response;
+		std::vector<std::string> get_unchecked_keys_since(int);
+private:
+		CppSQLite3DB db_;
+		std::map<std::string,int> ap_list_;
+		void run_checker();
+	};
 }
+#endif  // DAEMON_DB_MANAGER_H_

@@ -5,7 +5,6 @@ import "control_service_messages.proto";
 option cc_generic_services = false;
 
 service ControlService {
- rpc getInfo (Void) returns (InfoResponse);
  rpc get (GetRequest) returns (GetResponse);
  rpc put (PutRequest) returns (PutResponse);
  rpc storeObject (StoreObjectRequest) returns (CRUDResponse);

@@ -1,0 +1,37 @@
+import "util.proto";
+
+
+message PeerInfo {
+ required string ip = 1;
+ required int32 port = 2;
+}
+
+
+message Document {
+ required string owner = 1;
+ required string content = 2;
+}
+
+message InfoResponse {
+ optional int32 anVersion = 1;
+ optional int32 uptime = 3;
+ optional int32 connectedNodes = 4;
+ enum OperatingSystem {
+ osBSD = 0;
+ osLinux = 1;
+ osMac = 2;
+ osWin = 3;
+ osOther = 4;
+}
+optional OperatingSystem operatingsystem = 9;
+repeated Extension extensions = 10;
+}
+
+// Turn off the built-in generation of services classes
+option cc_generic_services = false;
+
+service RPCService {
+ rpc bootstrap (PeerInfo) returns (Status);
+ rpc createDocument (Document) returns (Status);
+ rpc getInfo (Void) returns (InfoResponse);
+}

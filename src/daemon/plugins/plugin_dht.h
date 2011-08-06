@@ -18,31 +18,25 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sqlite3.h>
-#include <map>
-#include <vector>
-#include "CppSQLite3.h"
-#include "singleton.h"
-#include "protocol/control_service_messages.pb.h"
+#include "puggDriver.h"
+#include "plugins/plugin.h"
 
-#ifndef DAEMON_DB_MANAGER_H_
-#define DAEMON_DB_MANAGER_H_
+#ifndef DAEMON_PLUGIN_DHT_H
+#define DAEMON_PLUGIN_DHT_H
 namespace an {
-		
-class DBManager : public Singleton<DBManager>
-	{
-		friend class Singleton<DBManager>;
-public:
-		bool init(const std::string&);
-		
-		bool store_object(const StoreObjectRequest* req);
-		bool delete_object(const DeleteObjectRequest* req);
 
-		std::vector<std::string> get_unchecked_keys_since(int);
-private:
-		CppSQLite3DB db_;
-		std::map<std::string,int> ap_list_;
-		void run_checker();
-	};
+#define PLG_DHT_SERVER_NAME "DHTServer"
+#define PLG_DHT_SERVER_VERSION 1
+
+class DHTplugin : public Plugin
+{
+public:
+	virtual const std::string getName() {return "generic DHTplugin";}
+};
+class DHTpluginDriver : public pugg::Driver
+{
+public:
+	virtual DHTplugin* createPlugin() = 0;
+};
 }
-#endif  // DAEMON_DB_MANAGER_H_
+#endif

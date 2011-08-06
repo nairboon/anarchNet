@@ -26,7 +26,7 @@
 #include <boost/tokenizer.hpp>
 
 #include "anarchNet.h"
-#include "connection_manager.h"
+#include "module_manager.h"
 #include "config_manager.h"
 
 using std::string;
@@ -36,15 +36,14 @@ using boost::asio::ip::tcp;
 namespace an
 {
 
-bool ConnectionManager::init()
+bool ModuleManager::init()
 {
-	if(!kad_init())
-		return false;
+
 	
 	return true;
 }
 	
-	bool ConnectionManager::bootstrapp_from_cache() {
+/*	bool ModuleManager::bootstrapp_from_cache() {
 		JoinCallback cb;
 
 		LOG(INFO) << "trying to bootstrap from cache";
@@ -57,7 +56,7 @@ bool ConnectionManager::init()
 		
 			return false;
 	}
-	bool ConnectionManager::bootstrapp_from_server() {
+	bool ModuleManager::bootstrapp_from_server() {
 		JoinCallback cb;
 		std::string res;
 		foreach (string server_url, ConfigManager::instance().config()["bs-list"].as< std::vector<string> >()) {
@@ -100,7 +99,7 @@ bool ConnectionManager::init()
 		return false;
 	}
 	
-	bool ConnectionManager::kad_init()
+	bool ModuleManager::kad_init()
 	{
 		trans_handler_.Register(new transport::TransportUDT, &trans_id_);
 		chmanager_ = new rpcprotocol::ChannelManager(&trans_handler_);
@@ -151,13 +150,13 @@ bool ConnectionManager::init()
 		
 		return true;
 	}
-	void ConnectionManager::create_network(JoinCallback* cb)
+	void ModuleManager::create_network(JoinCallback* cb)
 	{
 		
 		
 	}
 	
-	bool ConnectionManager::kad_shutdown()
+	bool ModuleManager::kad_shutdown()
 	{
 		trans_handler_.StopPingRendezvous();
     node_->Leave();
@@ -165,7 +164,7 @@ bool ConnectionManager::init()
     chmanager_->Stop();
 		return true;
 	}
-	bool ConnectionManager::kadconfig_empty(const std::string &path) {
+	bool ModuleManager::kadconfig_empty(const std::string &path) {
 		base::KadConfig kadconfig;
 		try {
 			boost::filesystem::ifstream input(path.c_str(),
@@ -183,7 +182,7 @@ bool ConnectionManager::init()
 		return false;
 	}
 	
-	bool ConnectionManager::write_to_kadconfig(const std::string &path, const std::string &node_id,
+	bool ModuleManager::write_to_kadconfig(const std::string &path, const std::string &node_id,
 																		const std::string &ip, const boost::uint16_t &port,
 																		const std::string &local_ip, const boost::uint16_t &local_port) {
 		base::KadConfig kadconfig;
@@ -207,8 +206,8 @@ bool ConnectionManager::init()
 		}
 		return boost::filesystem::exists(path);
 	}
-	
-	bool ConnectionManager::http_request(const std::string& _url,std::string *_response)
+*/	
+	bool ModuleManager::http_request(const std::string& _url,std::string *_response)
 	{
     std::size_t index = _url.find_first_of('/');
     std::string url_server = _url.substr(0,index);

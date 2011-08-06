@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "pb_json.h"
-#include "control_service.pb.h"
+#include "rpc_service.pb.h"
 
 TEST(json,write)
 {

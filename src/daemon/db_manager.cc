@@ -22,20 +22,20 @@
 #include <fstream>
 #include <vector>
 #include <glog/logging.h>
-#include "boost/thread.hpp"
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/asio.hpp>
+//#include <boost/bind.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
 #include "anarchNet.h"
 #include "db_manager.h"
-#include "config_manager.h"
+//#include "config_manager.h"
 
 using std::string;
 
 namespace an
 {
 
-	class online_checker
+/*	class online_checker
 		{
 		public:
 			online_checker(boost::asio::io_service& io,int seconds)
@@ -58,10 +58,10 @@ namespace an
 		private:
 			boost::asio::deadline_timer timer_;
 		};
-	
+	*/
 bool DBManager::init(const string& db_path)
 {
-	db_.open((db_path+"/"+ConfigManager::instance().config()["db"].as<std::string>()).c_str());
+/*	db_.open((db_path+"/"+ConfigManager::instance().config()["db"].as<std::string>()).c_str());
 	
 	// cache apps & protocols
 	// to avoid frequent queries to this "static" table
@@ -77,11 +77,11 @@ bool DBManager::init(const string& db_path)
 		int id = t.getIntField(0);
 		ap_list_[t.getStringField(1)] = id;
 	}
-	boost::thread thread(boost::bind(&DBManager::run_checker,this));
+	boost::thread thread(boost::bind(&DBManager::run_checker,this));*/
 	return true;
 }
 	
-bool DBManager::store_object(const StoreObjectRequest* req)
+/*bool DBManager::store_object(const StoreObjectRequest* req)
 {
 	//test if object is already stored
 	CppSQLite3Statement stmt = db_.compileStatement("select key from data where key=?;");
@@ -134,5 +134,5 @@ bool DBManager::store_object(const StoreObjectRequest* req)
 			res.push_back(q.fieldValue(0));
 		}
 		return res;
-	}
+	}*/
 }

@@ -26,15 +26,14 @@
 #include <glog/logging.h>
 
 #include "protobuf_rpc_socket.h"
-#include "maidsafe/transport/transportudt.h"
-#include "maidsafe/protobuf/contact_info.pb.h"
 
 #include "anarchNet.h"
 #include "daemon.h"
-#include "control_service.h"
+#include "rpc_service.h"
 #include "config_manager.h"
-#include "connection_manager.h"
+#include "module_manager.h"
 #include "db_manager.h"
+
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -50,19 +49,20 @@ bool anDaemon::init(const string& directory)
 	if(!ConfigManager::instance().init(directory))
 		return false;
 
-	if(!DBManager::instance().init(directory))
-		return false;
+//	if(!DBManager::instance().init(directory))
+//		return false;
 	
-	if(!ConnectionManager::instance().init())
+	if(!ModuleManager::instance().init())
 		return false;
 	
 	awk::protobuf::jerpc::socket_initialize();
 	return true;
 }
-void anDaemon::run()
+	
+void anDaemon::run() 
 {
-	control_service_ = new anControlService(ConnectionManager::instance().node());
-	server_.RegisterService(control_service_);
+	rpc_service_ = new anRPCService();
+	server_.RegisterService(rpc_service_);
 	LOG(INFO) << "main run";
 	server_.RunServer();
 }

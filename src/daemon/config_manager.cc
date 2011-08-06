@@ -26,7 +26,7 @@
 #include <vector>
 #include "boost/filesystem.hpp"
 #include "anarchNet.h"
-#include "connection_manager.h"
+#include "module_manager.h"
 
 using std::string;
 namespace po = boost::program_options;
@@ -38,13 +38,13 @@ namespace an
 bool ConfigManager::init(const string& directory)
 {
 	
-	string config_file = directory + "/config.cfg";
+	string config_file = directory + "/anarchnet.conf";
 
 	po::options_description config_file_options("Configuration");
 	config_file_options.add_options()
-	("control-rpc-port", po::value<int>()->default_value(ANARCHNET_RPC_PORT))
-	("anarchnet-port", po::value<int>()->default_value(ANARCHNET_PORT))
-	("plugin",po::value< std::vector<string> >()->composing())
+	("rpc-port", po::value<int>()->default_value(ANARCHNET_RPC_PORT))
+	("port", po::value<int>()->default_value(ANARCHNET_PORT))
+	("modules",po::value< std::vector<string> >()->composing())
 	("db",po::value<string>()->default_value("data.db"))
 	("db-recheck", po::value<int>()->default_value(10))
 	("bs-list",po::value< std::vector<string> >()->composing());
@@ -62,12 +62,9 @@ bool ConfigManager::init(const string& directory)
 		LOG(ERROR) << "no bs-list";
 		return false;
 	}
-	fs::path kad_path = fs::path(directory) / "kadconfig";
-	kad_config_ = kad_path.file_string();
 	
-	if (!fs::exists( kad_path ) ) {
-		LOG(ERROR) << "kadconfig not found: " << kad_path;
-		return false;
+	foreach (string plugin_name, vm_["modules"].as< std::vector<string> >()) {
+		LOG(INFO) << plugin_name;
 	}
 	
 	/*
@@ -86,7 +83,7 @@ bool ConfigManager::init(const string& directory)
 				LOG(ERROR) << "could not create directory: " << plugin_data_path;
 				return false;
 			}
-		if( !ConnectionManager::instance().loadPlugin(plugin_name,plugin_path.file_string(),plugin_data_path.directory_string())) {
+		if( !ModuleManager::instance().loadPlugin(plugin_name,plugin_path.file_string(),plugin_data_path.directory_string())) {
 			LOG(ERROR) << "could not load plugin: " << plugin_name;
 		}
 	}*/

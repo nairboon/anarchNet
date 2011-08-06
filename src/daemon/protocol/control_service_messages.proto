@@ -1,18 +1,5 @@
 import "util.proto";
 
-message InfoResponse {
- optional int32 anVersion = 1;
- optional int32 uptime = 3;
- optional int32 connectedNodes = 4;
- enum OperatingSystem {
- osBSD = 0;
- osLinux = 1;
- osMac = 2;
- osWin = 3;
- osOther = 4;
-}
-optional OperatingSystem operatingsystem = 9;
-repeated Extension extensions = 10;
 
 }
 message Status {

@@ -1,0 +1,9 @@
+import "util.proto";
+
+
+
+// Turn off the built-in generation of services classes
+option cc_generic_services = false;
+
+service p2p {
+}

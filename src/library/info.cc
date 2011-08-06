@@ -18,24 +18,28 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-#include <boost/program_options.hpp>
-#include "singleton.h"
+#include "client.h"
+#include "protobuf_rpc.h"
+#include "protobuf_rpc_channel.h"
+#include "protobuf_rpc_socket.h"
+#include "rpc_service.h"
 
-#ifndef DAEMON_CONFIG_MANAGER_H_
-#define DAEMON_CONFIG_MANAGER_H_
-namespace an {
+#include "info.h"
+
+InfoResponse* getInfo(void)
+{
+	RPCService* service;
+	Void request;
+	InfoResponse *response = new InfoResponse;
+	awk::protobuf::jerpc::SocketRpcController aController;
 	
-class ConfigManager : public Singleton<ConfigManager>
-	{
-		friend class Singleton<ConfigManager>;
-public:
-		bool init(const std::string&);
-		std::string kad_config() { return kad_config_; }
-		const boost::program_options::variables_map& config() { return vm_; }
-private:
-		boost::program_options::variables_map vm_;
-		std::string kad_config_;
-	};
+  service = new RPCService::Stub(an::anClient::instance().getChannel());
+		
+  // Execute the RPC.
+  service->getInfo(&aController, &request, response, NULL);
+
+	// printf("%s: response.anversion = %d\n", __FUNCTION__, response->anversion());
+	
+  delete service;
+	return response;
 }
-#endif  // DAEMON_CONFIG_MANAGER_H_

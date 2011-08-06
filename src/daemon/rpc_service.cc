@@ -18,10 +18,9 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "control_service.h"
+#include "rpc_service.h"
 #include <glog/logging.h>
 #include <iostream>
-#include "maidsafe/protobuf/kademlia_service_messages.pb.h"
 #include "version.h"
 #include "anarchNet.h"
 #include "db_manager.h"
@@ -30,7 +29,7 @@
 namespace an
 {
 
-void anControlService::getInfo(awk::protobuf::RpcController* controller,
+void anRPCService::getInfo(awk::protobuf::RpcController* controller,
 															 const Void* request,
 															 InfoResponse* response,
 															 google::protobuf::Closure* done)
@@ -53,23 +52,13 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 }
 	
 	
-	void anControlService::get(awk::protobuf::RpcController* controller,
+/*	void anRPCService::get(awk::protobuf::RpcController* controller,
 					 const GetRequest* request,
 					 GetResponse* response,
 					 google::protobuf::Closure* done)
 	{
 		identify;
-		
-		kad::KadId key;
-		try {
-			key = kad::KadId(request->key(), true);
-		}
-		catch(const kad::KadIdException&) {
-			key = kad::KadId(cryobj_.Hash(request->key().c_str(), "", crypto::STRING_STRING,
-																		false), false);
-		}
-		node_->FindValue(key, false,
-										 boost::bind(&anControlService::getCallback, this, _1, response, done));
+boost::bind(&anControlService::getCallback, this, _1, response, done));
 		
 	}
 	void anControlService::getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done)
@@ -89,14 +78,14 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 			
 			/*
 			 * \todo no iterating?
-			 */
+			 *
 			for (int i = 0; i < msg.values_size(); ++i)
         response->add_values( msg.values(i) );
 		}
 		if(done)
 			done->Run();
 	}
-	void anControlService::put(awk::protobuf::RpcController* controller,
+	void anRPCService::put(awk::protobuf::RpcController* controller,
 					 const PutRequest* request,
 					 PutResponse* response,
 					 google::protobuf::Closure* done)
@@ -114,7 +103,7 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 			node_->StoreValue(key, request->value(),request->ttl(), boost::bind(
 																											 &anControlService::putCallback, this, _1, response,done));
 			}
-	void anControlService::putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done)
+	void anRPCService::putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done)
 	{
 	
 		
@@ -144,7 +133,7 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 			done->Run();
 	}
 	
-	void anControlService::deleteObject(awk::protobuf::RpcController* controller,
+	void anRPCService::deleteObject(awk::protobuf::RpcController* controller,
 										const DeleteObjectRequest* request,
 										CRUDResponse* response,
 										google::protobuf::Closure* done)
@@ -152,5 +141,5 @@ void anControlService::getInfo(awk::protobuf::RpcController* controller,
 		DBManager::instance().delete_object(request);
 		if (done)
 			done->Run();
-	}
+	}*/
 }

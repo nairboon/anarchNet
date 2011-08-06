@@ -22,7 +22,7 @@
 #include <google/protobuf/descriptor.h>
 #include "protobuf_rpc_channel.h"
 #include "protobuf_rpc.h"
-#include "control_service.pb.h"
+#include "rpc_service.pb.h"
 #include "client.h"
 #include "anarchNet.h"
 
@@ -43,9 +43,9 @@ bool anClient::init()
 	
 	google::protobuf::Message* Query(const std::string& name, const google::protobuf::Message*req)
 	{
-		ControlService* service;
+		RPCService* service;
 		awk::protobuf::jerpc::SocketRpcController aController;
-		service = new ControlService::Stub(an::anClient::instance().getChannel());
+		service = new RPCService::Stub(an::anClient::instance().getChannel());
 		const google::protobuf::MethodDescriptor* method = service->GetDescriptor()->FindMethodByName(name);
 		
 		if(method != NULL)		
@@ -56,12 +56,12 @@ bool anClient::init()
 		google::protobuf::Message* res;
 		if(method->name() == "getInfo")
 			res = new InfoResponse;
-		else if (method->name() == "get")
+	/*	else if (method->name() == "get")
 			res = new GetResponse;
 		else if (method->name() == "put")
 			res = new PutResponse;
 		else if (method->name() == "storeObject" || method->name() == "deleteObject")
-			res = new CRUDResponse;
+			res = new CRUDResponse;*/
 		else {
 			LOG(FATAL) << "unregistered method @liban";
 			return NULL;

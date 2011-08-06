@@ -18,27 +18,26 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "control_service.pb.h"
+#include "RPC_service.pb.h"
 #include "config.h"
-#include "maidsafe/maidsafe-dht.h"
 #include "maidsafe/base/crypto.h"
+#include "protocol/rpc_service.pb.h"
 
-
-#ifndef DAEMON_CONTROL_SERVICE_H_
-#define DAEMON_CONTROL_SERVICE_H_
+#ifndef DAEMON_RPC_SERVICE_H_
+#define DAEMON_RPC_SERVICE_H_
 
 #define identify LOG(INFO) << __FUNCTION__ << " request"
 
 namespace an {
 	
-	class anControlService : public ControlService {
+	class anRPCService : public RPCService {
 	public:
-		explicit anControlService(kad::KNode *n) : node_(n) { cryobj_.set_hash_algorithm(crypto::SHA_512); }
+		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }
 		void getInfo(awk::protobuf::RpcController* controller,
 								 const Void* request,
 								 InfoResponse* response,
 								 google::protobuf::Closure* done);
-		void get(awk::protobuf::RpcController* controller,
+/*		void get(awk::protobuf::RpcController* controller,
 								 const GetRequest* request,
 								 GetResponse* response,
 								 google::protobuf::Closure* done);
@@ -53,15 +52,14 @@ namespace an {
 		void deleteObject(awk::protobuf::RpcController* controller,
 						 const DeleteObjectRequest* request,
 						 CRUDResponse* response,
-						 google::protobuf::Closure* done);
+						 google::protobuf::Closure* done);*/
 private:
 	
-	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
-	void putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done);
+//	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
+//	void putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done);
 
-	kad::KNode *node_;
 	crypto::Crypto cryobj_;
 
 };
 }
-#endif  // DAEMON_CONTROL_SERVICE_H_
+#endif  // DAEMON_RPC_SERVICE_H_

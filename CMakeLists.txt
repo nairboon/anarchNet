@@ -5,18 +5,21 @@
 project(anarchNet)
 cmake_minimum_required(VERSION 2.6)
 
-if (CMAKE_BUILD_TYPE STREQUAL "")
-   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release." FORCE)
-endif ()
+GET_FILENAME_COMPONENT(CMAKE_BUILD_TYPE_DIR ${CMAKE_BINARY_DIR} NAME)
+SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_DIR})
+
+
+set(ROOT_DIR  ${CMAKE_SOURCE_DIR})
+set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
 
 if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin")
+#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 	set(BIN_DIR "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
-	set(PLG_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/")
+#	set(PLG_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/")
 else()
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR})
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 	set(BIN_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 	set(PLG_BIN_DIR ${BIN_DIR})
 endif()
@@ -35,21 +38,22 @@ find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 
 
-set(Boost_ADDITIONAL_VERSIONS "1.41")
+set(Boost_ADDITIONAL_VERSIONS "1.47")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.41 COMPONENTS system program_options thread filesystem  REQUIRED)
+find_package(Boost 1.47 COMPONENTS system program_options thread filesystem  REQUIRED)
 
 include_directories( 
-	"${CMAKE_SOURCE_DIR}"
-	"${CMAKE_SOURCE_DIR}/daemon"
-	"${CMAKE_SOURCE_DIR}/library"
+	"${SOURCE_DIR}"
+	"${SOURCE_DIR}/daemon"
+	"${SOURCE_DIR}/library"
 	"/usr/local/include"
 	${Boost_INCLUDE_DIRS} 
 	${GTEST_INCLUDE_DIRS}
 	${MAIDSAFE_INCLUDE_DIRS}
-	"${CMAKE_SOURCE_DIR}/daemon/protocol"
-	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc"
+	"${SOURCE_DIR}/daemon/protocol"
+	"${ROOT_DIR}/third-party/protobuf-jerpc/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
+	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3"
  )
 set( LIB
@@ -102,67 +106,71 @@ set_source_files_properties(${SRCS} ${HDRS} PROPERTIES GENERATED 1)
 endmacro()
 
 ### generate rpc plugin ###
-set(RPC_PLG_SRC "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/file_generator.cc"
-		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/helpers.cc"
-		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/plugin.cc"
-		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service_generator.cc"
-		"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service.cc")
+set(RPC_PLG_SRC "${ROOT_DIR}/third-party/protobuf-jerpc/plugin/file_generator.cc"
+		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/helpers.cc"
+		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/plugin.cc"
+		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service_generator.cc"
+		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service.cc")
 add_executable(protoc-gen-rpc ${RPC_PLG_SRC})
 target_link_libraries(protoc-gen-rpc ${PROTOBUF_LIBRARIES} ${PROTOBUF_PROTOC_LIBRARY} ${PLATFORM_LIB})
 
 ### generate proto files ###
 
-set(PROTO_FILES "${CMAKE_SOURCE_DIR}/daemon/protocol/util.proto"
-       		"${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.proto"
-		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.proto"
-		"${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.proto")
-if(${REGENERATE})
-generate_protobuf_files(${PROTO_FILES})
-endif()
+set(PROTO_FILES "${SOURCE_DIR}/daemon/protocol/util.proto"
+       			"${SOURCE_DIR}/daemon/protocol/protorpc.proto"
+				"${SOURCE_DIR}/daemon/protocol/rpc_service.proto"
+				"${SOURCE_DIR}/daemon/protocol/p2p_service.proto")
+#if(${REGENERATE})
+	generate_protobuf_files(${PROTO_FILES})
+	MESSAGE("generated protobuf files")
+#endif()
 
 set(PB_DAEMON_G ${SRCS} ${HDRS})
 
-file(GLOB PB-RPC_C "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc/*.c*")
-file(GLOB PB-RPC_H "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/rpc/*.h*")
+file(GLOB PB-RPC_C "${ROOT_DIR}/third-party/protobuf-jerpc/rpc/*.c*")
+file(GLOB PB-RPC_H "${ROOT_DIR}/third-party/protobuf-jerpc/rpc/*.h*")
+
 list(APPEND PB-RPC_SRC ${PB-RPC_C} ${PB-RPC_H}
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/protorpc.pb.cc"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/util.pb.cc"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/util.pb.h"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.pb.cc"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service_messages.pb.h"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.pb.cc"
-		   "${CMAKE_SOURCE_DIR}/daemon/protocol/control_service.pb.h"
-		   "${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin/service.cc"
+		   "${SOURCE_DIR}/daemon/protocol/protorpc.pb.cc"
+		   "${SOURCE_DIR}/daemon/protocol/protorpc.pb.h"
+		   "${SOURCE_DIR}/daemon/protocol/util.pb.cc"
+		   "${SOURCE_DIR}/daemon/protocol/util.pb.h"
+		   "${SOURCE_DIR}/daemon/protocol/rpc_service.pb.cc"
+		   "${SOURCE_DIR}/daemon/protocol/rpc_service.pb.h"
+		   "${SOURCE_DIR}/daemon/protocol/p2p_service.pb.cc"
+		   "${SOURCE_DIR}/daemon/protocol/p2p_service.pb.h"
+		   "${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service.cc"
 )
 
 add_library(pb-rpc ${PB-RPC_SRC})
+add_dependencies(pb-rpc protoc-gen-rpc)
 
 ################################################################################
 # Daemon
 ################################################################################
 
-file(GLOB DAEMON_C "daemon/*.c*")
-file(GLOB DAEMON_H "daemon/*.h*")
+file(GLOB DAEMON_C "${SOURCE_DIR}/daemon/*.c*")
+file(GLOB DAEMON_H "${SOURCE_DIR}/daemon/*.h*")
 list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H}
-"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
-"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3/CppSQLite3.h")
+"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
+"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h")
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon protoc-rpc-plugin)
 target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} pb-rpc)
 
-configure_file(${CMAKE_SOURCE_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
-configure_file(${CMAKE_SOURCE_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
+configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
+configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
 add_custom_command(TARGET anDaemon POST_BUILD 
-		   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/daemon/config" "${BIN_DIR}/daemontest")
+		   COMMAND ${COMMAND} -E copy_directory "${SOURCE_DIR}/daemon/config" "${BIN_DIR}/daemontest")
 add_custom_command(TARGET anDaemon POST_BUILD
-		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${BIN_DIR}/daemontest" "~/.anarchNet")
+		   COMMAND ${COMMAND} -E create_symlink "${BIN_DIR}/daemontest" "~/.anarchNet")
 ################################################################################
 # Library
 ################################################################################
 
-file(GLOB LIBRARY_C "library/*.c*")
-file(GLOB LIBRARY_H "library/*.h*")
+file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
+file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
 list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
 file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
@@ -182,12 +190,12 @@ file(GLOB BROWSER_HTTP_C "browser/http/*.c*")
 file(GLOB BROWSER_HTTP_H "browser/http/*.h*")
 list(APPEND BROWSER_SRC ${BROWSER_C} ${BROWSER_H} ${BROWSER_HTTP_C} ${BROWSER_HTTP_H})
 
-add_executable(anBrowser ${BROWSER_SRC})
-add_dependencies(anBrowser liban protoc-rpc-plugin)
-target_link_libraries(anBrowser ${LIB} pb-rpc an)
+#add_executable(anBrowser ${BROWSER_SRC})
+#add_dependencies(anBrowser liban protoc-rpc-plugin)
+#target_link_libraries(anBrowser ${LIB} pb-rpc an)
 
-add_custom_command(TARGET anBrowser POST_BUILD
-		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
+#add_custom_command(TARGET anBrowser POST_BUILD
+#		   COMMAND ${COMMAND} -E create_symlink "${SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
 ################################################################################
 # Python library search (style check)                                          #
 ################################################################################
@@ -204,11 +212,11 @@ endif ()
 ###################################################################################################
 # Tests
 ###################################################################################################
-file(GLOB T_MAIN  "tests/main.cc")
-file(GLOB T_BASE_C "tests/base/*.c*")
-file(GLOB T_BASE_H "tests/base/*.h*")
-file(GLOB T_RPC_C "tests/rpc/*.c*")
-file(GLOB T_RPC_H "tests/rpc/*.h*")
+file(GLOB T_MAIN  "${SOURCE_DIR}/tests/main.cc")
+file(GLOB T_BASE_C "${SOURCE_DIR}/tests/base/*.c*")
+file(GLOB T_BASE_H "${SOURCE_DIR}/tests/base/*.h*")
+file(GLOB T_RPC_C "${SOURCE_DIR}/tests/rpc/*.c*")
+file(GLOB T_RPC_H "${SOURCE_DIR}/tests/rpc/*.h*")
 list(APPEND T_BASE_DIR ${T_BASE_C} ${T_BASE_H})
 list(APPEND T_RPC_DIR ${T_RPC_C} ${T_RPC_H} ${PB_DAEMON_FE})
 
@@ -230,7 +238,7 @@ add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
 if (PYTHONINTERP_FOUND)
   set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line,-build/include,-readability/streams")
   if (UNIX)
-    add_test(STYLE_CHECK_DAEMON ${CMAKE_SOURCE_DIR}/cpplint.py ${CPPLINTOPS} ${DAEMON_SRC})
+    add_test(STYLE_CHECK_DAEMON ${ROOT_DIR}/cpplint.py ${CPPLINTOPS} ${DAEMON_SRC})
     set_property(TEST STYLE_CHECK_DAEMON PROPERTY LABELS Functional Daemon CodingStyle)
    # ADD_TEST(STYLE_CHECK_LIBRARY ${MAIDSAFE_SOURCE_DIR}/cpplint.py ${M_BASE_DIR} ${T_BASE_DIR})
    # SET_PROPERTY(TEST STYLE_CHECK_LIBRARY PROPERTY LABELS Functional Library CodingStyle)
@@ -256,4 +264,4 @@ endif ()
    ENDIF()
  ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
 
-add_subdirectory(ap/core)
+#add_subdirectory(ap/core)
