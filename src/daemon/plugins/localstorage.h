@@ -18,26 +18,28 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>
-#include "singleton.h"
-#include "puggKernel.h"
-#include "puggServer.h"
-//#include "plugins/plugin_dht.h"
+#include "puggDriver.h"
+#include "plugins/plugin.h"
 
-#ifndef DAEMON_PLUGIN_MANAGER_H_
-#define DAEMON_PLUGIN_MANAGER_H_
+#ifndef DAEMON_PLUGIN_LOCALSTORAGE_H
+#define DAEMON_PLUGIN_LOCALSTORAGE_H
 namespace an {
-	
-	class PluginManager : public Singleton<PluginManager>
-	{
-		friend class Singleton<PluginManager>;
-	public:
-		bool init();
-		bool loadPlugin(const std::string&,const std::string&,const std::string&);
-	private:
-		pugg::Kernel plugin_kernel_;
-	//	pugg::Server<DHTpluginDriver>* dhtServer_;
-	//	std::vector<DHTplugin*> dhtPlugins_;
-	};
+
+#define PLG_LOCALSTORAGE_SERVER_NAME "LocalStorageServer"
+#define PLG_LOCALSTORAGE_SERVER_VERSION 1
+namespace plg {
+class LocalStorage : public Plugin
+{
+public:
+	virtual const std::string getName() {return "generic LOCALSTORAGEplugin";}
+};
+}
+	namespace plgdrv {
+class LocalStorage : public pugg::Driver
+{
+public:
+	virtual plg::LocalStorage* createPlugin() = 0;
+};
+	}
 }
 #endif

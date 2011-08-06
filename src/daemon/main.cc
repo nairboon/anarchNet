@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
 		//daemonize
 		if (vm.count("daemonize")) {
-			LOG(INFO) << "become daemon";
+			LOG(INFO) << "forking...";
 
 		 pid_t pid = fork();
 		 if ( pid < 0)

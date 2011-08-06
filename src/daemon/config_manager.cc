@@ -57,15 +57,13 @@ bool ConfigManager::init(const string& directory)
 	
 	store(parse_config_file(ifs, config_file_options), vm_);
 	notify(vm_);
-	
-	if(!vm_.count("bs-list")){
-		LOG(ERROR) << "no bs-list";
+
+	if(!vm_.count("modules")){
+		LOG(ERROR) << "no modules";
 		return false;
 	}
 	
-	foreach (string plugin_name, vm_["modules"].as< std::vector<string> >()) {
-		LOG(INFO) << plugin_name;
-	}
+
 	
 	/*
 	fs::path plugin_path;

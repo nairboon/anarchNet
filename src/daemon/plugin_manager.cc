@@ -23,6 +23,11 @@
 #include <glog/logging.h>
 #include "anarchNet.h"
 #include "plugin_manager.h"
+#include "plugins/bootstrap.h"
+#include "plugins/localstorage.h"
+#include "plugins/remotestorage.h"
+#include "plugins/session.h"
+
 
 using std::string;
 
@@ -31,24 +36,35 @@ namespace an
 	
 	bool PluginManager::init()
 	{
-		dhtServer_ = new pugg::Server<DHTpluginDriver>(PLG_DHT_SERVER_NAME,PLG_DHT_SERVER_VERSION);
-		plugin_kernel_.addServer(dhtServer_);
+		pugg::Server<an::plgdrv::Bootstrap>* bootstrap_server = new pugg::Server<plgdrv::Bootstrap>(PLG_BOOTSTRAP_SERVER_NAME,PLG_BOOTSTRAP_SERVER_VERSION);
+		pugg::Server<an::plgdrv::LocalStorage>* localstorage_server = new pugg::Server<plgdrv::LocalStorage>(PLG_LOCALSTORAGE_SERVER_NAME,PLG_LOCALSTORAGE_SERVER_VERSION);
+		pugg::Server<an::plgdrv::RemoteStorage>* remotestorage_server = new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
+		pugg::Server<an::plgdrv::Session>* session_server = new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
+
+		plugin_kernel_.addServer(bootstrap_server);
+		plugin_kernel_.addServer(localstorage_server);
+		plugin_kernel_.addServer(remotestorage_server);
+		plugin_kernel_.addServer(session_server);
+
 		return true;
 	}
 	
 	bool PluginManager::loadPlugin(const std::string& plugin_name, const std::string& plugin_path,const std::string& plugin_working_directory)
 	{
-		if(!plugin_kernel_.loadPlugin(plugin_path)) 
+		LOG(INFO) << "load plugin " << plugin_name;
+		if(!plugin_kernel_.loadPlugin(plugin_path)) {
+			LOG(ERROR) << "could not laod plugin: " << plugin_path;
 			return false; 
+		}
 		
-		std::vector<DHTpluginDriver*> drv;
+	/*	std::vector<DHTpluginDriver*> drv;
 		dhtServer_->getAllDrivers(drv);
 		std::cerr << drv.size() << " drivers register";
 		foreach(DHTpluginDriver* p,drv)
-		LOG(INFO) << p->createPlugin()->getName();
+		LOG(INFO) << p->createPlugin()->getName();*/
 		//	if(driver == NULL)
 		//return false;
-		LOG(FATAL) << "plg";
+		//LOG(FATAL) << "plg";
 		//	dhtPlugins_.push_back(driver->createPlugin());
 		return true;
 	}

@@ -14,12 +14,14 @@ set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
 
 if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/..")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
 	set(BIN_DIR "${CMAKE_BINARY_DIR}")
 	set(PLG_BIN_DIR ${BIN_DIR})
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/bin")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 	set(BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 	set(PLG_BIN_DIR ${BIN_DIR})
 endif()
@@ -152,7 +154,8 @@ add_dependencies(pb-rpc protoc-gen-rpc)
 
 file(GLOB DAEMON_C "${SOURCE_DIR}/daemon/*.c*")
 file(GLOB DAEMON_H "${SOURCE_DIR}/daemon/*.h*")
-list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H}
+file(GLOB DAEMON_PLG_H "${SOURCE_DIR}/daemon/plugins/*.h*")
+list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
 "${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
 "${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h")
 
@@ -180,7 +183,7 @@ file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
 file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
 list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
 
-add_library(an ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
+add_library(an SHARED ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
 add_dependencies(an pb-rpc protoc-rpc-plugin)
 target_link_libraries(an ${LIB} pb-rpc)
 ################################################################################
@@ -267,4 +270,8 @@ endif ()
    ENDIF()
  ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
 
-#add_subdirectory(ap/core)
+#add_subdirectory("${SOURCE_DIR}/modules/")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/bootstrap")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/localstorage")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/remotestorage")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/session")

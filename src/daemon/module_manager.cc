@@ -27,6 +27,7 @@
 
 #include "anarchNet.h"
 #include "module_manager.h"
+#include "plugin_manager.h"
 #include "config_manager.h"
 
 using std::string;
@@ -38,7 +39,9 @@ namespace an
 
 bool ModuleManager::init()
 {
-
+	foreach (string plugin_name, ConfigManager::instance().config()["modules"].as< std::vector<string> >()) {
+		PluginManager::instance().loadPlugin(plugin_name,plugin_name+".dylib",plugin_name);
+	}
 	
 	return true;
 }

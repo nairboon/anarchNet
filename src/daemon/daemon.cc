@@ -33,6 +33,7 @@
 #include "config_manager.h"
 #include "module_manager.h"
 #include "db_manager.h"
+#include "plugin_manager.h"
 
 
 namespace po = boost::program_options;
@@ -46,12 +47,18 @@ namespace an {
 bool anDaemon::init(const string& directory)
 {
 	
+	LOG(INFO) << "load config_manager";
 	if(!ConfigManager::instance().init(directory))
 		return false;
 
 //	if(!DBManager::instance().init(directory))
 //		return false;
 	
+	LOG(INFO) << "load plugin_manager";
+	if(!PluginManager::instance().init())
+		return false;
+	
+	LOG(INFO) << "load module_manager";
 	if(!ModuleManager::instance().init())
 		return false;
 	

@@ -21,22 +21,26 @@
 #include "puggDriver.h"
 #include "plugins/plugin.h"
 
-#ifndef DAEMON_PLUGIN_DHT_H
-#define DAEMON_PLUGIN_DHT_H
+#ifndef DAEMON_PLUGIN_SESSION_H
+#define DAEMON_PLUGIN_SESSION_H
 namespace an {
+	namespace plg {
+#define PLG_SESSION_SERVER_NAME "SessionServer"
+#define PLG_SESSION_SERVER_VERSION 1
 
-#define PLG_DHT_SERVER_NAME "DHTServer"
-#define PLG_DHT_SERVER_VERSION 1
-
-class DHTplugin : public Plugin
+class Session : public Plugin
 {
 public:
-	virtual const std::string getName() {return "generic DHTplugin";}
+	virtual const std::string getName() {return "generic session plugin";}
 };
-class DHTpluginDriver : public pugg::Driver
+	}
+		namespace plgdrv {
+class Session : public pugg::Driver
 {
 public:
-	virtual DHTplugin* createPlugin() = 0;
+	virtual plg::Session* createPlugin() = 0;
 };
+		}
+
 }
 #endif
