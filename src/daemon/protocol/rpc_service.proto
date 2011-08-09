@@ -1,5 +1,8 @@
 import "util.proto";
 
+message Hostlist {
+repeated string urls = 1;
+}
 
 message PeerInfo {
  required string ip = 1;
@@ -8,8 +11,14 @@ message PeerInfo {
 
 
 message Document {
- required string owner = 1;
- required string content = 2;
+ required string id = 1;
+ required string owner = 2;
+ required string content = 3;
+}
+
+message DocumentUpdateReq {
+ required string id = 1;
+ required string newcontent = 2;
 }
 
 message InfoResponse {
@@ -31,7 +40,14 @@ repeated Extension extensions = 10;
 option cc_generic_services = false;
 
 service RPCService {
- rpc bootstrap (PeerInfo) returns (Status);
+ rpc bootstrapFromPeer (PeerInfo) returns (Status);
+ rpc bootstrapFromHostlist (Hostlist) returns (Status);
+
  rpc createDocument (Document) returns (Status);
+ rpc watchDocument (Document) returns (Status);
+ rpc unwatchDocument (Document) returns (Status);
+ rpc deleteDocument (Document) returns (Status);
+ rpc updateDocument (DocumentUpdateReq) returns (Status);
+
  rpc getInfo (Void) returns (InfoResponse);
 }

@@ -45,7 +45,26 @@ bool ModuleManager::init()
 	
 	return true;
 }
+
+
+	bool ModuleManager::bootstrapFromPeer(const std::string&ip,int port)
+	{
+		for(std::vector<plg::Bootstrap*>::iterator it = _bootstrapers.begin(); it != _bootstrapers.end(); it++)
+			if( (*it)->bootstrapFromPeer(ip,port))
+				return true;
+		
+		return false;
+	}
 	
+	bool ModuleManager::bootstrapFromHostlist(const std::string&url)
+	{
+		for(std::vector<plg::Bootstrap*>::iterator it = _bootstrapers.begin(); it != _bootstrapers.end(); it++)
+			if( (*it)->bootstrapFromHostlist(url))
+				return true;
+		
+		return false;
+	}
+
 /*	bool ModuleManager::bootstrapp_from_cache() {
 		JoinCallback cb;
 

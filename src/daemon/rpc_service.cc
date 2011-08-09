@@ -18,17 +18,63 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "rpc_service.h"
 #include <glog/logging.h>
 #include <iostream>
 #include "version.h"
 #include "anarchNet.h"
 #include "db_manager.h"
-
+#include <json/json.h>
+#include "rpc_service.h"
+#include "config_manager.h"
 
 namespace an
 {
-
+	
+bool	RPCManager::init() {
+	_server = new Json::Rpc::TcpServer(std::string("127.0.0.1"), ConfigManager::instance().config()["rpc-port"].as<int>());
+	
+  if(!networking::init())
+  {
+    LOG(ERROR) << "Networking initialization failed";
+		return false;
+  }
+	
+	rpc::Bootstrap bs;
+  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(bs, &rpc::Bootstrap::BootstrapFromPeer, std::string("BootstrapFromPeer")));
+  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(bs, &rpc::Bootstrap::BootstrapFromHostlist, std::string("BootstrapFromHostlist")));
+	return true;
+}	
+	void RPCManager::run() 
+	{
+		
+		if(!_server->Bind())
+		{
+			LOG(ERROR) << "Bind failed";
+			exit(EXIT_FAILURE);
+		}
+		
+		if(!_server->Listen())
+		{
+			LOG(ERROR) << "Listen failed";
+			exit(EXIT_FAILURE);
+		}
+		
+		
+		LOG(INFO) << "Start JSON-RPC server";
+		
+		while(running)
+		{
+			_server->WaitMessage(1000);
+		}
+		
+		_server->Close();
+	}
+	
+	RPCManager::~RPCManager() {
+		LOG(INFO) << "Stop JSON-RPC TCP server";
+		networking::cleanup();
+	}	
+/*
 void anRPCService::getInfo(awk::protobuf::RpcController* controller,
 															 const Void* request,
 															 InfoResponse* response,
@@ -49,7 +95,7 @@ void anRPCService::getInfo(awk::protobuf::RpcController* controller,
 #endif
 	if (done)
 		done->Run();
-}
+}*/
 	
 	
 /*	void anRPCService::get(awk::protobuf::RpcController* controller,

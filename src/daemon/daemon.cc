@@ -47,7 +47,7 @@ namespace an {
 bool anDaemon::init(const string& directory)
 {
 	
-	LOG(INFO) << "load config_manager";
+	LOG(INFO) << "load config_manager in " << directory;
 	if(!ConfigManager::instance().init(directory))
 		return false;
 
@@ -62,16 +62,17 @@ bool anDaemon::init(const string& directory)
 	if(!ModuleManager::instance().init())
 		return false;
 	
-	awk::protobuf::jerpc::socket_initialize();
+	
 	return true;
 }
 	
+	
 void anDaemon::run() 
 {
-	rpc_service_ = new anRPCService();
-	server_.RegisterService(rpc_service_);
-	LOG(INFO) << "main run";
-	server_.RunServer();
+
 }
 
+	anDaemon::~anDaemon() {
+
+	}
 }

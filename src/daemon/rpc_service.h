@@ -18,10 +18,13 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "RPC_service.pb.h"
 #include "config.h"
+#include "singleton.h"
 #include "maidsafe/base/crypto.h"
 #include "protocol/rpc_service.pb.h"
+#include <json/json.h>
+#include "jsonrpc.h"
+
 
 #ifndef DAEMON_RPC_SERVICE_H_
 #define DAEMON_RPC_SERVICE_H_
@@ -30,6 +33,48 @@
 
 namespace an {
 	
+	class RPCManager : public Singleton<RPCManager>
+	{
+		friend class Singleton<RPCManager>;
+	public:
+		bool init();
+		void run();
+		void stop(){ running= false; LOG(INFO)<<"stop";}
+		~RPCManager();
+	private:
+		Json::Rpc::TcpServer *_server;
+		bool running;
+	};
+	
+	
+	namespace rpc {
+	class Bootstrap
+		{
+		public:
+			/**
+			 * \brief Reply with success.
+			 * \param root JSON-RPC request
+			 * \param response JSON-RPC response
+			 * \return true if correctly processed, false otherwise
+			 */
+			bool BootstrapFromPeer(const Json::Value& root, Json::Value& response)
+			{
+				std::cout << "Receive query: " << root << std::endl;
+				response["jsonrpc"] = "2.0";
+				response["id"] = root["id"];
+				response["result"] = "success";
+				return true;
+			}
+			
+			bool BootstrapFromHostlist(const Json::Value& root, Json::Value& response)
+			{
+				std::cout << "Notification: " << root << std::endl;
+				response = Json::Value::null;
+				return true;
+			}
+		};
+	};
+
 	class anRPCService : public RPCService {
 	public:
 		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }

@@ -1,3 +1,4 @@
 #!/bin/sh
 
-${BIN_DIR}/anDaemon -d
+cd ${BIN_DIR}
+./anDaemon -d

@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "singleton.h"
+#include "plugins/bootstrap.h"
 
 
 #ifndef DAEMON_CONNECTION_MANAGER_H_
@@ -34,11 +35,15 @@ public:
 		
 			~ModuleManager() {}
 		
+		bool bootstrapFromPeer(const std::string&ip,int port);
+		bool bootstrapFromHostlist(const std::string&url);
+
+		
 		static bool http_request(const std::string& url,std::string* response);
 protected:
 		ModuleManager() {}
 private:
-			
+		std::vector<plg::Bootstrap*> _bootstrapers;
 	//	transport::TransportHandler trans_handler_;
 	//	rpcprotocol::ChannelManager *chmanager_;
 		boost::int16_t trans_id_;

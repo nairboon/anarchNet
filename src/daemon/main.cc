@@ -32,6 +32,23 @@ using std::string;
 
 an::anDaemon* g_daemon;
 
+/**
+ * \brief Signal management.
+ * \param code signal code
+ */
+static void signal_handler(int code)
+{
+  switch(code)
+  {
+    case SIGINT:
+    case SIGTERM:
+      g_daemon->stop();
+      break;
+    default:
+      break;
+  }
+}
+
 void onexit()
 {
 	if (g_daemon != NULL)
@@ -106,8 +123,20 @@ int main(int argc, char* argv[])
 		 pid_t sid = setsid();
 		 if ( sid < 0)
 			 exit(EXIT_FAILURE);
+			
+			LOG(INFO) << "success";
 		}
 
+/*		if(signal(SIGTERM, signal_handler) == SIG_ERR)
+		{
+			std::cout << "Error signal SIGTERM will not be handled" << std::endl;
+		}
+		
+		if(signal(SIGINT, signal_handler) == SIG_ERR)
+		{
+			std::cout << "Error signal SIGINT will not be handled" << std::endl;
+		}*/
+		
 		g_daemon->run();
 	}
 	catch(CppSQLite3Exception& e) {

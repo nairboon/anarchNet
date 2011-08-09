@@ -31,13 +31,13 @@ endif()
 ###################################################################################################
 
 find_library(GLOG NAMES libglog.a glog REQUIRED)
-find_package(Protobuf REQUIRED)
+#find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
 #find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
-find_library(UDT NAMES udt_d REQUIRED)
+#find_library(UDT NAMES udt_d REQUIRED)
 find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
-find_library(ARCHIVE NAMES libarchive archive REQUIRED)
+#find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
@@ -58,6 +58,8 @@ include_directories(
 	"${ROOT_DIR}/third-party/protobuf-jerpc/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
+	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
+	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
 	"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3"
  )
 set( LIB
@@ -78,75 +80,26 @@ endif()
 
 message(STATUS "linked libraries: ${LIB}")
 
-###################################################################################################
-# Protobuf
-###################################################################################################
+################################################################################
+# jsoncpp
+################################################################################
 
-#Function to generate CC and header files derived from proto files
-macro(generate_protobuf_files)
+file(GLOB JSON_C "${ROOT_DIR}/third-party/jsoncpp/src/lib_json/*.c*")
+file(GLOB JSON_H "${ROOT_DIR}/third-party/jsoncpp/src/lib_json/*.h*")
+list(APPEND JSON_SRC ${JSON_C} ${JSON_H})
+add_library(json ${JSON_SRC})
 
- foreach(FIL ${ARGV})
-    get_filename_component(ABS_FIL ${FIL} NAME)
-    get_filename_component(FIL_WE ${FIL} NAME_WE)
-    get_filename_component(FILES_PATH ${FIL} PATH)
+################################################################################
+# jsonrpc
+################################################################################
 
-   list(APPEND SRCS "${FILES_PATH}/${FIL_WE}.pb.cc")
-    list(APPEND HDRS "${FILES_PATH}/${FIL_WE}.pb.h")
+file(GLOB JSON_RPC_C "${ROOT_DIR}/third-party/jsonrpc/src/*.c*")
+file(GLOB JSON_RPC_H "${ROOT_DIR}/third-party/jsonrpc/src/*.h*")
+list(APPEND JSON_RPC_SRC ${JSON_RPC_C} ${JSON_RPC_H})
 
-    message("Marked for compiling (protoc): ${FIL}")
-    get_target_property(PLUGIN_EXE protoc-gen-rpc LOCATION)
+add_library(jsonrpc ${JSON_RPC_SRC})
 
-	execute_process(COMMAND cmake -E remove "${FILES_PATH}/${FIL_WE}.pb.h")
-	execute_process(COMMAND cmake -E remove "${FILES_PATH}/${FIL_WE}.pb.cc")
-
-	add_custom_command( OUTPUT "${FILES_PATH}/${FIL_WE}.pb.cc"
-             			   "${FILES_PATH}/${FIL_WE}.pb.h"
-			    WORKING_DIRECTORY ${FILES_PATH}
-			    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} "-I${FILES_PATH}" "--cpp_out=${FILES_PATH}" "--plugin=protoc-gen-rpc=${PLUGIN_EXE}" "--rpc_out=${FILES_PATH}" ${FIL}
-			    DEPENDS protoc-gen-rpc)
-  endforeach()
-set_source_files_properties(${SRCS} ${HDRS} PROPERTIES GENERATED 1)
-endmacro()
-
-### generate rpc plugin ###
-set(RPC_PLG_SRC "${ROOT_DIR}/third-party/protobuf-jerpc/plugin/file_generator.cc"
-		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/helpers.cc"
-		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/plugin.cc"
-		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service_generator.cc"
-		"${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service.cc")
-add_executable(protoc-gen-rpc ${RPC_PLG_SRC})
-target_link_libraries(protoc-gen-rpc ${PROTOBUF_LIBRARIES} ${PROTOBUF_PROTOC_LIBRARY} ${PLATFORM_LIB})
-
-### generate proto files ###
-
-set(PROTO_FILES "${SOURCE_DIR}/daemon/protocol/util.proto"
-       			"${SOURCE_DIR}/daemon/protocol/protorpc.proto"
-				"${SOURCE_DIR}/daemon/protocol/rpc_service.proto"
-				"${SOURCE_DIR}/daemon/protocol/p2p_service.proto")
-#if(${REGENERATE})
-	generate_protobuf_files(${PROTO_FILES})
-	MESSAGE("generated protobuf files")
-#endif()
-
-set(PB_DAEMON_G ${SRCS} ${HDRS})
-
-file(GLOB PB-RPC_C "${ROOT_DIR}/third-party/protobuf-jerpc/rpc/*.c*")
-file(GLOB PB-RPC_H "${ROOT_DIR}/third-party/protobuf-jerpc/rpc/*.h*")
-
-list(APPEND PB-RPC_SRC ${PB-RPC_C} ${PB-RPC_H}
-		   "${SOURCE_DIR}/daemon/protocol/protorpc.pb.cc"
-		   "${SOURCE_DIR}/daemon/protocol/protorpc.pb.h"
-		   "${SOURCE_DIR}/daemon/protocol/util.pb.cc"
-		   "${SOURCE_DIR}/daemon/protocol/util.pb.h"
-		   "${SOURCE_DIR}/daemon/protocol/rpc_service.pb.cc"
-		   "${SOURCE_DIR}/daemon/protocol/rpc_service.pb.h"
-		   "${SOURCE_DIR}/daemon/protocol/p2p_service.pb.cc"
-		   "${SOURCE_DIR}/daemon/protocol/p2p_service.pb.h"
-		   "${ROOT_DIR}/third-party/protobuf-jerpc/plugin/service.cc"
-)
-
-add_library(pb-rpc ${PB-RPC_SRC})
-add_dependencies(pb-rpc protoc-gen-rpc)
+add_dependencies(jsonrpc json)
 
 ################################################################################
 # Daemon
@@ -160,8 +113,8 @@ list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
 "${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h")
 
 add_executable(anDaemon ${DAEMON_SRC})
-add_dependencies(anDaemon protoc-rpc-plugin)
-target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} pb-rpc)
+add_dependencies(anDaemon jsonrpc)
+target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} jsonrpc json)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -175,33 +128,18 @@ add_custom_command(TARGET anDaemon POST_BUILD
 # Library
 ################################################################################
 
-file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
-file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
-list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
+#file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
+#file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
+#list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
-file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
-file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
-list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
+#file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
+#file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
+#list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
 
-add_library(an SHARED ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
-add_dependencies(an pb-rpc protoc-rpc-plugin)
-target_link_libraries(an ${LIB} pb-rpc)
-################################################################################
-# browser
-################################################################################
+#add_library(an SHARED ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
+#add_dependencies(an pb-rpc protoc-rpc-plugin)
+#target_link_libraries(an ${LIB} pb-rpc)
 
-file(GLOB BROWSER_C "browser/*.c*")
-file(GLOB BROWSER_H "browser/*.h*")
-file(GLOB BROWSER_HTTP_C "browser/http/*.c*")
-file(GLOB BROWSER_HTTP_H "browser/http/*.h*")
-list(APPEND BROWSER_SRC ${BROWSER_C} ${BROWSER_H} ${BROWSER_HTTP_C} ${BROWSER_HTTP_H})
-
-#add_executable(anBrowser ${BROWSER_SRC})
-#add_dependencies(anBrowser liban protoc-rpc-plugin)
-#target_link_libraries(anBrowser ${LIB} pb-rpc an)
-
-#add_custom_command(TARGET anBrowser POST_BUILD
-#		   COMMAND ${COMMAND} -E create_symlink "${SOURCE_DIR}/browser/www" "${BIN_DIR}/www")
 ################################################################################
 # Python library search (style check)                                          #
 ################################################################################

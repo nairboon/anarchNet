@@ -18,9 +18,6 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "service.h"
-#include "protobuf_rpc_server.h"
-
 #ifndef DAEMON_DAEMON_H_
 #define DAEMON_DAEMON_H_
 namespace an {
@@ -29,14 +26,13 @@ namespace an {
 class anDaemon
 {
 public:
-	anDaemon(): rpc_service_(NULL)  {}
-	~anDaemon() { if(rpc_service_ != NULL) delete rpc_service_; }
+	anDaemon() : running(true) {}
+	~anDaemon();
 	bool init(const std::string&);
 	void run();
+	void stop() {}
 private:
-	awk::protobuf::Service* rpc_service_; 
-	awk::protobuf::jerpc::NetServer server_;
-	
+	bool running;
 };
 }
 #endif  // DAEMON_DAEMON_H_
