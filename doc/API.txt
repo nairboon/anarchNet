@@ -80,6 +80,36 @@ editBuddy
 
 
 
+db format
+
+messages
+snapshot {
+	diffs [] // id
+	based: snapshotid // 0 = root snapshot
+	timestamp: timeofsnapshot
+}
+
+diff {
+	snapshot: id
+	prev: id // id of previous diff, 0 = snapshot
+}
+
+
+local:
+	binary storage: id=hash
+	plain storage:
+			diffs
+			snapshots
+			objects {
+				snapshots
+				diffs
+				}
+
+authors
+	table: userid:diffid
+
+
+
 settings:
 dht-cache
 	how data stored from the dht

@@ -41,8 +41,14 @@ public:
 		bool bootstrapFromPeer(const std::string&ip,int port);
 		bool bootstrapFromHostlist(const std::string&url);
 
-		bool store_entry(const std::string& key, const std::string& value);
-		const std::string get_entry(const std::string& key);
+		// db types
+		bool db_store_snapshot(const db::Snapshot& ss);
+		bool db_store_diff(const db::Diff& diff);
+
+		
+		// key value store
+		bool kv_put(const std::string& key, const std::string& value);
+		const std::string kv_get(const std::string& key);
 
 		
 		static bool http_request(const std::string& url,std::string* response);

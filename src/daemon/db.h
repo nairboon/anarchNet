@@ -19,6 +19,9 @@
  */
 
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/time_serialize.hpp>
+#include <boost/serialization/string.hpp>
 
 #ifndef DAEMON_DB_H_
 #define DAEMON_DB_H_
@@ -26,19 +29,32 @@
 namespace an {
 	namespace db {
 		typedef std::string ObjID;
+		typedef std::string String;
 
 		class Snapshot;
 		class Diff {
 		public:
 			ObjID shapshot;
 			std::vector<ObjID> prev;
+			ObjID id;
 		};
 		
 		class Snapshot {
 		public:
 			std::vector<boost::shared_ptr<Diff> > diffs;
+			std::string content;
 			ObjID based;
-			// timestamp
+			ObjID id;
+			boost::posix_time::ptime time;
+			
+			template<class Archive>
+			void serialize(Archive & ar, const unsigned int version)
+			{
+        ar & id;
+				ar & based;
+				ar & content;
+				ar & time;
+			}
 		};
 		
 		class Object {
@@ -47,6 +63,8 @@ namespace an {
 			std::vector<boost::shared_ptr<Snapshot> > snapshots;
 			std::vector<boost::shared_ptr<Diff> > diffs;
 		};
+		
+		const ObjID create_ObjID(const String& input);
 	}
 }
 #endif  // DAEMON_DB_H_

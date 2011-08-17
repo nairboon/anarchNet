@@ -47,7 +47,7 @@ namespace an {
 			{
 			public:
 				/**
-				 * \brief Reply with success.
+				 * \brief Hello request used to bootstrap from other peers
 				 * \param root JSON-RPC request
 				 * \param response JSON-RPC response
 				 * \return true if correctly processed, false otherwise

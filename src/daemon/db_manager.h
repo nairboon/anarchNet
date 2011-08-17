@@ -36,7 +36,7 @@ public:
 	//	bool store_object(const StoreObjectRequest* req);
 //		bool delete_object(const DeleteObjectRequest* req);
 		
-		bool store_object(db::Object* obj);
+		db::ObjID store_object(const std::string& content);
 		bool update_object(db::Object* obj);
 		bool delete_object(db::Object* obj);
 		bool get_object(db::Object* obj);

@@ -66,23 +66,39 @@ bool ModuleManager::init()
 	}
 
 	
-	bool ModuleManager::store_entry(const std::string& key, const std::string& value)
+	bool ModuleManager::kv_put(const std::string& key, const std::string& value)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->store_entry(key,value))
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_put(key,value))
 				return true;
 		
 		return false;
 	}
 	
-	const std::string ModuleManager::get_entry(const std::string& key)
+	const std::string ModuleManager::kv_get(const std::string& key)
 	{
 		std::string res;
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && ( (res = (*it)->get_entry(key)) != ""))
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && ( (res = (*it)->kv_get(key)) != ""))
 				return res;
 		
 		return "";
+	}
+	
+	bool ModuleManager::db_store_snapshot(const db::Snapshot& ss) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_snapshot(ss))
+				return true;
+		
+		return false;
+	}
+	
+	bool ModuleManager::db_store_diff(const db::Diff& diff) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
+				return true;
+		
+		return false;
 	}
 /*	bool ModuleManager::bootstrapp_from_cache() {
 		JoinCallback cb;

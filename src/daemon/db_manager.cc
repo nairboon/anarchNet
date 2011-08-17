@@ -19,15 +19,18 @@
  */
 
 #include <iostream>
-#include <fstream>
+#include <sstream>
 #include <vector>
 #include <glog/logging.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 //#include <boost/thread.hpp>
 //#include <boost/asio.hpp>
 //#include <boost/bind.hpp>
 //#include <boost/date_time/posix_time/posix_time.hpp>
 #include "anarchNet.h"
 #include "db_manager.h"
+#include "module_manager.h"
 #include "diff_match_patch.h"
 //#include "config_manager.h"
 
@@ -42,9 +45,24 @@ namespace an
 	}
 	
 	
-	bool DBManager::store_object(db::Object* obj) 
+	db::ObjID DBManager::store_object(const std::string& content)
 	{
+		db::ObjID id = db::create_ObjID(content);
+		db::Snapshot sn;
+		sn.content = content;
+		sn.based = "";
+		sn.id = id;
 		
+	/*	std::stringstream ss;
+    {
+			boost::archive::text_oarchive oa(ss);
+			oa << sn;
+    }*/
+		
+		if(ModuleManager::instance().db_store_snapshot(sn))
+			return id;
+		else
+			return "";
 	}
 	bool DBManager::update_object(db::Object* obj) 
 	{

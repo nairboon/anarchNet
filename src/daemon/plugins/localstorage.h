@@ -20,6 +20,7 @@
 
 #include "puggDriver.h"
 #include "plugins/plugin.h"
+#include "db.h"
 
 #ifndef DAEMON_PLUGIN_LOCALSTORAGE_H
 #define DAEMON_PLUGIN_LOCALSTORAGE_H
@@ -35,8 +36,18 @@ public:
 
 	virtual const std::string getName() {return "generic LOCALSTORAGEplugin";}
 	virtual const StorageType getType() { return LocalStorage::PLAIN; }
-	virtual const bool store_entry(const std::string& key, const std::string& value) { return false; }
-	virtual const std::string get_entry(const std::string& key) { return ""; }
+	
+	virtual const bool db_store_snapshot(const db::Snapshot& sn) { return false; }
+	virtual const bool db_store_diff(const db::Diff& diff) { return false; }
+
+	/**
+	 * \brief KV Store
+	 * \param key id
+	 * \param value value to store
+	 * \return true if successfuly stored
+	 */
+	virtual const bool kv_put(const std::string& key, const std::string& value) { return false; }
+	virtual const std::string kv_get(const std::string& key) { return ""; }
 
 };
 }

@@ -42,7 +42,7 @@ set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_NO_SYSTEM_PATHS TRUE)
-find_package(Boost 1.47 COMPONENTS system program_options thread filesystem REQUIRED)
+find_package(Boost 1.47 COMPONENTS system program_options thread filesystem date_time serialization REQUIRED)
 
 include_directories( 
 	"${SOURCE_DIR}/daemon"
