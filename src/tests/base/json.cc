@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "pb_json.h"
+/*#include "pb_json.h"
 #include "rpc_service.pb.h"
 
 TEST(json,write)
@@ -14,4 +14,4 @@ TEST(json,write)
 	
 	EXPECT_EQ( an::JSONInterface::write(ir), "{\"anVersion\": 5,\"uptime\": 23,\"connectedNodes\": 0,\"operatingsystem\": \"osBSD\",\"extensions\": [{\"id\": \"ABCDERD\",\"algorithm_version\": 0,\"extension_version\": 100,\"description\": \"\"}]}");
 
-}
+}*/

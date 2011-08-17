@@ -26,13 +26,13 @@ namespace an {
 class anDaemon
 {
 public:
-	anDaemon() : running(true) {}
+	anDaemon() : running_(true) {}
 	~anDaemon();
 	bool init(const std::string&);
 	void run();
-	void stop() {}
+	void stop();
 private:
-	bool running;
+	bool running_;
 };
 }
 #endif  // DAEMON_DAEMON_H_

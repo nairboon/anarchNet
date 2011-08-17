@@ -29,8 +29,6 @@
 #include "plugins/session.h"
 
 
-using std::string;
-
 namespace an
 {
 	
@@ -53,7 +51,7 @@ namespace an
 	{
 		LOG(INFO) << "load plugin " << plugin_name;
 		if(!plugin_kernel_.loadPlugin(plugin_path)) {
-			LOG(ERROR) << "could not laod plugin: " << plugin_path;
+			LOG(ERROR) << "could not load plugin: " << plugin_path;
 			return false; 
 		}
 		

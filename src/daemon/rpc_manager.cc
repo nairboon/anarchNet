@@ -20,24 +20,19 @@
 
 #include <glog/logging.h>
 #include <iostream>
+#include <boost/thread.hpp>
 #include "version.h"
 #include "anarchNet.h"
 #include "db_manager.h"
 #include <json/json.h>
-#include "rpc_service.h"
+#include "rpc_manager.h"
 #include "config_manager.h"
 
 namespace an
 {
 	
 bool	RPCManager::init() {
-	_server = new Json::Rpc::TcpServer(std::string("127.0.0.1"), ConfigManager::instance().config()["rpc-port"].as<int>());
-	
-  if(!networking::init())
-  {
-    LOG(ERROR) << "Networking initialization failed";
-		return false;
-  }
+	_server = new Json::Rpc::TcpServer(std::string("127.0.0.1"), ConfigManager::instance().rpc_port());
 	
 	rpc::Bootstrap bs;
   _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(bs, &rpc::Bootstrap::BootstrapFromPeer, std::string("BootstrapFromPeer")));
@@ -62,7 +57,7 @@ bool	RPCManager::init() {
 		
 		LOG(INFO) << "Start JSON-RPC server";
 		
-		while(running)
+		while(running_)
 		{
 			_server->WaitMessage(1000);
 		}
@@ -72,7 +67,7 @@ bool	RPCManager::init() {
 	
 	RPCManager::~RPCManager() {
 		LOG(INFO) << "Stop JSON-RPC TCP server";
-		networking::cleanup();
+		delete _server;
 	}	
 /*
 void anRPCService::getInfo(awk::protobuf::RpcController* controller,

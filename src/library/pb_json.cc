@@ -18,13 +18,13 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "pb_json.h"
+//#include "pb_json.h"
 
-using namespace google::protobuf;
+//using namespace google::protobuf;
 using namespace std;
 
 namespace an
-{
+{ /*
 std::string JSONInterface::write(const google::protobuf::Message& m)
 {
 	stringstream out;
@@ -134,5 +134,5 @@ void JSONInterface::printField(const FieldDescriptor *fd,
 				break;
 		}
 	}
-	
+	*/
 }

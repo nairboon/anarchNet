@@ -19,15 +19,12 @@
  */
 #include <cstdio>
 #include <glog/logging.h>
-#include <google/protobuf/descriptor.h>
-#include "protobuf_rpc_channel.h"
-#include "protobuf_rpc.h"
-#include "rpc_service.pb.h"
+
 #include "client.h"
 #include "anarchNet.h"
 
-namespace an {
-bool anClient::init()
+//namespace an {
+/*bool anClient::init()
 {
 	if(init_) //avoid double init
 		return true;
@@ -61,7 +58,7 @@ bool anClient::init()
 		else if (method->name() == "put")
 			res = new PutResponse;
 		else if (method->name() == "storeObject" || method->name() == "deleteObject")
-			res = new CRUDResponse;*/
+			res = new CRUDResponse;*
 		else {
 			LOG(FATAL) << "unregistered method @liban";
 			return NULL;
@@ -77,5 +74,5 @@ bool anClient::init()
 			 LOG(WARNING) << "RPC-call to undefined method: " << name;
 			 return NULL;
 		}
-	}
-}
+	}*/
+//}

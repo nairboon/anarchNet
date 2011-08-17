@@ -24,13 +24,12 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/asio.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/foreach.hpp>
 
 #include "anarchNet.h"
 #include "module_manager.h"
 #include "plugin_manager.h"
 #include "config_manager.h"
-
-using std::string;
 
 using boost::asio::ip::tcp;
 
@@ -39,8 +38,9 @@ namespace an
 
 bool ModuleManager::init()
 {
-	foreach (string plugin_name, ConfigManager::instance().config()["modules"].as< std::vector<string> >()) {
-		PluginManager::instance().loadPlugin(plugin_name,plugin_name+".dylib",plugin_name);
+	BOOST_FOREACH (std::string plugin_name, ConfigManager::instance().modules()) {
+		if(!PluginManager::instance().loadPlugin(plugin_name,plugin_name+".dylib",plugin_name))
+			return false;
 	}
 	
 	return true;

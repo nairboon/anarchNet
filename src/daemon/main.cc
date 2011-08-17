@@ -20,8 +20,9 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <cstdio>
-#include "boost/program_options.hpp"
-#include "glog/logging.h"
+#include <boost/thread.hpp>
+#include <boost/program_options.hpp>
+#include <glog/logging.h>
 #include "anarchnet.h"
 #include "version.h"
 #include "daemon.h"
@@ -42,6 +43,7 @@ static void signal_handler(int code)
   {
     case SIGINT:
     case SIGTERM:
+			LOG(ERROR)<<"shuting down";
       g_daemon->stop();
       break;
     default:
@@ -49,12 +51,6 @@ static void signal_handler(int code)
   }
 }
 
-void onexit()
-{
-	if (g_daemon != NULL)
-		delete g_daemon;
-	exit(EXIT_SUCCESS);
-}
 
 int main(int argc, char* argv[])
 {
@@ -64,7 +60,6 @@ int main(int argc, char* argv[])
 	google::InitGoogleLogging(argv[0]);
 
 	g_daemon = NULL;
-	atexit(onexit);
 	try {
 
 		po::options_description generic("Generic options");
@@ -81,7 +76,7 @@ int main(int argc, char* argv[])
 		po::variables_map vm;
 		store(po::command_line_parser(argc, argv).
 					options(generic).positional(p).run(), vm);
-
+		
 		po::notify(vm);
 
 		if (vm.count("help")) {
@@ -127,7 +122,7 @@ int main(int argc, char* argv[])
 			LOG(INFO) << "success";
 		}
 
-/*		if(signal(SIGTERM, signal_handler) == SIG_ERR)
+		if(signal(SIGTERM, signal_handler) == SIG_ERR)
 		{
 			std::cout << "Error signal SIGTERM will not be handled" << std::endl;
 		}
@@ -135,9 +130,10 @@ int main(int argc, char* argv[])
 		if(signal(SIGINT, signal_handler) == SIG_ERR)
 		{
 			std::cout << "Error signal SIGINT will not be handled" << std::endl;
-		}*/
+		}
 		
 		g_daemon->run();
+		LOG(INFO) << "done";		
 	}
 	catch(CppSQLite3Exception& e) {
 		LOG(ERROR) << "DBException: " << e.errorCode()<< ": " << e.errorMessage();

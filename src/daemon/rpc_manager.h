@@ -21,7 +21,6 @@
 #include "config.h"
 #include "singleton.h"
 #include "maidsafe/base/crypto.h"
-#include "protocol/rpc_service.pb.h"
 #include <json/json.h>
 #include "jsonrpc.h"
 
@@ -39,11 +38,13 @@ namespace an {
 	public:
 		bool init();
 		void run();
-		void stop(){ running= false; LOG(INFO)<<"stop";}
+		void stop(){ mutex.lock(); running_ = false; mutex.unlock();}
 		~RPCManager();
+		RPCManager() : running_(true) {}
 	private:
 		Json::Rpc::TcpServer *_server;
-		bool running;
+		boost::mutex mutex; 
+		bool running_;
 	};
 	
 	
@@ -75,7 +76,7 @@ namespace an {
 		};
 	};
 
-	class anRPCService : public RPCService {
+	/*class anRPCService : public RPCService {
 	public:
 		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }
 		void getInfo(awk::protobuf::RpcController* controller,
@@ -97,7 +98,7 @@ namespace an {
 		void deleteObject(awk::protobuf::RpcController* controller,
 						 const DeleteObjectRequest* request,
 						 CRUDResponse* response,
-						 google::protobuf::Closure* done);*/
+						 google::protobuf::Closure* done);*
 private:
 	
 //	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
@@ -105,6 +106,6 @@ private:
 
 	crypto::Crypto cryobj_;
 
-};
+};*/
 }
 #endif  // DAEMON_RPC_SERVICE_H_

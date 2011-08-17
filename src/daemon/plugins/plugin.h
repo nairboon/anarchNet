@@ -27,8 +27,7 @@ namespace an {
 			Plugin() {}
 			virtual ~Plugin() {}
 			virtual const std::string getName() = 0;
-			virtual const unsigned int getPluginVersion() = 0;
-			virtual const unsigned int getAlgorithmVersion() = 0;
+			virtual const unsigned int getVersion() = 0;
 			virtual bool initialise() = 0;
 			virtual void shutdown() = 0;
 		};

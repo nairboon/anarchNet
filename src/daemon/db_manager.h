@@ -18,10 +18,8 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sqlite3.h>
 #include <map>
 #include <vector>
-#include "CppSQLite3.h"
 #include "singleton.h"
 
 #ifndef DAEMON_DB_MANAGER_H_
@@ -39,9 +37,7 @@ public:
 
 		std::vector<std::string> get_unchecked_keys_since(int);
 private:
-		CppSQLite3DB db_;
-		std::map<std::string,int> ap_list_;
-		void run_checker();
+	
 	};
 }
 #endif  // DAEMON_DB_MANAGER_H_

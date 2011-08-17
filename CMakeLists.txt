@@ -31,9 +31,7 @@ endif()
 ###################################################################################################
 
 find_library(GLOG NAMES libglog.a glog REQUIRED)
-#find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
-#find_library(MAIDSAFE NAMES maidsafe_dht_d libmaidsafe_dht_d.a maidsafe REQUIRED)
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 #find_library(UDT NAMES udt_d REQUIRED)
 find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
@@ -47,38 +45,33 @@ set(Boost_NO_SYSTEM_PATHS TRUE)
 find_package(Boost 1.47 COMPONENTS system program_options thread filesystem REQUIRED)
 
 include_directories( 
-	"${SOURCE_DIR}"
 	"${SOURCE_DIR}/daemon"
 	"${SOURCE_DIR}/library"
-	"/usr/local/include"
 	${Boost_INCLUDE_DIRS} 
 	${GTEST_INCLUDE_DIRS}
-	#${MAIDSAFE_INCLUDE_DIRS}
-	"${SOURCE_DIR}/daemon/protocol"
-	"${ROOT_DIR}/third-party/protobuf-jerpc/rpc"
-	"${CMAKE_SOURCE_DIR}/third-party/protobuf-jerpc/plugin"
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
 	"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3"
+	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
+	"/usr/local/include"
  )
 set( LIB
 	${Boost_LIBRARIES}
 	${GLOG}
-	${GCOV}
-	${GTEST_LIBRARIES}
-	${PROTOBUF_LIBRARIES}
-	${UDT}
 	${CRYPTOPP}
 	${SQLITE}
 	${ARCHIVE}
 	)
-
+set( TEST_LIB
+	${GCOV}
+	${GTEST_LIBRARIES}
+	)
 if(UNIX)
 set(PLATFORM_LIB pthread dl)
 endif()
 
-message(STATUS "linked libraries: ${LIB}")
+message(STATUS "linked libraries: ${LIB} ${TEST_LIB}")
 
 ################################################################################
 # jsoncpp
@@ -110,7 +103,9 @@ file(GLOB DAEMON_H "${SOURCE_DIR}/daemon/*.h*")
 file(GLOB DAEMON_PLG_H "${SOURCE_DIR}/daemon/plugins/*.h*")
 list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
 "${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
-"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h")
+"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h"
+"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
+)
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon jsonrpc)
@@ -128,17 +123,13 @@ add_custom_command(TARGET anDaemon POST_BUILD
 # Library
 ################################################################################
 
-#file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
-#file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
-#list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
+file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
+file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
+list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
-#file(GLOB LIBRARY_JSON_C "third-party/json_spirit/*.c*")
-#file(GLOB LIBRARY_JSON_H "third-party/json_spirit/*.h*")
-#list(APPEND LIBRARY_JSON_SRC ${LIBRARY_JSON_C} ${LIBRARY_JSON_H})
-
-#add_library(an SHARED ${LIBRARY_SRC} ${LIBRARY_JSON_SRC})
-#add_dependencies(an pb-rpc protoc-rpc-plugin)
-#target_link_libraries(an ${LIB} pb-rpc)
+add_library(an SHARED ${LIBRARY_SRC})
+add_dependencies(an jsonrpc)
+target_link_libraries(an ${LIB} jsonrpc json)
 
 ################################################################################
 # Python library search (style check)                                          #
@@ -170,8 +161,8 @@ add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
 add_dependencies(TESTbase anDaemon)
 add_dependencies(TESTrpc anDaemon)
 
-target_link_libraries(TESTbase ${LIB} pb-rpc an)
-target_link_libraries(TESTrpc ${LIB} pb-rpc an)
+target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json jsonrpc an)
+target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
@@ -208,7 +199,6 @@ endif ()
    ENDIF()
  ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
 
-#add_subdirectory("${SOURCE_DIR}/modules/")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/bootstrap")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/localstorage")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/remotestorage")

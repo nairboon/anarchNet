@@ -18,7 +18,6 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "rpc_service.pb.h"
 
 
-InfoResponse* getInfo(void);
+//InfoResponse* getInfo(void);

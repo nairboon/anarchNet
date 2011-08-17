@@ -46,7 +46,6 @@
 
 #ifndef DAEMON_ANARCHNET_H_
 #define DAEMON_ANARCHNET_H_
-#include <boost/foreach.hpp>
 #include "config.h"
 
 /*!
@@ -55,8 +54,8 @@
  */
 namespace an
 {
-#define ANARCHNET_RPC_PORT 6788
-#define ANARCHNET_PORT 39999
+#define ANARCHNET_RPC_PORT 23666
+#define ANARCHNET_PORT 23555
 
 #define ANARCHNET_PLATFORM_WIN32 1
 #define ANARCHNET_PLATFORM_LINUX 2
@@ -71,6 +70,5 @@ namespace an
 #   define ANARCHNET_PLATFORM ANARCHNET_PLATFORM_LINUX
 #endif
 
-#define foreach BOOST_FOREACH
 }
 #endif  // DAEMON_ANARCHNET_H_

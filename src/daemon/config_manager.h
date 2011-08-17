@@ -19,7 +19,8 @@
  */
 
 #include <string>
-#include <boost/program_options.hpp>
+#include <set>
+#include <boost/property_tree/ptree.hpp>
 #include "singleton.h"
 
 #ifndef DAEMON_CONFIG_MANAGER_H_
@@ -31,9 +32,15 @@ class ConfigManager : public Singleton<ConfigManager>
 		friend class Singleton<ConfigManager>;
 public:
 		bool init(const std::string&);
-		const boost::program_options::variables_map& config() { return vm_; }
+		const 	boost::property_tree::ptree& config() { return _pt; }
+		const std::set<std::string>& modules() { return _modules; }
+		int port() { return _port; }
+		int rpc_port() { return _rpc_port; }
 private:
-		boost::program_options::variables_map vm_;
+		boost::property_tree::ptree _pt;
+		std::set<std::string> _modules;
+		int _port;
+		int _rpc_port;
 	};
 }
 #endif  // DAEMON_CONFIG_MANAGER_H_

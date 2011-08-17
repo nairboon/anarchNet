@@ -19,15 +19,11 @@
  */
 #include <queue>
 #include "singleton.h"
-#include "service.h"
-#include "protobuf_rpc_server.h"
-#include "protobuf_rpc_channel.h"
-#include "protobuf_rpc_socket.h"
 
 #ifndef LIBRARY_CLIENT_H_
 #define LIBRARY_CLIENT_H_
 namespace an {
-
+/*
 class anClient : public Singleton<anClient>
 {
 	friend class Singleton<anClient>;
@@ -42,7 +38,8 @@ private:
 	/**
 	 * @brief generic rpc request
 	 * @param name name of the rpc method
-	 */
+	 *
 	google::protobuf::Message* Query(const std::string& name, const google::protobuf::Message* request);
+}*/
 }
 #endif  // LIBRARY_CLIENT_H_

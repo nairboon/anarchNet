@@ -7,8 +7,8 @@ low level:
 - bootstrapBT(BT-masterlist)
 - BFbootstrap()
 
-- store(key,data,meta,priority,ttl,pkey)
-- get(key)
+- store(key,data,meta,priority,ttl,pkey,secure=false)
+- get(key,secure=false)
 - search(keyword)
 
 - createSession(type) => session_handle (session_id,network)

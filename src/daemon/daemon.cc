@@ -18,41 +18,27 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <boost/program_options.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/fstream.hpp>
+#include <boost/thread.hpp>
 #include <glog/logging.h>
-
-#include "protobuf_rpc_socket.h"
 
 #include "anarchNet.h"
 #include "daemon.h"
-#include "rpc_service.h"
+#include "rpc_manager.h"
 #include "config_manager.h"
 #include "module_manager.h"
 #include "db_manager.h"
 #include "plugin_manager.h"
+#include "net_manager.h"
 
-
-namespace po = boost::program_options;
-namespace fs = boost::filesystem;
-using std::string;
 
 namespace an {
 	
-
-	
-bool anDaemon::init(const string& directory)
+	bool anDaemon::init(const std::string& directory)
 {
 	
 	LOG(INFO) << "load config_manager in " << directory;
 	if(!ConfigManager::instance().init(directory))
 		return false;
-
-//	if(!DBManager::instance().init(directory))
-//		return false;
 	
 	LOG(INFO) << "load plugin_manager";
 	if(!PluginManager::instance().init())
@@ -62,17 +48,38 @@ bool anDaemon::init(const string& directory)
 	if(!ModuleManager::instance().init())
 		return false;
 	
+	if(!networking::init())
+  {
+    LOG(ERROR) << "Networking initialization failed";
+		return false;
+  }
+	
+	LOG(INFO) << "load net_manager";
+	if(!NetManager::instance().init())
+		return false;
+	
+	LOG(INFO) << "load rpc_manager";
+	if(!RPCManager::instance().init())
+		return false;
 	
 	return true;
 }
 	
-	
 void anDaemon::run() 
 {
+	boost::thread network(boost::bind(&NetManager::run,boost::ref(NetManager::instance())));
+	boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
 
+	network.join();
+	rpc.join();
 }
 
+	void anDaemon::stop() {
+		RPCManager::instance().stop();
+		NetManager::instance().stop();
+	}
+	
 	anDaemon::~anDaemon() {
-
+		networking::cleanup();
 	}
 }

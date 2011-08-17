@@ -49,10 +49,8 @@
 #include "jsonrpc_common.h"
 #include "jsonrpc_handler.h"
 #include "jsonrpc_server.h"
-#include "jsonrpc_udpserver.h"
 #include "jsonrpc_tcpserver.h"
 #include "jsonrpc_client.h"
-#include "jsonrpc_udpclient.h"
 #include "jsonrpc_tcpclient.h"
 
 #include "netstring.h"

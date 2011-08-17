@@ -19,13 +19,13 @@
  */
 
 #include <sstream>
-#include <google/protobuf/message.h>
-#include <google/protobuf/descriptor.h>
+//#include <google/protobuf/message.h>
+//#include <google/protobuf/descriptor.h>
 
 
 namespace an
 {
-class JSONInterface
+/*class JSONInterface
 {
 public:
 	// convert pb -> json
@@ -37,5 +37,5 @@ private:
 												 const google::protobuf::Message&,std::stringstream&);
 	static void printRepeatedValue(const google::protobuf::FieldDescriptor *,
 												 const google::protobuf::Message&,std::stringstream&, int );
-};
+};*/
 }

@@ -28,13 +28,18 @@
 //#include <boost/date_time/posix_time/posix_time.hpp>
 #include "anarchNet.h"
 #include "db_manager.h"
+#include "diff_match_patch.h"
 //#include "config_manager.h"
 
 using std::string;
 
 namespace an
 {
-
+	bool DBManager::init(const string& db_path)
+	{
+		
+		return true;
+	}
 /*	class online_checker
 		{
 		public:
@@ -59,9 +64,10 @@ namespace an
 			boost::asio::deadline_timer timer_;
 		};
 	*/
-bool DBManager::init(const string& db_path)
-{
-/*	db_.open((db_path+"/"+ConfigManager::instance().config()["db"].as<std::string>()).c_str());
+
+/*
+ init
+ db_.open((db_path+"/"+ConfigManager::instance().config()["db"].as<std::string>()).c_str());
 	
 	// cache apps & protocols
 	// to avoid frequent queries to this "static" table
@@ -78,8 +84,7 @@ bool DBManager::init(const string& db_path)
 		ap_list_[t.getStringField(1)] = id;
 	}
 	boost::thread thread(boost::bind(&DBManager::run_checker,this));*/
-	return true;
-}
+
 	
 /*bool DBManager::store_object(const StoreObjectRequest* req)
 {

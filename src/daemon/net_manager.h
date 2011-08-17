@@ -18,33 +18,49 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>
+#include "config.h"
 #include "singleton.h"
-#include "plugins/bootstrap.h"
 
 
-#ifndef DAEMON_MODULE_MANAGER_H_
-#define DAEMON_MODULE_MANAGER_H_
+#ifndef DAEMON_NET_MANAGER_H_
+#define DAEMON_NET_MANAGER_H_
+
 namespace an {
 	
-class ModuleManager : public Singleton<ModuleManager>
+	class NetManager : public Singleton<NetManager>
 	{
-		friend class Singleton<ModuleManager>;
-public:
+		friend class Singleton<NetManager>;
+	public:
 		bool init();
-		
-			~ModuleManager() {}
-		
-		bool bootstrapFromPeer(const std::string&ip,int port);
-		bool bootstrapFromHostlist(const std::string&url);
-
-		
-		static bool http_request(const std::string& url,std::string* response);
-protected:
-		ModuleManager() {}
-private:
-		std::vector<plg::Bootstrap*> _bootstrapers;
-		boost::int16_t trans_id_;
+		void run();
+		NetManager() : running_(true) {}
+		~NetManager();
+		void stop(){ mutex.lock(); running_ = false; mutex.unlock();}
+	private:
+		Json::Rpc::TcpServer *_server;
+		boost::mutex mutex;
+		bool running_;
 	};
+	
+	namespace p2p {
+		class Hello
+			{
+			public:
+				/**
+				 * \brief Reply with success.
+				 * \param root JSON-RPC request
+				 * \param response JSON-RPC response
+				 * \return true if correctly processed, false otherwise
+				 */
+				bool Hello(const Json::Value& root, Json::Value& response)
+				{
+					
+				}
+				bool GetPeers(const Json::Value& root, Json::Value& response)
+				{
+					
+				}
+			};
+	}
 }
-#endif  // DAEMON_MODULE_MANAGER_H_
+#endif  // DAEMON_NET_MANAGER_H_

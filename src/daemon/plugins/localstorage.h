@@ -32,6 +32,9 @@ class LocalStorage : public Plugin
 {
 public:
 	virtual const std::string getName() {return "generic LOCALSTORAGEplugin";}
+	virtual const Type getType() { return Type::NORMAL; }
+	
+	typedef enum Type { NORMAl, ENCRYPTED, ANONYM };
 };
 }
 	namespace plgdrv {

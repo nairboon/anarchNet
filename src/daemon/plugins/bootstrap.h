@@ -32,9 +32,9 @@ class Bootstrap : public Plugin
 {
 public:
 	virtual const std::string getName() {return "generic bootstrap plugin";}
-	virtual const bool bootstrap(std::string args) { return false; }
-	virtual const bool bootstrapFromPeer(std::string ip,int port) { return false; }
-	virtual const bool bootstrapFromHostlist(std::string args) { return false; }
+	virtual bool bootstrap(std::string args) { return false; }
+	virtual bool bootstrapFromPeer(std::string ip,int port) { return false; }
+	virtual bool bootstrapFromHostlist(std::string args) { return false; }
 };
 	}
 		namespace plgdrv {

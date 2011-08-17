@@ -18,36 +18,35 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config_manager.h"
 #include <glog/logging.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "boost/filesystem.hpp"
 #include "anarchNet.h"
-#include "module_manager.h"
+#include "config_manager.h"
+#include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
 
-using std::string;
-namespace po = boost::program_options;
-namespace fs = boost::filesystem;
+
 
 namespace an
 {
 
-bool ConfigManager::init(const string& directory)
+	bool ConfigManager::init(const std::string& directory)
 {
 	
-	string config_file = directory + "/anarchnet.conf";
+	std::string config_file = directory + "/anarchnet.conf";
 
-	po::options_description config_file_options("Configuration");
+/*	po::options_description config_file_options("Configuration");
 	config_file_options.add_options()
 	("rpc-port", po::value<int>()->default_value(ANARCHNET_RPC_PORT))
 	("port", po::value<int>()->default_value(ANARCHNET_PORT))
-	("modules",po::value< std::vector<string> >()->composing())
-	("db",po::value<string>()->default_value("data.db"))
+	("modules",po::value< std::vector<std::string> >()->composing())
+	("db",po::value<std::string>()->default_value("data.db"))
 	("db-recheck", po::value<int>()->default_value(10))
-	("bs-list",po::value< std::vector<string> >()->composing());
+	("bs-list",po::value< std::vector<std::string> >()->composing());
 	
 	std::ifstream ifs(config_file.c_str());
 	if (!ifs) {
@@ -55,36 +54,25 @@ bool ConfigManager::init(const string& directory)
 		return false;
 	}
 	
-	store(parse_config_file(ifs, config_file_options), vm_);
-	notify(vm_);
+	po::store(po::parse_config_file<char>(config_file.c_str(),config_file_options,true), vm_);
+	po::notify(vm_);
 
 	if(!vm_.count("modules")){
 		LOG(ERROR) << "no modules";
 		return false;
 	}
+*/
+	boost::property_tree::info_parser::read_info(config_file, _pt);
 	
-
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
+								_pt.get_child("daemon.modules"))
+	_modules.insert(v.first);
 	
-	/*
-	fs::path plugin_path;
-	fs::path plugin_data_path;
+	_port = _pt.get("daemon.port", ANARCHNET_PORT);
+	_rpc_port = _pt.get("daemon.rpc_port", ANARCHNET_RPC_PORT);
 
-	foreach (string plugin_name, vm_["plugin"].as< std::vector<string> >()) {
-		plugin_path = fs::path(directory) / "plugins" / plugin_name;
-		if (!fs::exists( plugin_path ) ) {
-			LOG(ERROR) << "plugin not found: " << plugin_path;
-			return false;
-		}
-		plugin_data_path = fs::path(directory) / "plugin_data" / plugin_name;
-		if (!fs::is_directory( plugin_data_path )) 
-			if (!fs::create_directory( plugin_data_path )) {
-				LOG(ERROR) << "could not create directory: " << plugin_data_path;
-				return false;
-			}
-		if( !ModuleManager::instance().loadPlugin(plugin_name,plugin_path.file_string(),plugin_data_path.directory_string())) {
-			LOG(ERROR) << "could not load plugin: " << plugin_name;
-		}
-	}*/
 	return true;
 }
+	
+
 }

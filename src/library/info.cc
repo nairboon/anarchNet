@@ -19,14 +19,11 @@
  */
 
 #include "client.h"
-#include "protobuf_rpc.h"
-#include "protobuf_rpc_channel.h"
-#include "protobuf_rpc_socket.h"
-#include "rpc_service.h"
+
 
 #include "info.h"
 
-InfoResponse* getInfo(void)
+/*InfoResponse* getInfo(void)
 {
 	RPCService* service;
 	Void request;
@@ -42,4 +39,4 @@ InfoResponse* getInfo(void)
 	
   delete service;
 	return response;
-}
+}*/
