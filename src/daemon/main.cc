@@ -26,7 +26,6 @@
 #include "anarchnet.h"
 #include "version.h"
 #include "daemon.h"
-#include "CppSQLite3.h"
 
 namespace po = boost::program_options;
 using std::string;
@@ -135,10 +134,10 @@ int main(int argc, char* argv[])
 		g_daemon->run();
 		LOG(INFO) << "done";		
 	}
-	catch(CppSQLite3Exception& e) {
+/*	catch(CppSQLite3Exception& e) {
 		LOG(ERROR) << "DBException: " << e.errorCode()<< ": " << e.errorMessage();
 		return EXIT_FAILURE;
-	}
+	}*/
 	catch(const std::exception& e) {
 		LOG(ERROR) << "Exception: " << e.what();
 		return EXIT_FAILURE;

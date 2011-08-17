@@ -52,7 +52,6 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
-	"${CMAKE_SOURCE_DIR}/third-party/CppSQLite3"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
 	"/usr/local/include"
  )
@@ -102,8 +101,6 @@ file(GLOB DAEMON_C "${SOURCE_DIR}/daemon/*.c*")
 file(GLOB DAEMON_H "${SOURCE_DIR}/daemon/*.h*")
 file(GLOB DAEMON_PLG_H "${SOURCE_DIR}/daemon/plugins/*.h*")
 list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
-"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.cpp"
-"${ROOT_DIR}/third-party/CppSQLite3/CppSQLite3.h"
 "${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
 )
 

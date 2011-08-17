@@ -100,6 +100,14 @@ bool ModuleManager::init()
 		
 		return false;
 	}
+	
+	bool ModuleManager::db_remove(const db::ObjID& id) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_remove(id))
+				return true;
+		
+		return false;
+	}
 /*	bool ModuleManager::bootstrapp_from_cache() {
 		JoinCallback cb;
 

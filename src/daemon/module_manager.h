@@ -44,7 +44,7 @@ public:
 		// db types
 		bool db_store_snapshot(const db::Snapshot& ss);
 		bool db_store_diff(const db::Diff& diff);
-
+		bool db_remove(const db::ObjID& id);
 		
 		// key value store
 		bool kv_put(const std::string& key, const std::string& value);

@@ -39,6 +39,7 @@ public:
 	
 	virtual const bool db_store_snapshot(const db::Snapshot& sn) { return false; }
 	virtual const bool db_store_diff(const db::Diff& diff) { return false; }
+	virtual const bool db_remove(const db::ObjID& id) { return false; }
 
 	/**
 	 * \brief KV Store
