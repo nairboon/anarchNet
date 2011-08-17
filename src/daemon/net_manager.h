@@ -43,7 +43,7 @@ namespace an {
 	};
 	
 	namespace p2p {
-		class Hello
+		class Discovery
 			{
 			public:
 				/**

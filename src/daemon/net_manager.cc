@@ -36,9 +36,9 @@ namespace an
 		_server = new Json::Rpc::TcpServer(std::string("127.0.0.1"), ConfigManager::instance().port());
 		
 		
-		p2p::Hello hs;
-		_server->AddMethod(new Json::Rpc::RpcMethod<p2p::Hello>(hs, &p2p::Hello::Hello, std::string("Hello")));
-		_server->AddMethod(new Json::Rpc::RpcMethod<p2p::Hello>(hs, &p2p::Hello::GetPeers, std::string("GetPeers")));
+		p2p::Discovery hs;
+		_server->AddMethod(new Json::Rpc::RpcMethod<p2p::Discovery>(hs, &p2p::Discovery::Hello, std::string("Hello")));
+		_server->AddMethod(new Json::Rpc::RpcMethod<p2p::Discovery>(hs, &p2p::Discovery::GetPeers, std::string("GetPeers")));
 		return true;
 	}	
 	void NetManager::run() 

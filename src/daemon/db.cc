@@ -18,32 +18,22 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <map>
+#include <iostream>
+#include <fstream>
 #include <vector>
-#include "db.h"
-#include "singleton.h"
+#include <glog/logging.h>
+//#include <boost/thread.hpp>
+//#include <boost/asio.hpp>
+//#include <boost/bind.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
+#include "anarchNet.h"
+#include "db_manager.h"
+#include "diff_match_patch.h"
+//#include "config_manager.h"
 
-#ifndef DAEMON_DB_MANAGER_H_
-#define DAEMON_DB_MANAGER_H_
-namespace an {
+using std::string;
 
-class DBManager : public Singleton<DBManager>
-	{
-		friend class Singleton<DBManager>;
-public:
-		bool init(const std::string&);
-		
-	//	bool store_object(const StoreObjectRequest* req);
-//		bool delete_object(const DeleteObjectRequest* req);
-		
-		bool store_object(db::Object* obj);
-		bool update_object(db::Object* obj);
-		bool delete_object(db::Object* obj);
-		bool get_object(db::Object* obj);
-
-		std::vector<std::string> get_unchecked_keys_since(int);
-private:
+namespace an
+{
 	
-	};
 }
-#endif  // DAEMON_DB_MANAGER_H_

@@ -40,6 +40,23 @@ namespace an
 		
 		return true;
 	}
+	
+	
+	bool DBManager::store_object(db::Object* obj) 
+	{
+		
+	}
+	bool DBManager::update_object(db::Object* obj) 
+	{
+		
+	}
+	bool DBManager::delete_object(db::Object* obj)
+	{
+	}
+	bool DBManager::get_object(db::Object* obj)
+	{
+	}
+	
 /*	class online_checker
 		{
 		public:

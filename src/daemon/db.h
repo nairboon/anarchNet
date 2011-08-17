@@ -18,32 +18,35 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <map>
-#include <vector>
-#include "db.h"
-#include "singleton.h"
+#include <boost/shared_ptr.hpp>
 
-#ifndef DAEMON_DB_MANAGER_H_
-#define DAEMON_DB_MANAGER_H_
+#ifndef DAEMON_DB_H_
+#define DAEMON_DB_H_
+
 namespace an {
+	namespace db {
+		typedef std::string ObjID;
 
-class DBManager : public Singleton<DBManager>
-	{
-		friend class Singleton<DBManager>;
-public:
-		bool init(const std::string&);
+		class Snapshot;
+		class Diff {
+		public:
+			ObjID shapshot;
+			std::vector<ObjID> prev;
+		};
 		
-	//	bool store_object(const StoreObjectRequest* req);
-//		bool delete_object(const DeleteObjectRequest* req);
+		class Snapshot {
+		public:
+			std::vector<boost::shared_ptr<Diff> > diffs;
+			ObjID based;
+			// timestamp
+		};
 		
-		bool store_object(db::Object* obj);
-		bool update_object(db::Object* obj);
-		bool delete_object(db::Object* obj);
-		bool get_object(db::Object* obj);
-
-		std::vector<std::string> get_unchecked_keys_since(int);
-private:
-	
-	};
+		class Object {
+		public:
+			ObjID id;
+			std::vector<boost::shared_ptr<Snapshot> > snapshots;
+			std::vector<boost::shared_ptr<Diff> > diffs;
+		};
+	}
 }
-#endif  // DAEMON_DB_MANAGER_H_
+#endif  // DAEMON_DB_H_

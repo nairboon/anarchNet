@@ -28,12 +28,15 @@ namespace an {
 #define PLG_REMOTESTORAGE_SERVER_NAME "RemoteStorageServer"
 #define PLG_REMOTESTORAGE_SERVER_VERSION 1
 		
-		class RemoteStorage : public Plugin
-			{
-			public:
-				virtual const std::string getName() {return "generic RemoteStorage plugin";}
-			};
-	}
+class RemoteStorage : public Plugin
+{
+	public:
+		enum StorageType { NORMAL, ENCRYPTED, ANONYM };
+
+		virtual const std::string getName() {return "generic RemoteStorage plugin";}
+		virtual const StorageType getType() { return RemoteStorage::NORMAL; }
+};
+}
 	namespace plgdrv {
 		class RemoteStorage : public pugg::Driver
 		{

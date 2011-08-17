@@ -21,6 +21,9 @@
 #include <vector>
 #include "singleton.h"
 #include "plugins/bootstrap.h"
+#include "plugins/localstorage.h"
+#include "plugins/remotestorage.h"
+#include "db.h"
 
 
 #ifndef DAEMON_MODULE_MANAGER_H_
@@ -38,13 +41,17 @@ public:
 		bool bootstrapFromPeer(const std::string&ip,int port);
 		bool bootstrapFromHostlist(const std::string&url);
 
+		bool store_entry(const std::string& key, const std::string& value);
+		const std::string get_entry(const std::string& key);
+
 		
 		static bool http_request(const std::string& url,std::string* response);
 protected:
 		ModuleManager() {}
 private:
 		std::vector<plg::Bootstrap*> _bootstrapers;
-		boost::int16_t trans_id_;
+		std::vector<plg::LocalStorage*> _localstorages;
+		std::vector<plg::RemoteStorage*> _remotestorages;
 	};
 }
 #endif  // DAEMON_MODULE_MANAGER_H_

@@ -31,10 +31,13 @@ namespace plg {
 class LocalStorage : public Plugin
 {
 public:
+	enum StorageType { PLAIN, BINARY };
+
 	virtual const std::string getName() {return "generic LOCALSTORAGEplugin";}
-	virtual const Type getType() { return Type::NORMAL; }
-	
-	typedef enum Type { NORMAl, ENCRYPTED, ANONYM };
+	virtual const StorageType getType() { return LocalStorage::PLAIN; }
+	virtual const bool store_entry(const std::string& key, const std::string& value) { return false; }
+	virtual const std::string get_entry(const std::string& key) { return ""; }
+
 };
 }
 	namespace plgdrv {
