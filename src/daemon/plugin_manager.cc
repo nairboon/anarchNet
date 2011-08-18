@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <string>
-#include <glog/logging.h>
+#include "logger.h"
 #include "anarchNet.h"
 #include "plugin_manager.h"
 #include "plugins/bootstrap.h"
@@ -39,10 +39,10 @@ namespace an
 		pugg::Server<an::plgdrv::RemoteStorage>* remotestorage_server = new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
 		pugg::Server<an::plgdrv::Session>* session_server = new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
 
-		plugin_kernel_.addServer(bootstrap_server);
-		plugin_kernel_.addServer(localstorage_server);
-		plugin_kernel_.addServer(remotestorage_server);
-		plugin_kernel_.addServer(session_server);
+		_plugin_kernel.addServer(bootstrap_server);
+		_plugin_kernel.addServer(localstorage_server);
+		_plugin_kernel.addServer(remotestorage_server);
+		_plugin_kernel.addServer(session_server);
 
 		return true;
 	}
@@ -50,7 +50,7 @@ namespace an
 	bool PluginManager::loadPlugin(const std::string& plugin_name, const std::string& plugin_path,const std::string& plugin_working_directory)
 	{
 		LOG(INFO) << "load plugin " << plugin_name;
-		if(!plugin_kernel_.loadPlugin(plugin_path)) {
+		if(!_plugin_kernel.loadPlugin(plugin_path)) {
 			LOG(ERROR) << "could not load plugin: " << plugin_path;
 			return false; 
 		}

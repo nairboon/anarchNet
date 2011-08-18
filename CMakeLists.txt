@@ -30,13 +30,12 @@ endif()
 # Dependencies
 ###################################################################################################
 
-find_library(GLOG NAMES libglog.a glog REQUIRED)
 find_package(GTest REQUIRED)
 find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 #find_library(UDT NAMES udt_d REQUIRED)
 find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
-
+find_library(BOOST_LOG NAMES libboost_log.a boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
@@ -52,15 +51,16 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
+	"${CMAKE_SOURCE_DIR}/third-party/boost-log"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
 	"/usr/local/include"
  )
 set( LIB
 	${Boost_LIBRARIES}
-	${GLOG}
 	${CRYPTOPP}
 	${SQLITE}
 	${ARCHIVE}
+	${BOOST_LOG}
 	)
 set( TEST_LIB
 	${GCOV}
@@ -94,6 +94,13 @@ add_library(jsonrpc ${JSON_RPC_SRC})
 add_dependencies(jsonrpc json)
 
 ################################################################################
+# logger
+################################################################################
+
+set(LOGGER_SRC "${SOURCE_DIR}/daemon/logger.h" "${SOURCE_DIR}/daemon/logger.cc")
+add_library(logger ${LOGGER_SRC})
+
+################################################################################
 # Daemon
 ################################################################################
 
@@ -105,8 +112,8 @@ list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
 )
 
 add_executable(anDaemon ${DAEMON_SRC})
-add_dependencies(anDaemon jsonrpc)
-target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} jsonrpc json)
+add_dependencies(anDaemon jsonrpc logger)
+target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} jsonrpc json logger)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -125,8 +132,8 @@ file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
 list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
 add_library(an SHARED ${LIBRARY_SRC})
-add_dependencies(an jsonrpc)
-target_link_libraries(an ${LIB} jsonrpc json)
+add_dependencies(an jsonrpc logger)
+target_link_libraries(an ${LIB} jsonrpc json logger)
 
 ################################################################################
 # Python library search (style check)                                          #
@@ -155,11 +162,11 @@ list(APPEND T_RPC_DIR ${T_RPC_C} ${T_RPC_H} ${PB_DAEMON_FE})
 add_executable(TESTbase ${T_MAIN} ${T_BASE_DIR})
 add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
 
-add_dependencies(TESTbase anDaemon)
-add_dependencies(TESTrpc anDaemon)
+add_dependencies(TESTbase anDaemon logger)
+add_dependencies(TESTrpc anDaemon logger)
 
-target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json jsonrpc an)
-target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an)
+target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json jsonrpc an logger)
+target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an logger)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)

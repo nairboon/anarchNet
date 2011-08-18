@@ -17,3 +17,6 @@ http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
 CppSQLite3 - C++ Wrapper for SQLite
 Copyright 2004 Rob Groves
 http://www.codeproject.com/KB/database/CppSQLite.aspx
+
+
+svn co https://boost-log.svn.sourceforge.net/svnroot/boost-log/trunk/boost-log boost-log

@@ -22,10 +22,11 @@
 #include <cstdio>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
-#include <glog/logging.h>
+#include "logger.h"
 #include "anarchnet.h"
 #include "version.h"
 #include "daemon.h"
+#include <boost/log/trivial.hpp>
 
 namespace po = boost::program_options;
 using std::string;
@@ -54,9 +55,7 @@ static void signal_handler(int code)
 int main(int argc, char* argv[])
 {
 
-	FLAGS_log_dir=".";
-	FLAGS_stderrthreshold = 0;
-	google::InitGoogleLogging(argv[0]);
+	an::Logger::instance().init("daemon.log");
 
 	g_daemon = NULL;
 	try {
@@ -132,12 +131,10 @@ int main(int argc, char* argv[])
 		}
 		
 		g_daemon->run();
+		boost::this_thread::sleep(boost::posix_time::seconds(1));
 		LOG(INFO) << "done";		
 	}
-/*	catch(CppSQLite3Exception& e) {
-		LOG(ERROR) << "DBException: " << e.errorCode()<< ": " << e.errorMessage();
-		return EXIT_FAILURE;
-	}*/
+
 	catch(const std::exception& e) {
 		LOG(ERROR) << "Exception: " << e.what();
 		return EXIT_FAILURE;

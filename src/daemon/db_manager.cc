@@ -21,13 +21,13 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <glog/logging.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 //#include <boost/thread.hpp>
 //#include <boost/asio.hpp>
 //#include <boost/bind.hpp>
 //#include <boost/date_time/posix_time/posix_time.hpp>
+#include "logger.h"
 #include "anarchNet.h"
 #include "db_manager.h"
 #include "module_manager.h"

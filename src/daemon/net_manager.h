@@ -33,13 +33,13 @@ namespace an {
 	public:
 		bool init();
 		void run();
-		NetManager() : running_(true) {}
+		NetManager() : _running(true) {}
 		~NetManager();
-		void stop(){ mutex.lock(); running_ = false; mutex.unlock();}
+		void stop(){ _mutex.lock(); _running = false; _server->Close(); _mutex.unlock();}
 	private:
 		Json::Rpc::TcpServer *_server;
-		boost::mutex mutex;
-		bool running_;
+		boost::mutex _mutex;
+		bool _running;
 	};
 	
 	namespace p2p {

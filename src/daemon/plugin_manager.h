@@ -34,10 +34,9 @@ namespace an {
 	public:
 		bool init();
 		bool loadPlugin(const std::string&,const std::string&,const std::string&);
+		pugg::Kernel& get_kernel() { return _plugin_kernel; }
 	private:
-		pugg::Kernel plugin_kernel_;
-	//	pugg::Server<DHTpluginDriver>* dhtServer_;
-	//	std::vector<DHTplugin*> dhtPlugins_;
+		pugg::Kernel _plugin_kernel;
 	};
 }
 #endif

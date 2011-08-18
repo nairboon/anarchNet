@@ -18,7 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glog/logging.h>
+#include "logger.h"
 #include <iostream>
 #include <boost/thread.hpp>
 #include "version.h"
@@ -59,12 +59,11 @@ namespace an
 		
 		LOG(INFO) << "Start p2p networking";
 		
-		while(running_)
+		while(_running)
 		{
 			_server->WaitMessage(1000);
 		}
 		
-		_server->Close();
 	}
 	
 	NetManager::~NetManager() {

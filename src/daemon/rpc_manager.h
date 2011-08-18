@@ -38,13 +38,13 @@ namespace an {
 	public:
 		bool init();
 		void run();
-		void stop(){ mutex.lock(); running_ = false; mutex.unlock();}
+		void stop(){ _mutex.lock(); _running = false; _server->Close(); _mutex.unlock();}
 		~RPCManager();
-		RPCManager() : running_(true) {}
+		RPCManager() : _running(true) {}
 	private:
 		Json::Rpc::TcpServer *_server;
-		boost::mutex mutex; 
-		bool running_;
+		boost::mutex _mutex; 
+		bool _running;
 	};
 	
 	

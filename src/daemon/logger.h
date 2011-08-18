@@ -18,32 +18,41 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-#include <set>
-#include <boost/property_tree/ptree.hpp>
 #include "singleton.h"
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_logger.hpp>
 
-#ifndef DAEMON_CONFIG_MANAGER_H_
-#define DAEMON_CONFIG_MANAGER_H_
-namespace an {
-	
-class ConfigManager : public Singleton<ConfigManager>
+
+#ifndef DAEMON_LOG_H_
+#define DAEMON_LOG_H_
+
+
+namespace an
+{
+	enum severity_level
 	{
-		friend class Singleton<ConfigManager>;
-public:
-		bool init(const std::string&);
-		const 	boost::property_tree::ptree& config() { return _pt; }
-		const std::set<std::string>& modules() { return _modules; }
-		int port() { return _port; }
-		int rpc_port() { return _rpc_port; }
-		std::string datadir() { return _data_dir; }
-private:
-		boost::property_tree::ptree _pt;
-		std::set<std::string> _modules;
-		int _port;
-		int _rpc_port;
-		std::string _data_dir;
-		std::string _dir;
+		DEBUG,
+		INFO,
+		WARNING,
+		ERROR,
+		FATAL
 	};
+
+	
+	class Logger : public Singleton<Logger>
+	{
+		friend class Singleton<Logger>;
+	public:
+
+		bool init(const std::string& logfile);
+		boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
+		
+	private:
+		boost::log::sources::severity_logger_mt< severity_level > _logger;
+	};
+	
+#define LOG(lvl)\
+BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),\
+(::boost::log::keywords::severity = ::an::lvl))
 }
-#endif  // DAEMON_CONFIG_MANAGER_H_
+#endif  // DAEMON_LOG_H_

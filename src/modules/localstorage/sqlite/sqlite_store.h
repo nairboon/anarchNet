@@ -2,6 +2,7 @@
 #define PLG_SQLITE_H
 
 #include "plugins/localstorage.h"
+#include "cpp_sqlite3.h"
 
 #define PLG_SQLITE_VERSION 1
 
@@ -12,12 +13,16 @@ public:
 	const unsigned int getVersion() { return PLG_SQLITE_VERSION; }
 	bool initialise();
 	void shutdown();
+private:
+	CppSQLite3DB _db;
+	std::string _db_path;
+	bool create_db();
 };
 
 class SqliteDriver : public an::plgdrv::LocalStorage
 {
 public: 
-	std::string getName() { return "sqlite_driver"; }
+	const std::string getName() { return "sqlite_driver"; }
 	Sqlite* createPlugin() {return new Sqlite();}
 };
 

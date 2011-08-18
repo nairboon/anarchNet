@@ -33,7 +33,7 @@ namespace pugg
 		 As pugg holds drivers in std::map structure this string functions as a key.
 		 This key helps the host program distinguish between diffrent drivers.
 		 */
-		virtual std::string getName() = 0;
+		virtual const std::string getName() = 0;
 		
 		virtual ~Driver() { };
 	};

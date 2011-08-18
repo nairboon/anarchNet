@@ -19,8 +19,8 @@
  */
 
 #include <boost/thread.hpp>
-#include <glog/logging.h>
 
+#include "logger.h"
 #include "anarchNet.h"
 #include "daemon.h"
 #include "rpc_manager.h"
@@ -75,8 +75,8 @@ void anDaemon::run()
 }
 
 	void anDaemon::stop() {
-		RPCManager::instance().stop();
 		NetManager::instance().stop();
+		RPCManager::instance().stop();
 	}
 	
 	anDaemon::~anDaemon() {

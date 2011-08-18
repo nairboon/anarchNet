@@ -23,6 +23,7 @@
 #include "plugins/bootstrap.h"
 #include "plugins/localstorage.h"
 #include "plugins/remotestorage.h"
+#include "plugins/session.h"
 #include "db.h"
 
 
@@ -58,6 +59,7 @@ private:
 		std::vector<plg::Bootstrap*> _bootstrapers;
 		std::vector<plg::LocalStorage*> _localstorages;
 		std::vector<plg::RemoteStorage*> _remotestorages;
+		std::vector<plg::Session*> _sessions;
 	};
 }
 #endif  // DAEMON_MODULE_MANAGER_H_

@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <string>
-#include <glog/logging.h>
+#include "logger.h"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/asio.hpp>
 #include <boost/tokenizer.hpp>
@@ -30,6 +30,10 @@
 #include "module_manager.h"
 #include "plugin_manager.h"
 #include "config_manager.h"
+#include "plugins/bootstrap.h"
+#include "plugins/localstorage.h"
+#include "plugins/remotestorage.h"
+#include "plugins/session.h"
 
 using boost::asio::ip::tcp;
 
@@ -43,6 +47,45 @@ bool ModuleManager::init()
 			return false;
 	}
 	
+	std::vector<plgdrv::Bootstrap*> bs_drivers;
+	dynamic_cast<pugg::Server<an::plgdrv::Bootstrap>*>(PluginManager::instance().get_kernel().getServer(PLG_BOOTSTRAP_SERVER_NAME))->getAllDrivers(bs_drivers);
+	BOOST_FOREACH (plgdrv::Bootstrap* drv, bs_drivers) {
+		plg::Bootstrap* plg = drv->createPlugin();
+		LOG(INFO)<< plg->getName() << " created";
+		plg->initialise();
+		LOG(INFO)<< plg->getName() << " initialized";
+		_bootstrapers.push_back(plg);
+	}
+	
+	std::vector<plgdrv::LocalStorage*> ls_drivers;
+	dynamic_cast<pugg::Server<an::plgdrv::LocalStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_LOCALSTORAGE_SERVER_NAME))->getAllDrivers(ls_drivers);
+	BOOST_FOREACH (plgdrv::LocalStorage* drv, ls_drivers) {
+		plg::LocalStorage* plg = drv->createPlugin();
+		LOG(INFO)<< plg->getName() << " created";
+		plg->initialise();
+		LOG(INFO)<< plg->getName() << " initialized";
+		_localstorages.push_back(plg);
+	}
+	
+	std::vector<plgdrv::RemoteStorage*> rs_drivers;
+	dynamic_cast<pugg::Server<an::plgdrv::RemoteStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_REMOTESTORAGE_SERVER_NAME))->getAllDrivers(rs_drivers);
+	BOOST_FOREACH (plgdrv::RemoteStorage* drv, rs_drivers) {
+		plg::RemoteStorage* plg = drv->createPlugin();
+		LOG(INFO)<< plg->getName() << " created";
+		plg->initialise();
+		LOG(INFO)<< plg->getName() << " initialized";
+		_remotestorages.push_back(plg);
+	}
+	
+	std::vector<plgdrv::Session*> s_drivers;
+	dynamic_cast<pugg::Server<an::plgdrv::Session>*>(PluginManager::instance().get_kernel().getServer(PLG_SESSION_SERVER_NAME))->getAllDrivers(s_drivers);
+	BOOST_FOREACH (plgdrv::Session* drv, s_drivers) {
+		plg::Session* plg = drv->createPlugin();
+		LOG(INFO)<< plg->getName() << " created";
+		plg->initialise();
+		LOG(INFO)<< plg->getName() << " initialized";
+		_sessions.push_back(plg);
+	}
 	return true;
 }
 

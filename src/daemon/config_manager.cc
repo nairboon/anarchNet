@@ -18,18 +18,21 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glog/logging.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include "anarchNet.h"
 #include "config_manager.h"
+#include "logger.h"
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
+#include <boost/filesystem.hpp>
 
 
+
+namespace fs = boost::filesystem;
 
 namespace an
 {
@@ -70,7 +73,38 @@ namespace an
 	
 	_port = _pt.get("daemon.port", ANARCHNET_PORT);
 	_rpc_port = _pt.get("daemon.rpc_port", ANARCHNET_RPC_PORT);
+	_dir = _pt.get("daemon.dir", "~/.anarchNet");
+	_data_dir = _pt.get("daemon.datadir", "~/.anarchNet/data");
 
+	if (_dir[0] == '~') 
+		_dir = std::string(getenv("HOME")) + _dir.substr(1);
+
+	if (_data_dir[0] == '~') 
+		_data_dir = std::string(getenv("HOME")) + _data_dir.substr(1);
+
+	if(!fs::exists(_dir)) {
+		 LOG(INFO)<< "creating anarchNet dir: " << _dir;
+		 if(!fs::create_directory(_dir)) {
+			LOG(ERROR) << "Could not create: " << _dir;
+			return false;
+		 }
+	}
+	else if(!fs::is_directory(_dir)) {
+		 LOG(ERROR) << _dir << " is not a directory";
+		return false;
+	}
+	if(!fs::exists(_data_dir)) {
+		 LOG(INFO)<< "creating anarchNet data dir: " << _data_dir;
+		 if(!fs::create_directory(_data_dir)) {
+			LOG(ERROR) << "Could not create: " << _data_dir;
+			return false;
+		 }		
+	}
+	else if(!fs::is_directory(_data_dir)) {
+	 LOG(ERROR) << _data_dir << " is not a directory";
+	 return false;
+	 }
+		 
 	return true;
 }
 	

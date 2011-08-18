@@ -1,17 +1,78 @@
+#include "logger.h"
 #include "puggKernel.h"
 #include "sqlite_store.h"
+#include "config_manager.h"
+#include <boost/filesystem.hpp>
+
+
+
+namespace fs = boost::filesystem;
 
 using namespace pugg;
 
+#define PATH "/sqlite_store.db"
 extern "C" //__declspec(dllexport)
 void registerPlugin(Kernel &K) 
 {
-	Server<an::plgdrv::LocalStorage>* server =CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
+	Server<an::plgdrv::LocalStorage>* server = CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
 	assert(server != NULL);
 	server->addDriver(new SqliteDriver(),PLG_LOCALSTORAGE_SERVER_VERSION);
 }
 
+bool Sqlite::initialise() {
+	_db_path = an::ConfigManager::instance().datadir()+PATH;
+try {
+	// check data
+	if(!fs::exists(_db_path)) {
+		if(!create_db()) {
+				LOG(ERROR) << "could not create sqlite db";
+				return false;
+		}
+		LOG(INFO) << "created new sqlitedb";
+	}
+	_db.open(_db_path.c_str());
+}
+catch(CppSQLite3Exception& e) {
+	LOG(ERROR) << "DBException: " << e.errorCode()<< ": " << e.errorMessage();
+	return false;
+}
+	LOG(INFO) << "sqlite store ready";
+	return true;
+}
 
+
+bool Sqlite::create_db() {
+	_db.open(_db_path.c_str());
+	CppSQLite3Query q = _db.execQuery("CREATE TABLE diff_history ( \
+																		diff INTEGER , \
+																		previous INTEGER );");
+	q = _db.execQuery("CREATE TABLE diffs ( \
+																		pk INTEGER , \
+																		id TEXT , \
+																		snapshot TEXT );");
+	q = _db.execQuery("CREATE TABLE object_diffs ( \
+																		obj_id INTEGER , \
+																		diff_id INTEGER );");
+	q = _db.execQuery("CREATE TABLE object_snapshots ( \
+																		obj_id INTEGER , \
+																		snapshot_id INTEGER );");
+	q = _db.execQuery("CREATE TABLE objects ( \
+																		pk INTEGER , \
+																		id TEXT );");
+	q = _db.execQuery("CREATE TABLE snapshots ( \
+																		pk INTEGER , \
+																		id TEXT , \
+																		based TEXT , \
+																		content TEXT , \
+																		time INTEGER ); \
+																		");
+		_db.close();
+	return true;
+}
+
+void Sqlite::shutdown() {
+	
+}
 
 
 

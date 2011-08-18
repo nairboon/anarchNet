@@ -34,7 +34,7 @@ class LocalStorage : public Plugin
 public:
 	enum StorageType { PLAIN, BINARY };
 
-	virtual const std::string getName() {return "generic LOCALSTORAGEplugin";}
+	virtual const std::string getName() {return "generic LocalStorage plugin";}
 	virtual const StorageType getType() { return LocalStorage::PLAIN; }
 	
 	virtual const bool db_store_snapshot(const db::Snapshot& sn) { return false; }
