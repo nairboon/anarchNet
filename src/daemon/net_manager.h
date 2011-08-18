@@ -17,10 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "config.h"
 #include "singleton.h"
-
 
 #ifndef DAEMON_NET_MANAGER_H_
 #define DAEMON_NET_MANAGER_H_
@@ -55,11 +52,11 @@ namespace an {
 				 */
 				bool Hello(const boost::json::Value& root, boost::json::Value& response)
 				{
-					
+					return false;
 				}
 				bool GetPeers(const boost::json::Value& root, boost::json::Value& response)
 				{
-					
+					return false;
 				}
 			};
 	}

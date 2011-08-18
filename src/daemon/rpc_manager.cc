@@ -18,18 +18,13 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logger.h"
 #include <iostream>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include "version.h"
-#include "anarchNet.h"
-#include "db_manager.h"
-#include <json/json.h>
 #include "rpc_server.h"
 #include "rpc_manager.h"
 #include "config_manager.h"
+#include "logger.h"
 
 namespace an
 {

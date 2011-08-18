@@ -18,8 +18,6 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <map>
-#include <vector>
 #include "db.h"
 #include "singleton.h"
 

@@ -18,11 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
 #include "singleton.h"
-#include "maidsafe/base/crypto.h"
-#include <json/json.h>
-
 
 #ifndef DAEMON_RPC_SERVICE_H_
 #define DAEMON_RPC_SERVICE_H_
@@ -64,13 +60,12 @@ namespace an {
 	public:
 		bool init();
 		void run();
-		void stop(){ _mutex.lock(); _running = false; _io_service.stop(); _mutex.unlock();}
+		void stop(){ _io_service.stop(); }
 		~RPCManager();
 		RPCManager() : _running(true) {}
 	private:
 		an::RpcServer *_server;
 		boost::asio::io_service _io_service;
-		boost::mutex _mutex; 
 		bool _running;
 		rpc::Bootstrap _bs;
 	};
@@ -82,7 +77,7 @@ namespace an {
 								 const Void* request,
 								 InfoResponse* response,
 								 google::protobuf::Closure* done);
-/*		void get(awk::protobuf::RpcController* controller,
+/		void get(awk::protobuf::RpcController* controller,
 								 const GetRequest* request,
 								 GetResponse* response,
 								 google::protobuf::Closure* done);

@@ -18,11 +18,9 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>
 #include "singleton.h"
 #include "puggKernel.h"
 #include "puggServer.h"
-//#include "plugins/plugin_dht.h"
 
 #ifndef DAEMON_PLUGIN_MANAGER_H_
 #define DAEMON_PLUGIN_MANAGER_H_

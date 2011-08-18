@@ -19,14 +19,12 @@
  */
 #include <sys/stat.h>
 #include <iostream>
-#include <cstdio>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 #include "logger.h"
 #include "anarchnet.h"
 #include "version.h"
 #include "daemon.h"
-#include <boost/log/trivial.hpp>
 
 namespace po = boost::program_options;
 using std::string;

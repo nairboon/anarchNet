@@ -18,15 +18,11 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <string>
-#include "logger.h"
-#include <boost/filesystem/fstream.hpp>
 #include <boost/asio.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
-
 #include "anarchNet.h"
+#include "logger.h"
 #include "module_manager.h"
 #include "plugin_manager.h"
 #include "config_manager.h"

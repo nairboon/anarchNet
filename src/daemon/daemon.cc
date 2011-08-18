@@ -19,7 +19,8 @@
  */
 
 #include <boost/thread.hpp>
-
+#include <boost/asio.hpp>
+#include <boost/json/json.hpp>
 #include "logger.h"
 #include "anarchNet.h"
 #include "daemon.h"
@@ -54,8 +55,8 @@ namespace an {
 		return false;
 	
 	LOG(INFO) << "load rpc_manager";
-	//if(!RPCManager::instance().init())
-//		return false;
+	if(!RPCManager::instance().init())
+		return false;
 	
 	return true;
 }
@@ -63,12 +64,12 @@ namespace an {
 void anDaemon::run() 
 {
 	boost::thread network(boost::bind(&NetManager::run,boost::ref(NetManager::instance())));
-	//boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
+	boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
 
 	LOG(INFO)<<"waiting..";
 	network.join();
 	LOG(INFO) << "network joind";
-	//rpc.join();
+	rpc.join();
 	LOG(INFO) << "rpc joind";
 }
 

@@ -51,8 +51,8 @@ namespace an
 	//	boost::log::sources::severity_logger_mt< severity_level > _logger;
 	};
 	
-//#define LOG(lvl)\
-//BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),\
+//#define LOG(lvl)
+//BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),
 //(::boost::log::keywords::severity = ::an::lvl))
 #define LOG(lvl) std::cerr << std::endl; std::cerr
 }

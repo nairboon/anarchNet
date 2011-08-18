@@ -20,17 +20,12 @@
 
 #include <vector>
 #include "singleton.h"
-#include "plugins/bootstrap.h"
-#include "plugins/localstorage.h"
-#include "plugins/remotestorage.h"
-#include "plugins/session.h"
 #include "db.h"
-
 
 #ifndef DAEMON_MODULE_MANAGER_H_
 #define DAEMON_MODULE_MANAGER_H_
 namespace an {
-	
+	namespace plg { class Bootstrap; class LocalStorage; class RemoteStorage; class Session; }
 class ModuleManager : public Singleton<ModuleManager>
 	{
 		friend class Singleton<ModuleManager>;

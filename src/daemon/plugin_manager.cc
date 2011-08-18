@@ -18,7 +18,6 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <string>
 #include "logger.h"
 #include "anarchNet.h"

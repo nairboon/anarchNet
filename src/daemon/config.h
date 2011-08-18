@@ -21,6 +21,4 @@
 #ifndef DAEMON_CONFIG_H_
 #define DAEMON_CONFIG_H_
 
-#define HAVE_GLOG 1
-
 #endif  // DAEMON_CONFIG_H_

@@ -18,15 +18,9 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <sstream>
-#include <vector>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-//#include <boost/thread.hpp>
-//#include <boost/asio.hpp>
-//#include <boost/bind.hpp>
-//#include <boost/date_time/posix_time/posix_time.hpp>
 #include "logger.h"
 #include "anarchNet.h"
 #include "db_manager.h"
@@ -66,13 +60,15 @@ namespace an
 	}
 	bool DBManager::update_object(db::Object* obj) 
 	{
-		
+		return false;
 	}
 	bool DBManager::delete_object(db::Object* obj)
 	{
+		return false;
 	}
 	bool DBManager::get_object(db::Object* obj)
 	{
+		return false;
 	}
 	
 
