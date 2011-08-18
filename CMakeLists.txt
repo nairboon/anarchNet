@@ -48,6 +48,8 @@ include_directories(
 	"${SOURCE_DIR}/library"
 	${Boost_INCLUDE_DIRS} 
 	${GTEST_INCLUDE_DIRS}
+	"${SOURCE_DIR}/rpc"
+	"${CMAKE_SOURCE_DIR}/third-party/"
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
@@ -73,11 +75,11 @@ endif()
 message(STATUS "linked libraries: ${LIB} ${TEST_LIB}")
 
 ################################################################################
-# jsoncpp
+# json
 ################################################################################
 
-file(GLOB JSON_C "${ROOT_DIR}/third-party/jsoncpp/src/lib_json/*.c*")
-file(GLOB JSON_H "${ROOT_DIR}/third-party/jsoncpp/src/lib_json/*.h*")
+file(GLOB JSON_C "${ROOT_DIR}/third-party/boost/json/src/*.c*")
+file(GLOB JSON_H "${ROOT_DIR}/third-party/boost/json/*.h*")
 list(APPEND JSON_SRC ${JSON_C} ${JSON_H})
 add_library(json ${JSON_SRC})
 
@@ -89,10 +91,21 @@ file(GLOB JSON_RPC_C "${ROOT_DIR}/third-party/jsonrpc/src/*.c*")
 file(GLOB JSON_RPC_H "${ROOT_DIR}/third-party/jsonrpc/src/*.h*")
 list(APPEND JSON_RPC_SRC ${JSON_RPC_C} ${JSON_RPC_H})
 
-add_library(jsonrpc ${JSON_RPC_SRC})
+#add_library(jsonrpc ${JSON_RPC_SRC})
 
-add_dependencies(jsonrpc json)
+#add_dependencies(jsonrpc json)
 
+################################################################################
+# rpc
+################################################################################
+
+file(GLOB RPC_C "${SOURCE_DIR}/rpc/*.c*")
+file(GLOB RPC_H "${SOURCE_DIR}/rpc/*.h*")
+list(APPEND RPC_SRC ${RPC_C} ${RPC_H} ${JSON_RPC_H} "${ROOT_DIR}/third-party/jsonrpc/src/jsonrpc_handler.cpp")
+
+add_library(rpc ${RPC_SRC})
+
+add_dependencies(rpc json logger)
 ################################################################################
 # logger
 ################################################################################
@@ -113,7 +126,7 @@ list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
 
 add_executable(anDaemon ${DAEMON_SRC})
 add_dependencies(anDaemon jsonrpc logger)
-target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} jsonrpc json logger)
+target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} json logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -132,8 +145,8 @@ file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
 list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
 add_library(an SHARED ${LIBRARY_SRC})
-add_dependencies(an jsonrpc logger)
-target_link_libraries(an ${LIB} jsonrpc json logger)
+add_dependencies(an rpc logger)
+target_link_libraries(an ${LIB} jsonrpc json logger rpc)
 
 ################################################################################
 # Python library search (style check)                                          #
@@ -163,10 +176,10 @@ add_executable(TESTbase ${T_MAIN} ${T_BASE_DIR})
 add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
 
 add_dependencies(TESTbase anDaemon logger)
-add_dependencies(TESTrpc anDaemon logger)
+add_dependencies(TESTrpc anDaemon logger rpc)
 
-target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json jsonrpc an logger)
-target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an logger)
+target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json an logger)
+target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an logger rpc)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)

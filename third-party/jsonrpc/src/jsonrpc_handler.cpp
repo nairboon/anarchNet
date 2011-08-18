@@ -36,14 +36,14 @@ namespace Json
 
     Handler::Handler()
     {
-      /* add a RPC method that list the actual RPC methods contained in the Handler */
-      Json::Value root;
+      /* add a RPC method that list the actual RPC methods contained in the Handler *
+      boost::json::Value root;
 
       root["description"] = "List the RPC methods available";
       root["parameters"] = Json::Value::null;
       root["returns"] = "Object that contains description of all methods registered";
-
-      AddMethod(new RpcMethod<Handler>(*this, &Handler::SystemDescribe, std::string("system.describe"), root));
+*/
+      AddMethod(new RpcMethod<Handler>(*this, &Handler::SystemDescribe, std::string("system.describe")));
     }
 
     Handler::~Handler()
@@ -80,9 +80,9 @@ namespace Json
       }
     }
 
-    bool Handler::SystemDescribe(const Json::Value& msg, Json::Value& response)
+    bool Handler::SystemDescribe(const boost::json::Value& msg, boost::json::Value& response)
     {
-      Json::Value methods;
+      boost::json::Value methods;
       response["jsonrpc"] = "2.0";
       response["id"] = msg["id"];
 
@@ -95,19 +95,19 @@ namespace Json
       return true;
     }
 
-    std::string Handler::GetString(Json::Value value)
+    std::string Handler::GetString(boost::json::Value& value)
     {
-      return m_writer.write(value);
+      return boost::json::write(value);
     }
 
-    bool Handler::Check(const Json::Value& root, Json::Value& error)
+    bool Handler::Check(const boost::json::Value& root, boost::json::Value& error)
     {
-      Json::Value err;
+      boost::json::Value err;
       
       /* check the JSON-RPC version => 2.0 */
-      if(!root.isObject() || !root.isMember("jsonrpc") || root["jsonrpc"] != "2.0") 
+      if(!root.is_null() || !root.contains("jsonrpc") || root["jsonrpc"].get_str() != "2.0") 
       {
-        error["id"] = Json::Value::null;
+        error["id"] = NULL;
         error["jsonrpc"] = "2.0";
         
         err["code"] = INVALID_REQUEST;
@@ -116,9 +116,9 @@ namespace Json
         return false;
       }
 
-      if(root.isMember("id") && (root["id"].isArray() || root["id"].isObject()))
+      if(root.contains("id") && (root["id"].type() == boost::json::array_type || root["id"].type()==boost::json::obj_type))
       {
-        error["id"] = Json::Value::null;
+        error["id"] = NULL;
         error["jsonrpc"] = "2.0";
 
         err["code"] = INVALID_REQUEST;
@@ -128,9 +128,9 @@ namespace Json
       }
 
       /* extract "method" attribute */
-      if(!root.isMember("method") || !root["method"].isString())
+      if(!root.contains("method") || (root["method"].type()!=boost::json::str_type))
       {
-        error["id"] = Json::Value::null;
+        error["id"] = NULL;
         error["jsonrpc"] = "2.0";
 
         err["code"] = INVALID_REQUEST;
@@ -142,9 +142,9 @@ namespace Json
       return true;
     }
 
-    bool Handler::Process(const Json::Value& root, Json::Value& response)
+    bool Handler::Process(const boost::json::Value& root, boost::json::Value& response)
     {
-      Json::Value error;
+      boost::json::Value error;
       std::string method;
 
       if(!Check(root, error))
@@ -153,7 +153,7 @@ namespace Json
         return false;
       }
 
-      method = root["method"].asString();
+      method = root["method"].get_str();
       
       if(method != "")
       {
@@ -165,7 +165,8 @@ namespace Json
       }
       
       /* forge an error response */
-      response["id"] = root.isMember("id") ? root["id"] : Json::Value::null;
+			boost::json::Value null;
+      response["id"] = root.contains("id") ? root["id"] : null;
       response["jsonrpc"] = "2.0";
 
       error["code"] = METHOD_NOT_FOUND;
@@ -175,19 +176,19 @@ namespace Json
       return false;
     }
 
-    bool Handler::Process(const std::string& msg, Json::Value& response)
+    bool Handler::Process(const std::string& msg, boost::json::Value& response)
     {
-      Json::Value root;
-      Json::Value error;
+      boost::json::Value root;
+      boost::json::Value error;
       bool parsing = false;
 
       /* parsing */
-      parsing = m_reader.parse(msg, root);
+      parsing = boost::json::read(msg, root);
       
       if(!parsing)
       {
         /* request or batched call is not in JSON format */
-        response["id"] = Json::Value::null;
+        response["id"] = NULL;
         response["jsonrpc"] = "2.0";
         
         error["code"] = PARSING_ERROR;
@@ -196,18 +197,18 @@ namespace Json
         return false;
       }
       
-      if(root.isArray())
+      if(root.type()==boost::json::array_type)
       {
         /* batched call */
         size_t i = 0;
         size_t j = 0;
-        
-        for(i = 0 ; i < root.size() ; i++)
+        boost::json::Value::Array arr = root.get_array();
+        for(i = 0 ; i < arr.size() ; i++)
         {
-          Json::Value ret;
-          Process(root[i], ret);
+          boost::json::Value ret;
+          Process(arr[i], ret);
           
-          if(ret != Json::Value::null)
+          if(!ret.is_null())
           {
             /* it is not a notification, add to array of responses */
             response[j] = ret;
@@ -222,7 +223,7 @@ namespace Json
       }
     }
 
-    bool Handler::Process(const char* msg, Json::Value& response)
+    bool Handler::Process(const char* msg, boost::json::Value& response)
     {
       std::string str(msg);
 

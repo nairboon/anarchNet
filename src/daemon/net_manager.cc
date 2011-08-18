@@ -21,19 +21,22 @@
 #include "logger.h"
 #include <iostream>
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
 #include "version.h"
 #include "anarchNet.h"
 #include "db_manager.h"
 #include <json/json.h>
 #include "jsonrpc.h"
 #include "config_manager.h"
+#include "rpc_server.h"
 #include "net_manager.h"
 
 namespace an
 {
 	
 	bool	NetManager::init() {
-		_server = new Json::Rpc::TcpServer(std::string("127.0.0.1"), ConfigManager::instance().port());
+		_server = new RpcServer(_io_service, ConfigManager::instance().port());
 		
 		
 		p2p::Discovery hs;
@@ -43,31 +46,18 @@ namespace an
 	}	
 	void NetManager::run() 
 	{
-		
-		if(!_server->Bind())
-		{
-			LOG(ERROR) << "Bind failed";
-			exit(EXIT_FAILURE);
+		try {
+			LOG(INFO) << "Start p2p networking";
+			_io_service.run();
+			LOG(INFO) << "Finished NetManager";
 		}
-		
-		if(!_server->Listen())
+		catch (std::exception& e)
 		{
-			LOG(ERROR) << "Listen failed";
-			exit(EXIT_FAILURE);
-		}
-		
-		
-		LOG(INFO) << "Start p2p networking";
-		
-		while(_running)
-		{
-			_server->WaitMessage(1000);
-		}
-		
+			LOG(ERROR) << "Exception: " << e.what() << "\n";
+		}	
 	}
 	
 	NetManager::~NetManager() {
-		LOG(INFO) << "Stop NetManager";
 		delete _server;
 	}	
 		

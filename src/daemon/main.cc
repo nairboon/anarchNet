@@ -42,6 +42,9 @@ static void signal_handler(int code)
   switch(code)
   {
     case SIGINT:
+		case SIGHUP:
+		case SIGQUIT:
+		case SIGKILL:
     case SIGTERM:
 			LOG(ERROR)<<"shuting down";
       g_daemon->stop();
@@ -55,7 +58,7 @@ static void signal_handler(int code)
 int main(int argc, char* argv[])
 {
 
-	an::Logger::instance().init("daemon.log");
+	//an::Logger::instance().init("daemon.log");
 
 	g_daemon = NULL;
 	try {
@@ -98,9 +101,10 @@ int main(int argc, char* argv[])
 		else
 			directory = directory_path;
 		
-		if (!g_daemon->init(directory))
+		if (!g_daemon->init(directory)) {
 			LOG(FATAL) << "init failed";
-
+			return EXIT_FAILURE;
+		}
 		//daemonize
 		if (vm.count("daemonize")) {
 			LOG(INFO) << "forking...";
@@ -131,7 +135,6 @@ int main(int argc, char* argv[])
 		}
 		
 		g_daemon->run();
-		boost::this_thread::sleep(boost::posix_time::seconds(1));
 		LOG(INFO) << "done";		
 	}
 

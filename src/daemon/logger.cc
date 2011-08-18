@@ -62,8 +62,8 @@ namespace an
 		return strm;
 	}
 	
-	bool Logger::init(const std::string& logfile) {
-		logging::init_log_to_console(std::clog, keywords::format = "%TimeStamp%: %_%");
+/*	bool Logger::init(const std::string& logfile) {
+		//logging::init_log_to_console(std::clog, keywords::format = "%TimeStamp%: %_%");
 		
 		// One can also use lambda expressions to setup filters and formatters
 		logging::init_log_to_file
@@ -81,6 +81,6 @@ namespace an
 		logging::add_common_attributes();
 		_logger.add_attribute("Uptime", attrs::timer());
 		return true;
-	}
+	}*/
 
 }

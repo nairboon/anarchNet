@@ -19,8 +19,8 @@
  */
 
 #include "singleton.h"
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_logger.hpp>
+//#include <boost/log/sources/record_ostream.hpp>
+//#include <boost/log/sources/severity_logger.hpp>
 
 
 #ifndef DAEMON_LOG_H_
@@ -44,15 +44,16 @@ namespace an
 		friend class Singleton<Logger>;
 	public:
 
-		bool init(const std::string& logfile);
-		boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
+	//	bool init(const std::string& logfile);
+	//	boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
 		
 	private:
-		boost::log::sources::severity_logger_mt< severity_level > _logger;
+	//	boost::log::sources::severity_logger_mt< severity_level > _logger;
 	};
 	
-#define LOG(lvl)\
-BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),\
-(::boost::log::keywords::severity = ::an::lvl))
+//#define LOG(lvl)\
+//BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),\
+//(::boost::log::keywords::severity = ::an::lvl))
+#define LOG(lvl) std::cerr << std::endl; std::cerr
 }
 #endif  // DAEMON_LOG_H_

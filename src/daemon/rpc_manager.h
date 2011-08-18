@@ -22,7 +22,6 @@
 #include "singleton.h"
 #include "maidsafe/base/crypto.h"
 #include <json/json.h>
-#include "jsonrpc.h"
 
 
 #ifndef DAEMON_RPC_SERVICE_H_
@@ -31,23 +30,7 @@
 #define identify LOG(INFO) << __FUNCTION__ << " request"
 
 namespace an {
-	
-	class RPCManager : public Singleton<RPCManager>
-	{
-		friend class Singleton<RPCManager>;
-	public:
-		bool init();
-		void run();
-		void stop(){ _mutex.lock(); _running = false; _server->Close(); _mutex.unlock();}
-		~RPCManager();
-		RPCManager() : _running(true) {}
-	private:
-		Json::Rpc::TcpServer *_server;
-		boost::mutex _mutex; 
-		bool _running;
-	};
-	
-	
+
 	namespace rpc {
 	class Bootstrap
 		{
@@ -58,24 +41,40 @@ namespace an {
 			 * \param response JSON-RPC response
 			 * \return true if correctly processed, false otherwise
 			 */
-			bool BootstrapFromPeer(const Json::Value& root, Json::Value& response)
+			bool BootstrapFromPeer(const boost::json::Value& root, boost::json::Value& response)
 			{
-				std::cout << "Receive query: " << root << std::endl;
+				std::cout << "Receive query: " << root.get_str() << std::endl;
 				response["jsonrpc"] = "2.0";
 				response["id"] = root["id"];
 				response["result"] = "success";
 				return true;
 			}
 			
-			bool BootstrapFromHostlist(const Json::Value& root, Json::Value& response)
+			bool BootstrapFromHostlist(const boost::json::Value& root, boost::json::Value& response)
 			{
-				std::cout << "Notification: " << root << std::endl;
-				response = Json::Value::null;
+				std::cout << "Notification: " << root.get_str() << std::endl;
 				return true;
 			}
 		};
 	};
-
+	
+	class RPCManager : public Singleton<RPCManager>
+	{
+		friend class Singleton<RPCManager>;
+	public:
+		bool init();
+		void run();
+		void stop(){ _mutex.lock(); _running = false; _io_service.stop(); _mutex.unlock();}
+		~RPCManager();
+		RPCManager() : _running(true) {}
+	private:
+		an::RpcServer *_server;
+		boost::asio::io_service _io_service;
+		boost::mutex _mutex; 
+		bool _running;
+		rpc::Bootstrap _bs;
+	};
+	
 	/*class anRPCService : public RPCService {
 	public:
 		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }

@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "anarchNet.h"
 #include "daemon.h"
+#include "rpc_server.h"
 #include "rpc_manager.h"
 #include "config_manager.h"
 #include "module_manager.h"
@@ -48,19 +49,13 @@ namespace an {
 	if(!ModuleManager::instance().init())
 		return false;
 	
-	if(!networking::init())
-  {
-    LOG(ERROR) << "Networking initialization failed";
-		return false;
-  }
-	
 	LOG(INFO) << "load net_manager";
 	if(!NetManager::instance().init())
 		return false;
 	
 	LOG(INFO) << "load rpc_manager";
-	if(!RPCManager::instance().init())
-		return false;
+	//if(!RPCManager::instance().init())
+//		return false;
 	
 	return true;
 }
@@ -68,10 +63,13 @@ namespace an {
 void anDaemon::run() 
 {
 	boost::thread network(boost::bind(&NetManager::run,boost::ref(NetManager::instance())));
-	boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
+	//boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
 
+	LOG(INFO)<<"waiting..";
 	network.join();
-	rpc.join();
+	LOG(INFO) << "network joind";
+	//rpc.join();
+	LOG(INFO) << "rpc joind";
 }
 
 	void anDaemon::stop() {
@@ -80,6 +78,5 @@ void anDaemon::run()
 	}
 	
 	anDaemon::~anDaemon() {
-		networking::cleanup();
 	}
 }

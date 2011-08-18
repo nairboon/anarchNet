@@ -33,6 +33,7 @@
 #include <json/json.h>
 
 #include "jsonrpc_common.h"
+#include <boost/json/json.hpp>
 
 namespace Json 
 {
@@ -59,7 +60,7 @@ namespace Json
          * \return true if message has been correctly processed, false otherwise
          * \note Have to be implemented by subclasses
          */
-        virtual bool Call(const Json::Value& msg, Json::Value& response) = 0;
+			virtual bool Call(const boost::json::Value& msg, boost::json::Value& response) = 0;
 
         /**
          * \brief Get the name of the methods (optional).
@@ -72,7 +73,7 @@ namespace Json
          * \brief Get the description of the methods (optional).
          * \return description
          */
-        virtual Json::Value GetDescription() const = 0;
+        virtual boost::json::Value GetDescription() const = 0;
     };
 
     /**
@@ -94,21 +95,19 @@ namespace Json
          * \typedef Method
          * \brief T method signature.
          */
-        typedef bool (T::*Method)(const Json::Value& msg, Json::Value& response);
+        typedef bool (T::*Method)(const boost::json::Value& msg, boost::json::Value& response);
 
         /**
          * \brief Constructor.
          * \param obj object
          * \param method class method
          * \param name symbolic name (i.e. system.describe)
-         * \param description method description (in JSON format)
          */
-        RpcMethod(T& obj, Method method, const std::string& name, const Json::Value description = Json::Value::null)
+        RpcMethod(T& obj, Method method, const std::string& name)
         {
           m_obj = &obj;
           m_name = name;
           m_method = method;
-          m_description = description;
         }
 
         /**
@@ -118,7 +117,7 @@ namespace Json
          * \return true if message has been correctly processed, false otherwise
          * \note JSON-RPC's notification method MUST set response to Json::Value::null
          */
-        virtual bool Call(const Json::Value& msg, Json::Value& response)
+        virtual bool Call(const boost::json::Value& msg, boost::json::Value& response)
         {
           return (m_obj->*m_method)(msg, response);
         }
@@ -136,7 +135,7 @@ namespace Json
          * \brief Get the description of the methods (optional).
          * \return description
          */
-        virtual Json::Value GetDescription() const
+        virtual boost::json::Value GetDescription() const
         {
           return m_description;
         }
@@ -160,7 +159,7 @@ namespace Json
         /**
          * \brief JSON-formated description of the RPC method.
          */
-        Json::Value m_description;
+        boost::json::Value m_description;
     };
 
     /**
@@ -232,7 +231,7 @@ namespace Json
          * \note in case msg is a notification, response is equal to Json::Value::null 
          * and the return value is true.
          */
-        bool Process(const std::string& msg, Json::Value& response);
+        bool Process(const std::string& msg, boost::json::Value& response);
 
         /**
          * \brief Process a JSON-RPC message.
@@ -243,7 +242,7 @@ namespace Json
          * \note in case msg is a notification, response is equal to Json::Value::null 
          * and the return value is true.
          */
-        bool Process(const char* msg, Json::Value& response);
+        bool Process(const char* msg, boost::json::Value& response);
 
         /**
          * \brief RPC method that get all the RPC methods and their description.
@@ -251,27 +250,17 @@ namespace Json
          * \param response response
          * \return true if processed correctly, false otherwise
          */
-        bool SystemDescribe(const Json::Value& msg, Json::Value& response);
+        bool SystemDescribe(const boost::json::Value& msg, boost::json::Value& response);
 
         /**
          * \brief Get a std::string representation of Json::Value.
          * \param value JSON message
          * \return string representation
          */
-        std::string GetString(Json::Value value);
+        std::string GetString(boost::json::Value& value);
 
       private:
-        /**
-         * \brief JSON reader.
-         */
-        Json::Reader m_reader;
-
-        /**
-         * \brief JSON writer.
-         */
-        Json::FastWriter m_writer;
-
-        /**
+				/**
          * \brief List of RPC methods.
          */
         std::list<CallbackMethod*> m_methods;
@@ -289,7 +278,7 @@ namespace Json
          * \param error complete JSON-RPC error message if method failed
          * \return true if the message is a JSON one, false otherwise
          */
-        bool Check(const Json::Value& root, Json::Value& error);
+        bool Check(const boost::json::Value& root, boost::json::Value& error);
 
         /**
          * \brief Process a JSON-RPC object message.
@@ -300,7 +289,7 @@ namespace Json
          * \note In case msg is a notification, response is equal to Json::Value::null 
          * and the return value is true.
          */
-        bool Process(const Json::Value& root, Json::Value& response);
+        bool Process(const boost::json::Value& root, boost::json::Value& response);
     };
 
   } /* namespace Rpc */

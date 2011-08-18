@@ -35,9 +35,10 @@ namespace an {
 		void run();
 		NetManager() : _running(true) {}
 		~NetManager();
-		void stop(){ _mutex.lock(); _running = false; _server->Close(); _mutex.unlock();}
+		void stop(){ _mutex.lock(); _running = false; _io_service.stop(); _mutex.unlock();}
 	private:
-		Json::Rpc::TcpServer *_server;
+		an::RpcServer *_server;
+		boost::asio::io_service _io_service;
 		boost::mutex _mutex;
 		bool _running;
 	};
@@ -52,11 +53,11 @@ namespace an {
 				 * \param response JSON-RPC response
 				 * \return true if correctly processed, false otherwise
 				 */
-				bool Hello(const Json::Value& root, Json::Value& response)
+				bool Hello(const boost::json::Value& root, boost::json::Value& response)
 				{
 					
 				}
-				bool GetPeers(const Json::Value& root, Json::Value& response)
+				bool GetPeers(const boost::json::Value& root, boost::json::Value& response)
 				{
 					
 				}
