@@ -1,8 +1,10 @@
 #include "logger.h"
 #include "puggKernel.h"
+#include "db.h"
 #include "sqlite_store.h"
 #include "config_manager.h"
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 
 
 
@@ -17,6 +19,14 @@ void registerPlugin(Kernel &K)
 	Server<an::plgdrv::LocalStorage>* server = CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
 	assert(server != NULL);
 	server->addDriver(new SqliteDriver(),PLG_LOCALSTORAGE_SERVER_VERSION);
+}
+
+time_t to_time_t(const boost::posix_time::ptime& pt)
+{
+  using namespace boost::posix_time;
+  static ptime epoch(boost::gregorian::date(1970, 1, 1));
+  time_duration diff(pt - epoch);
+  return (diff.ticks() / diff.ticks_per_second());
 }
 
 bool Sqlite::initialise() {
@@ -40,6 +50,28 @@ catch(CppSQLite3Exception& e) {
 	return true;
 }
 
+bool Sqlite::db_store_snapshot(const an::db::Snapshot& sn) {
+	BOOST_FOREACH (boost::shared_ptr<an::db::Diff> diff, sn.diffs) {
+		if(!db_store_diff(*diff))
+			return false;
+	}
+	CppSQLite3Statement stmt = _db.compileStatement("insert into snapshots values (NULL,?,?,?,?);");
+	stmt.bind(1,sn.id.c_str());
+	stmt.bind(2,sn.based.c_str());
+	stmt.bind(3,sn.content.c_str());
+	stmt.bind(4,(int)to_time_t(sn.time));	
+	stmt.execDML();
+	stmt.reset();
+	
+	return true;
+}
+bool Sqlite::db_store_diff(const an::db::Diff& diff) {
+}
+bool Sqlite::db_remove(const an::db::ObjID& id)
+{
+}
+
+
 
 bool Sqlite::create_db() {
 	_db.open(_db_path.c_str());
@@ -47,7 +79,7 @@ bool Sqlite::create_db() {
 																		diff INTEGER , \
 																		previous INTEGER );");
 	q = _db.execQuery("CREATE TABLE diffs ( \
-																		pk INTEGER , \
+																		pk INTEGER PRIMARY KEY, \
 																		id TEXT , \
 																		snapshot TEXT );");
 	q = _db.execQuery("CREATE TABLE object_diffs ( \
@@ -57,10 +89,10 @@ bool Sqlite::create_db() {
 																		obj_id INTEGER , \
 																		snapshot_id INTEGER );");
 	q = _db.execQuery("CREATE TABLE objects ( \
-																		pk INTEGER , \
+																		pk INTEGER PRIMARY KEY, \
 																		id TEXT );");
 	q = _db.execQuery("CREATE TABLE snapshots ( \
-																		pk INTEGER , \
+																		pk INTEGER PRIMARY KEY, \
 																		id TEXT , \
 																		based TEXT , \
 																		content TEXT , \

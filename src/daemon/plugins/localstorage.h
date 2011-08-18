@@ -37,9 +37,9 @@ public:
 	virtual const std::string getName() {return "generic LocalStorage plugin";}
 	virtual const StorageType getType() { return LocalStorage::PLAIN; }
 	
-	virtual const bool db_store_snapshot(const db::Snapshot& sn) { return false; }
-	virtual const bool db_store_diff(const db::Diff& diff) { return false; }
-	virtual const bool db_remove(const db::ObjID& id) { return false; }
+	virtual bool db_store_snapshot(const db::Snapshot& sn) { return false; }
+	virtual bool db_store_diff(const db::Diff& diff) { return false; }
+	virtual bool db_remove(const db::ObjID& id) { return false; }
 
 	/**
 	 * \brief KV Store

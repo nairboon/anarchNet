@@ -13,6 +13,10 @@ public:
 	const unsigned int getVersion() { return PLG_SQLITE_VERSION; }
 	bool initialise();
 	void shutdown();
+	
+	bool db_store_snapshot(const an::db::Snapshot& sn);
+	bool db_store_diff(const an::db::Diff& diff);
+	bool db_remove(const an::db::ObjID& id);
 private:
 	CppSQLite3DB _db;
 	std::string _db_path;
