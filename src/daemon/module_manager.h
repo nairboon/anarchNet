@@ -41,6 +41,11 @@ public:
 		bool db_store_snapshot(const db::Snapshot& ss);
 		bool db_store_diff(const db::Diff& diff);
 		bool db_remove(const db::ObjID& id);
+		bool db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res);
+		bool db_get_diff(const db::ObjID& id,db::DiffPtr res);
+		bool db_get_obj(const db::ObjID& id,db::ObjPtr res);
+		bool db_update_obj(const db::ObjID& id,db::ObjPtr obj);
+
 		
 		// key value store
 		bool kv_put(const std::string& key, const std::string& value);

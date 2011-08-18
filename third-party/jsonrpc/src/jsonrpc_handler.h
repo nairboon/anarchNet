@@ -233,16 +233,6 @@ namespace Json
          */
         bool Process(const std::string& msg, boost::json::Value& response);
 
-        /**
-         * \brief Process a JSON-RPC message.
-         * \param msg JSON-RPC message as C-String
-         * \param response JSON-RPC response (could be Json::Value::null)
-         * \return true if the request has been correctly processed, false otherwise (may be
-         * caused by parsed error, ...)
-         * \note in case msg is a notification, response is equal to Json::Value::null 
-         * and the return value is true.
-         */
-        bool Process(const char* msg, boost::json::Value& response);
 
         /**
          * \brief RPC method that get all the RPC methods and their description.

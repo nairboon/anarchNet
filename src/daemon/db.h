@@ -22,6 +22,7 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
 #include <boost/serialization/string.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #ifndef DAEMON_DB_H_
 #define DAEMON_DB_H_
@@ -38,7 +39,8 @@ namespace an {
 			std::vector<ObjID> prev;
 			ObjID id;
 		};
-		
+		typedef boost::shared_ptr<Diff> DiffPtr;
+
 		class Snapshot {
 		public:
 			std::vector<boost::shared_ptr<Diff> > diffs;
@@ -56,14 +58,22 @@ namespace an {
 				ar & time;
 			}
 		};
+		typedef boost::shared_ptr<Snapshot> SnapshotPtr;
 		
-		class Object {
+		class Object : public boost::enable_shared_from_this<Object> {
 		public:
 			ObjID id;
-			std::vector<boost::shared_ptr<Snapshot> > snapshots;
-			std::vector<boost::shared_ptr<Diff> > diffs;
+			std::vector<SnapshotPtr> snapshots;
+			std::vector<DiffPtr> diffs;
+			bool save();
+			bool create(std::string inp);
+			bool load(const ObjID& id);
+			bool remove();
+			Object() {}
+			Object(std::string inp);
+		private:
 		};
-		
+		typedef boost::shared_ptr<Object> ObjPtr;
 		const ObjID create_ObjID(const String& input);
 	}
 }

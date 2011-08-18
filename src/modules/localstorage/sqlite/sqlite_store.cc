@@ -5,7 +5,7 @@
 #include "config_manager.h"
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
-
+#include <boost/smart_ptr.hpp>
 
 
 namespace fs = boost::filesystem;
@@ -65,13 +65,36 @@ bool Sqlite::db_store_snapshot(const an::db::Snapshot& sn) {
 	
 	return true;
 }
-bool Sqlite::db_store_diff(const an::db::Diff& diff) {
+bool Sqlite::db_store_diff(const an::db::Diff& diff) 
+{
+	return false;
 }
 bool Sqlite::db_remove(const an::db::ObjID& id)
 {
+	return false;
+}
+bool Sqlite::db_get_snapshot(const an::db::ObjID& id,an::db::SnapshotPtr res)
+{
+	
+	return false;	
 }
 
-
+bool Sqlite::db_get_diff(const an::db::ObjID& id,an::db::DiffPtr res) 
+{
+	return false;	
+}
+bool Sqlite::db_get_obj(const an::db::ObjID& id, an::db::ObjPtr res)
+{
+	return false;	
+}
+bool Sqlite::db_update_obj(const an::db::ObjID& id, an::db::ObjPtr obj)
+{
+	return false;	
+}
+bool Sqlite::db_store_obj(const an::db::Object& obj)
+{
+	return false;
+}
 
 bool Sqlite::create_db() {
 	_db.open(_db_path.c_str());

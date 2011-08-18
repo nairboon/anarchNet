@@ -34,6 +34,11 @@ bool	RPCManager::init() {
 	
   _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, &rpc::Bootstrap::BootstrapFromPeer, std::string("BootstrapFromPeer")));
   _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, &rpc::Bootstrap::BootstrapFromHostlist, std::string("BootstrapFromHostlist")));
+
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::CreateObject, std::string("object.create")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::GetObject, std::string("object.get")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::UpdateObject, std::string("object.update")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::DeleteObject, std::string("object.delete")));
 	return true;
 }	
 	void RPCManager::run() 
@@ -52,6 +57,28 @@ bool	RPCManager::init() {
 	RPCManager::~RPCManager() {
 		//delete _server;
 	}	
+namespace rpc {	
+	bool LocalStorage::CreateObject(const boost::json::Value& root, boost::json::Value& response)
+	{
+		return false;
+	}
+	bool LocalStorage::GetObject(const boost::json::Value& root, boost::json::Value& response)
+	{
+		return false;
+	}
+	bool LocalStorage::DeleteObject(const boost::json::Value& root, boost::json::Value& response)
+	{
+		return false;
+	}
+	bool LocalStorage::UpdateObject(const boost::json::Value& root, boost::json::Value& response)
+	{
+		return false;
+	}
+}
+	
+	
+	
+	
 /*
 void anRPCService::getInfo(awk::protobuf::RpcController* controller,
 															 const Void* request,

@@ -39,7 +39,7 @@ namespace an
 	}
 	
 	
-	db::ObjID DBManager::store_object(const std::string& content)
+	bool DBManager::store_object(const std::string& content,db::ObjPtr obj)
 	{
 		db::ObjID id = db::create_ObjID(content);
 		db::Snapshot sn;
@@ -54,20 +54,21 @@ namespace an
     }*/
 		
 		if(ModuleManager::instance().db_store_snapshot(sn))
-			return id;
+			return true;
 		else
-			return "";
+			return false;
 	}
-	bool DBManager::update_object(db::Object* obj) 
+	bool DBManager::update_object(const db::ObjID& id,db::ObjPtr obj) 
 	{
 		return false;
 	}
-	bool DBManager::delete_object(db::Object* obj)
+	bool DBManager::delete_entry(const db::ObjID& id)
 	{
 		return false;
 	}
-	bool DBManager::get_object(db::Object* obj)
+	bool DBManager::get_object(const db::ObjID& id,db::ObjPtr obj)
 	{
+		
 		return false;
 	}
 	

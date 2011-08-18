@@ -18,6 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/smart_ptr.hpp>
 #include "puggDriver.h"
 #include "plugins/plugin.h"
 #include "db.h"
@@ -37,9 +38,14 @@ public:
 	virtual const std::string getName() {return "generic LocalStorage plugin";}
 	virtual const StorageType getType() { return LocalStorage::PLAIN; }
 	
+	virtual bool db_store_obj(const db::Object& obj) { return false; }
 	virtual bool db_store_snapshot(const db::Snapshot& sn) { return false; }
 	virtual bool db_store_diff(const db::Diff& diff) { return false; }
 	virtual bool db_remove(const db::ObjID& id) { return false; }
+	virtual bool db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res) { return false; }
+	virtual bool db_get_diff(const db::ObjID& id,db::DiffPtr res) { return false; }
+	virtual bool db_get_obj(const db::ObjID& id,db::ObjPtr res) { return false; }
+	virtual bool db_update_obj(const db::ObjID& id,db::ObjPtr obj) { return false; }
 
 	/**
 	 * \brief KV Store

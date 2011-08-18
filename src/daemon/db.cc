@@ -22,6 +22,7 @@
 #include <cryptopp/files.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "db.h"
+#include "db_manager.h"
 
 
 using std::string;
@@ -38,6 +39,29 @@ namespace an
 			CryptoPP::StringSource(input+time, true,
 														 new CryptoPP::HashFilter(hash, new CryptoPP::StringSink(result)));
 			return ObjID(result);
+		}
+		
+		Object::Object(std::string inp)
+		{
+			create(inp);
+		}
+
+		bool Object::create(std::string inp)
+		{
+			return DBManager::instance().store_object(inp,shared_from_this());
+		}
+
+		bool Object::save() {
+			return DBManager::instance().update_object(id,shared_from_this());
+		}
+		
+		bool Object::remove() {
+			return DBManager::instance().delete_entry(id);
+		}
+		
+		bool Object::load(const ObjID& id)
+		{
+			return DBManager::instance().get_object(id,shared_from_this());
 		}
 	}
 }

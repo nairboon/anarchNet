@@ -52,8 +52,17 @@ namespace an {
 				return true;
 			}
 		};
-	};
 	
+	class LocalStorage
+		{
+		public:
+			bool CreateObject(const boost::json::Value& root, boost::json::Value& response);
+			bool GetObject(const boost::json::Value& root, boost::json::Value& response);
+			bool DeleteObject(const boost::json::Value& root, boost::json::Value& response);
+			bool UpdateObject(const boost::json::Value& root, boost::json::Value& response);
+		};
+};
+
 	class RPCManager : public Singleton<RPCManager>
 	{
 		friend class Singleton<RPCManager>;
@@ -68,6 +77,9 @@ namespace an {
 		boost::asio::io_service _io_service;
 		bool _running;
 		rpc::Bootstrap _bs;
+		rpc::LocalStorage _ls;
+		//rpc::RemoteStorage _rs;
+		//rpc::Session _s;
 	};
 	
 	/*class anRPCService : public RPCService {

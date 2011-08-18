@@ -23,6 +23,7 @@
  */
 
 #include "jsonrpc_handler.h"
+#include "logger.h"
 
 namespace Json
 {
@@ -102,40 +103,43 @@ namespace Json
 
     bool Handler::Check(const boost::json::Value& root, boost::json::Value& error)
     {
-      boost::json::Value err;
+      boost::json::Object err;
       
       /* check the JSON-RPC version => 2.0 */
-      if(!root.is_null() || !root.contains("jsonrpc") || root["jsonrpc"].get_str() != "2.0") 
+      if(root.is_null() || !root.contains("jsonrpc") || root["jsonrpc"].get_str() != "2.0") 
       {
-        error["id"] = NULL;
+        error["id"] = "0";
         error["jsonrpc"] = "2.0";
         
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
-        error["error"] = err;
+        err.push_back(boost::json::Pair("code",INVALID_REQUEST));
+       // err["message"] = "Invalid JSON-RPC request.";
+      //  error["error"] = err;
+			//	LOG(INFO) << err["message"].get_str();
         return false;
       }
 
-      if(root.contains("id") && (root["id"].type() == boost::json::array_type || root["id"].type()==boost::json::obj_type))
+      if(root.contains("id") && (root["id"].type() == boost::json::array_type || root["id"].type() == boost::json::obj_type))
       {
-        error["id"] = NULL;
+        error["id"] = "0";
         error["jsonrpc"] = "2.0";
 
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
+      //  err["code"] = INVALID_REQUEST;
+       // err["message"] = "Invalid JSON-RPC request.";
         error["error"] = err;
+				//LOG(INFO) << err["message"].get_str();
         return false;
       }
 
       /* extract "method" attribute */
       if(!root.contains("method") || (root["method"].type()!=boost::json::str_type))
       {
-        error["id"] = NULL;
+        error["id"] = "0";
         error["jsonrpc"] = "2.0";
 
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
-        error["error"] = err;
+       // err["code"] = INVALID_REQUEST;
+       // err["message"] = "Invalid JSON-RPC request.";
+       // error["error"] = err;
+			//	LOG(INFO) << err["message"].get_str();
         return false;
       }
 
@@ -144,6 +148,7 @@ namespace Json
 
     bool Handler::Process(const boost::json::Value& root, boost::json::Value& response)
     {
+			LOG(INFO) << "process json: " << root["id"].type();
       boost::json::Value error;
       std::string method;
 
@@ -152,7 +157,8 @@ namespace Json
         response = error;
         return false;
       }
-
+			LOG(INFO) << "check passed";
+			
       method = root["method"].get_str();
       
       if(method != "")
@@ -163,16 +169,17 @@ namespace Json
           return rpc->Call(root, response);
         }
       }
-      
+			boost::json::Object res;
+			boost::json::Object err;
+
       /* forge an error response */
-			boost::json::Value null;
-      response["id"] = root.contains("id") ? root["id"] : null;
-      response["jsonrpc"] = "2.0";
+      res.push_back(boost::json::Pair("id", root.contains("id") ? root["id"] : "0"));
+      res.push_back(boost::json::Pair("jsonrpc","2.0"));
 
-      error["code"] = METHOD_NOT_FOUND;
-      error["message"] = "Method not found.";
-      response["error"] = error;
-
+      err.push_back(boost::json::Pair("code", METHOD_NOT_FOUND));
+      err.push_back(boost::json::Pair("message", "Method not found."));
+      res.push_back(boost::json::Pair("error",error));
+			response = res;
       return false;
     }
 
@@ -184,7 +191,7 @@ namespace Json
 
       /* parsing */
       parsing = boost::json::read(msg, root);
-      
+
       if(!parsing)
       {
         /* request or batched call is not in JSON format */
@@ -223,12 +230,6 @@ namespace Json
       }
     }
 
-    bool Handler::Process(const char* msg, boost::json::Value& response)
-    {
-      std::string str(msg);
-
-      return Process(str, response);
-    }
 
     CallbackMethod* Handler::Lookup(const std::string& name) const
     {

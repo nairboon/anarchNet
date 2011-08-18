@@ -31,14 +31,11 @@ class DBManager : public Singleton<DBManager>
 public:
 		bool init(const std::string&);
 		
-	//	bool store_object(const StoreObjectRequest* req);
-//		bool delete_object(const DeleteObjectRequest* req);
+		bool store_object(const std::string& content, db::ObjPtr obj);
+		bool update_object(const db::ObjID& id, db::ObjPtr obj);
+		bool delete_entry(const db::ObjID& id);
+		bool get_object(const db::ObjID& id,db::ObjPtr obj);
 		
-		db::ObjID store_object(const std::string& content);
-		bool update_object(db::Object* obj);
-		bool delete_object(db::Object* obj);
-		bool get_object(db::Object* obj);
-
 		std::vector<std::string> get_unchecked_keys_since(int);
 private:
 	

@@ -26,12 +26,13 @@ namespace an
 		{
 			LOG(INFO) << "got: " << data_;
 			boost::json::Value response;
-			_jsonHandler->Process(data_, response);
+				_jsonHandler->Process(std::string(data_), response);
+
 			if(!response.is_null())
 			{
 				std::string rep = _jsonHandler->GetString(response);
 		
-
+				LOG(INFO) << "send: " << rep;
 			boost::asio::async_write(socket_,
 															 boost::asio::buffer(rep, rep.size()),
 															 boost::bind(&session::handle_write, this,
@@ -40,7 +41,6 @@ namespace an
 		}
 		else
 		{
-			LOG(ERROR) << error;
 			delete this;
 		}
 	}
