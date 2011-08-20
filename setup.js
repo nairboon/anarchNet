@@ -19,19 +19,40 @@ Settings  = mongoose.model('settings');
 		userid = user._id;
 		setup.ScanLocalPackages(function(err,mlid){
 			console.log("packages scaned");
-			var s = new Settings();
-			s.key = "masterlist";
-			s.value = mlid;
-			s.save(function(err){
-				if(err)
-					throw new Error("could not save settings");
-					
-				setup.createDefaultRepo(mlid,function(err,res){
-					if(err)
-						throw new Error("could not create a repo");
-						
-					mongoose.disconnect();	
-				});
+			Settings.findOne({key:'masterlist'}, function(err,res) {
+				if(!res) {//no settings create some
+					var s = new Settings();
+					s.key = "masterlist";
+					s.value = mlid;
+					s.save(function(err){
+						if(err)
+							throw new Error("could not save settings");
+							
+							setup.createDefaultRepo(mlid,function(err,res){
+								if(err)
+									throw new Error("could not create a repo");
+
+								mongoose.disconnect();	
+							});
+					});
+							
+				}
+				else { // update mlid
+					console.log("update settings");
+					res.value = mlid;
+					res.save(function(err){
+							if(err)
+								throw new Error("could not save settings");
+								
+								
+								setup.createDefaultRepo(mlid,function(err,res){
+									if(err)
+										throw new Error("could not create a repo");
+									console.log("repo created");
+									mongoose.disconnect();
+								});	
+					});
+				}
 			});
 		});
 	});

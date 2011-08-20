@@ -16,6 +16,7 @@ var express = require('express'),
 	auth = require('./auth.js'),
 	common = require('./models/common.js'),
 	apploader = require('./lib/apploader.js'),
+	sharejs = require('share').server,
 	config = require('./config.js');
 	
 var db_handle = mongoose.connect(config.dburl).db;
@@ -121,4 +122,7 @@ if (!module.parent) {
 
   app.listen(config.port);
   console.log("Express server listening on port %d", app.address().port);
+
+	var options = {db: {type: 'memory'}};
+	sharejs.attach(app, options);
 }

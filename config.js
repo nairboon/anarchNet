@@ -3,6 +3,7 @@ module.exports = {
 	,testingdburl: 'mongodb://localhost/testing'
 	,sessionsecret: 'your secret here'
 	,port: 3000
+	,anarchnet_port: 23666
 	,filestore: './filestore'
 	,ssl_key: './ssl/privatekey.pem'
 	,ssl_cert: './ssl/certificate.pem'
