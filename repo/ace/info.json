@@ -1,0 +1,9 @@
+{
+   "name": "ace",
+   "version": "1",
+	"code": {
+		"ace": "ace.js"
+	}
+}
+
+

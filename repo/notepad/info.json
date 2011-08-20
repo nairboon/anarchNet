@@ -1,0 +1,17 @@
+{
+   "name": "notepad",
+   "version": "0.0.1",
+	"dependencies": {
+		"crypto" : ">=0.0.1",
+		"ace" : ">=1"
+	},
+	"code": {
+		"client": "client.js"
+	},
+	"html" : "index.html",
+	"resources": [
+		"css"
+	]
+}
+
+
