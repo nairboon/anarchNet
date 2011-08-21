@@ -42,10 +42,10 @@ namespace an
 	bool DBManager::store_object(const std::string& content,db::ObjPtr obj)
 	{
 		db::ObjID id = db::create_ObjID(content);
-		db::Snapshot sn;
-		sn.content = content;
-		sn.based = "";
-		sn.id = id;
+		db::SnapshotPtr sn(new db::Snapshot);
+		sn->content = content;
+		sn->based = "";
+		sn->id = id;
 		
 	/*	std::stringstream ss;
     {
@@ -55,8 +55,8 @@ namespace an
 		
 		if(ModuleManager::instance().db_store_snapshot(sn))
 			return true;
-		else
-			return false;
+	
+		return false;
 	}
 	bool DBManager::update_object(const db::ObjID& id,db::ObjPtr obj) 
 	{

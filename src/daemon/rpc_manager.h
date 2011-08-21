@@ -61,6 +61,18 @@ namespace an {
 			bool DeleteObject(const boost::json::Value& root, boost::json::Value& response);
 			bool UpdateObject(const boost::json::Value& root, boost::json::Value& response);
 		};
+		
+	class anStore
+		{
+		public:
+			bool kv_get(const boost::json::Value& root, boost::json::Value& response);
+			bool kv_put(const boost::json::Value& root, boost::json::Value& response);
+			
+			bool session_t_join(const boost::json::Value& root, boost::json::Value& response);
+			bool session_t_leave(const boost::json::Value& root, boost::json::Value& response);
+			bool session_t_update(const boost::json::Value& root, boost::json::Value& response);
+
+		};
 };
 
 	class RPCManager : public Singleton<RPCManager>
@@ -77,6 +89,7 @@ namespace an {
 		boost::asio::io_service _io_service;
 		bool _running;
 		rpc::Bootstrap _bs;
+		rpc::anStore _ans;
 		rpc::LocalStorage _ls;
 		//rpc::RemoteStorage _rs;
 		//rpc::Session _s;

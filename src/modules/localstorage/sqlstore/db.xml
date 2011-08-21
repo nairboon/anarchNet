@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE database SYSTEM "litesql.dtd">
+<database name="SQLDB" namespace="db">
+    <object name="ObjID">
+        <field name="aid" type="string"/>
+    </object>
+    <object name="Object" inherits="ObjID">
+    </object>
+    <object name="Snapshot" inherits="ObjID">
+        <field name="based" type="string"/>
+        <field name="content" type="string"/>
+        <field name="time" type="datetime"/>
+
+    </object>
+    <object name="Diff" inherits="ObjID">
+        <field name="snapshot" type="string"/>        
+    </object>
+       <relation>
+            <relate object="Object" handle="snapshots"/>
+        	<relate object="Snapshot"/>
+       </relation>
+       <relation>
+            <relate object="Object" handle="diffs"/>
+        	<relate object="Diff"/>
+       </relation>
+       <relation>
+            <relate object="Snapshot" handle="diffs"/>
+        	<relate object="Diff"/>
+       </relation>
+       <relation unidir="true">
+            <relate object="Diff" handle="prev"/>
+        	<relate object="ObjID"/>
+       </relation>
+</database>

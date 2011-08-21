@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "module_manager.h"
 /*#include "pb_json.h"
 #include "rpc_service.pb.h"
 

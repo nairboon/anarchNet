@@ -39,6 +39,14 @@ bool	RPCManager::init() {
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::GetObject, std::string("object.get")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::UpdateObject, std::string("object.update")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::DeleteObject, std::string("object.delete")));
+	
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::kv_get, std::string("kv.get")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::kv_put, std::string("kv.put")));
+
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_join, std::string("session.t.join")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_leave, std::string("session.t.leave")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_update, std::string("session.t.update")));
+
 	return true;
 }	
 	void RPCManager::run() 
@@ -62,18 +70,50 @@ namespace rpc {
 	{
 		return false;
 	}
+	
 	bool LocalStorage::GetObject(const boost::json::Value& root, boost::json::Value& response)
 	{
 		return false;
 	}
+	
 	bool LocalStorage::DeleteObject(const boost::json::Value& root, boost::json::Value& response)
 	{
 		return false;
 	}
+	
 	bool LocalStorage::UpdateObject(const boost::json::Value& root, boost::json::Value& response)
 	{
 		return false;
 	}
+	
+	bool anStore::kv_get(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	
+	bool anStore::kv_put(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	
+	bool anStore::session_t_join(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	bool anStore::session_t_leave(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	bool anStore::session_t_update(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	
 }
 	
 	

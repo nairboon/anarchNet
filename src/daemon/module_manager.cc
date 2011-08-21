@@ -124,7 +124,7 @@ bool ModuleManager::init()
 		return "";
 	}
 	
-	bool ModuleManager::db_store_snapshot(const db::Snapshot& ss) {
+	bool ModuleManager::db_store_snapshot(db::SnapshotPtr ss) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_snapshot(ss))
 				return true;
@@ -132,7 +132,7 @@ bool ModuleManager::init()
 		return false;
 	}
 	
-	bool ModuleManager::db_store_diff(const db::Diff& diff) {
+	bool ModuleManager::db_store_diff(db::DiffPtr diff) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
 				return true;

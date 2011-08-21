@@ -38,8 +38,8 @@ public:
 		bool bootstrapFromHostlist(const std::string&url);
 
 		// db types
-		bool db_store_snapshot(const db::Snapshot& ss);
-		bool db_store_diff(const db::Diff& diff);
+		bool db_store_snapshot(db::SnapshotPtr ss);
+		bool db_store_diff(db::DiffPtr diff);
 		bool db_remove(const db::ObjID& id);
 		bool db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res);
 		bool db_get_diff(const db::ObjID& id,db::DiffPtr res);

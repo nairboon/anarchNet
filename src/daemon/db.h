@@ -35,7 +35,7 @@ namespace an {
 		class Snapshot;
 		class Diff {
 		public:
-			ObjID shapshot;
+			ObjID snapshot;
 			std::vector<ObjID> prev;
 			ObjID id;
 		};
@@ -43,7 +43,7 @@ namespace an {
 
 		class Snapshot {
 		public:
-			std::vector<boost::shared_ptr<Diff> > diffs;
+			std::vector<DiffPtr> diffs;
 			std::string content;
 			ObjID based;
 			ObjID id;
