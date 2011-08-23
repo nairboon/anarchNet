@@ -152,13 +152,13 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/plugins/plugin.h"
 		"${SOURCE_DIR}/daemon/plugins/session.h"
 		"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
-		"${SOURCE_DIR}/daemon/main.cc"
+		
 )
 
-
-add_executable(anDaemon ${DAEMON_SRC})
-add_dependencies(anDaemon json logger rpc)
-target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} json logger rpc)
+add_library(anDaemonInternal STATIC ${DAEMON_SRC})
+add_executable(anDaemon "${SOURCE_DIR}/daemon/main.cc")
+add_dependencies(anDaemon anDaemonInternal json logger rpc)
+target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} json logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -193,7 +193,6 @@ endif ()
 # Tests
 ###################################################################################################
 file(GLOB T_MAIN  "${SOURCE_DIR}/tests/main.cc")
-file(GLOB T_MAIND  "${SOURCE_DIR}/tests/main_daemon.cc")
 
 file(GLOB T_BASE_C "${SOURCE_DIR}/tests/base/*.c*")
 file(GLOB T_BASE_H "${SOURCE_DIR}/tests/base/*.h*")
@@ -205,29 +204,20 @@ list(APPEND T_RPC_DIR ${T_RPC_C} ${T_RPC_H})
 
 file(GLOB T_MD_C "${SOURCE_DIR}/tests/modules/*.c*")
 file(GLOB T_MD_H "${SOURCE_DIR}/tests/modules/*.h*")
-set(T_MD_D 	"${SOURCE_DIR}/daemon/module_manager.cc"
-		"${SOURCE_DIR}/daemon/db_manager.cc"
-		"${SOURCE_DIR}/daemon/daemon.cc"
-		"${SOURCE_DIR}/daemon/plugin_manager.cc"
-		"${SOURCE_DIR}/daemon/net_manager.cc"
-		"${SOURCE_DIR}/daemon/rpc_manager.cc"
-		"${SOURCE_DIR}/daemon/config_manager.cc"
-		"${SOURCE_DIR}/daemon/db.cc"
-		"${SOURCE_DIR}/daemon/crypto.cc"
-)
-list(APPEND T_MD_DIR ${T_MD_C} ${T_MD_H} ${T_MD_D})
+
+list(APPEND T_MD_DIR ${T_MD_C} ${T_MD_H})
 
 add_executable(TBase ${T_MAIN} ${T_BASE_DIR})
 add_executable(TRPC ${T_MAIN} ${T_RPC_DIR})
-add_executable(TModule ${T_MAIND} ${T_MD_DIR})
+add_executable(TModule ${T_MAIN} ${T_MD_DIR})
 
 add_dependencies(TBase anDaemon logger)
 add_dependencies(TRPC anDaemon logger rpc)
 add_dependencies(TModule anDaemon logger rpc)
 
-target_link_libraries(TBase ${LIB} ${TEST_LIB} json an logger)
-target_link_libraries(TRPC ${LIB} ${TEST_LIB} json an logger rpc)
-target_link_libraries(TModule ${LIB} ${TEST_LIB} json an logger rpc)
+target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} json an logger)
+target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} json an logger rpc)
+target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} json an logger rpc)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
