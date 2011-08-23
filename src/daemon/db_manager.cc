@@ -41,11 +41,8 @@ namespace an
 	
 	bool DBManager::store_object(const std::string& content,db::ObjPtr obj)
 	{
-		db::ObjID id = db::create_ObjID(content);
-		db::SnapshotPtr sn(new db::Snapshot);
-		sn->content = content;
-		sn->based = "";
-		sn->id = id;
+		db::SnapshotPtr sn(new db::Snapshot("",content));
+
 		
 	/*	std::stringstream ss;
     {

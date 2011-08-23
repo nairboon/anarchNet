@@ -31,8 +31,6 @@
 #include "plugins/remotestorage.h"
 #include "plugins/session.h"
 
-using boost::asio::ip::tcp;
-
 namespace an
 {
 
@@ -132,6 +130,14 @@ bool ModuleManager::init()
 		return false;
 	}
 	
+	bool ModuleManager::db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_snapshot(id,res))
+				return true;
+		
+		return false;
+	}
+	
 	bool ModuleManager::db_store_diff(db::DiffPtr diff) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
@@ -140,6 +146,14 @@ bool ModuleManager::init()
 		return false;
 	}
 	
+	bool ModuleManager::db_get_diff(const db::ObjID& id,db::DiffPtr res) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_diff(id,res))
+				return true;
+		
+		return false;
+	}
+
 	bool ModuleManager::db_remove(const db::ObjID& id) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_remove(id))
@@ -311,7 +325,7 @@ bool ModuleManager::init()
 		return boost::filesystem::exists(path);
 	}
 */	
-	bool ModuleManager::http_request(const std::string& _url,std::string *_response)
+	/*bool ModuleManager::http_request(const std::string& _url,std::string *_response)
 	{
     std::size_t index = _url.find_first_of('/');
     std::string url_server = _url.substr(0,index);
@@ -347,7 +361,7 @@ bool ModuleManager::init()
     std::ostream request_stream(&request);
     request_stream << "GET " << url_file << " HTTP/1.0\r\n";
     request_stream << "Host: " << url_server << "\r\n";
-    request_stream << "Accept: */*\r\n";
+    request_stream << "Accept: *//*\r\n";
     request_stream << "Connection: close\r\n\r\n";
 		
     // Send the request.
@@ -399,5 +413,5 @@ bool ModuleManager::init()
 
 	*_response = out.str();
 return true;
-}
+}*/
 }

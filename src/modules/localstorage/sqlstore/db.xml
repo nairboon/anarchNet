@@ -2,7 +2,7 @@
 <!DOCTYPE database SYSTEM "litesql.dtd">
 <database name="SQLDB" namespace="db">
     <object name="ObjID">
-        <field name="aid" type="string"/>
+        <field name="anID" type="string"/>
     </object>
     <object name="Object" inherits="ObjID">
     </object>
@@ -13,7 +13,9 @@
 
     </object>
     <object name="Diff" inherits="ObjID">
-        <field name="snapshot" type="string"/>        
+        <field name="snapshot" type="string"/> 
+        <field name="content" type="string"/>
+        <field name="time" type="datetime"/>
     </object>
        <relation>
             <relate object="Object" handle="snapshots"/>

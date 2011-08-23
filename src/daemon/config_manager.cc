@@ -18,6 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>

@@ -18,10 +18,11 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cryptopp/sha.h>
-#include <cryptopp/files.h>
+#include <cstdlib>
+#include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "db.h"
+#include "crypto.h"
 #include "db_manager.h"
 
 
@@ -29,16 +30,18 @@ using std::string;
 
 namespace an
 {
+
 	namespace db {
-	const ObjID create_ObjID(const String& input)
-		{
-			boost::posix_time::ptime t(boost::posix_time::microsec_clock::local_time());
-			std::string time = boost::posix_time::to_iso_string(t);
-			CryptoPP::SHA512 hash;
-			std::string result;
-			CryptoPP::StringSource(input+time, true,
-														 new CryptoPP::HashFilter(hash, new CryptoPP::StringSink(result)));
-			return ObjID(result);
+		bool needs_ObjID::create_random_id() {
+			std::string stime = boost::posix_time::to_iso_string(time);
+			std::stringstream rndinp;
+			rndinp << stime << content << random();
+			id = ObjID(crypto::sha512(rndinp.str()));
+			return true;
+		}
+		bool needs_ObjID::create_content_id() {
+			id = ObjID(crypto::sha512(content));		
+			return true;
 		}
 		
 		Object::Object(std::string inp)

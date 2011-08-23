@@ -95,8 +95,8 @@ public:
     litesql::Field<int> id;
     static const litesql::FieldType Type;
     litesql::Field<std::string> type;
-    static const litesql::FieldType Aid;
-    litesql::Field<std::string> aid;
+    static const litesql::FieldType AnID;
+    litesql::Field<std::string> anID;
 protected:
     void defaults();
 public:
@@ -240,6 +240,13 @@ public:
     static const std::string table__;
     static const litesql::FieldType Snapshot;
     litesql::Field<std::string> snapshot;
+    static const litesql::FieldType Content;
+    litesql::Field<std::string> content;
+    static const litesql::FieldType Time;
+    litesql::Field<litesql::DateTime> time;
+protected:
+    void defaults();
+public:
     Diff(const litesql::Database& db);
     Diff(const litesql::Database& db, const litesql::Record& rec);
     Diff(const Diff& obj);

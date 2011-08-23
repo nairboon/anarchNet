@@ -43,7 +43,7 @@ using boost::shared_ptr;
 
 namespace an
 {
-	template< typename CharT, typename TraitsT >
+/*	template< typename CharT, typename TraitsT >
 	inline std::basic_ostream< CharT, TraitsT >& operator<< (
 																													 std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl)
 	{
@@ -61,7 +61,7 @@ namespace an
 			strm << static_cast< int >(lvl);
 		return strm;
 	}
-	
+	*/
 /*	bool Logger::init(const std::string& logfile) {
 		//logging::init_log_to_console(std::clog, keywords::format = "%TimeStamp%: %_%");
 		

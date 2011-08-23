@@ -31,12 +31,13 @@ endif()
 ###################################################################################################
 
 find_package(GTest REQUIRED)
-find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
+find_library(GCRYPT NAMES gcrypt REQUIRED)
+#find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
 find_library(LSQL NAMES litesql REQUIRED PATH)
 find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
-find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
+#find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 find_library(BOOST_LOG NAMES libboost_log.a boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
 
@@ -59,13 +60,15 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/boost-log"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
 	"/usr/local/include"
+	"/sw/include"
  )
 set( LIB
 	${Boost_LIBRARIES}
-	${CRYPTOPP}
-	${SQLITE}
+	#${CRYPTOPP}
+	#${SQLITE}
 	${ARCHIVE}
 	${BOOST_LOG}
+	${GCRYPT}
 	)
 set( TEST_LIB
 	${GCOV}
@@ -119,24 +122,46 @@ add_library(logger ${LOGGER_SRC})
 ################################################################################
 # Daemon
 ################################################################################
-
-file(GLOB DAEMON_C "${SOURCE_DIR}/daemon/*.c*")
-file(GLOB DAEMON_H "${SOURCE_DIR}/daemon/*.h*")
-file(GLOB DAEMON_PLG_H "${SOURCE_DIR}/daemon/plugins/*.h*")
-list(APPEND DAEMON_SRC ${DAEMON_C} ${DAEMON_H} ${DAEMON_PLG_H}
-"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
+set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
+		"${SOURCE_DIR}/daemon/config.h"
+		"${SOURCE_DIR}/daemon/singleton.h"
+		"${SOURCE_DIR}/daemon/version.h"
+		"${SOURCE_DIR}/daemon/config_manager.h"
+		"${SOURCE_DIR}/daemon/db_manager.h"
+		"${SOURCE_DIR}/daemon/module_manager.h"
+		"${SOURCE_DIR}/daemon/net_manager.h"
+		"${SOURCE_DIR}/daemon/plugin_manager.h"
+		"${SOURCE_DIR}/daemon/rpc_manager.h"
+		"${SOURCE_DIR}/daemon/db.h"
+		"${SOURCE_DIR}/daemon/logger.h"
+		"${SOURCE_DIR}/daemon/daemon.h"
+		"${SOURCE_DIR}/daemon/crypto.cc"
+		"${SOURCE_DIR}/daemon/crypto.h"
+		"${SOURCE_DIR}/daemon/config_manager.cc"
+		"${SOURCE_DIR}/daemon/db_manager.cc"
+		"${SOURCE_DIR}/daemon/module_manager.cc"
+		"${SOURCE_DIR}/daemon/net_manager.cc"
+		"${SOURCE_DIR}/daemon/plugin_manager.cc"
+		"${SOURCE_DIR}/daemon/rpc_manager.cc"
+		"${SOURCE_DIR}/daemon/db.cc"
+		"${SOURCE_DIR}/daemon/logger.cc"
+		"${SOURCE_DIR}/daemon/daemon.cc"
+		"${SOURCE_DIR}/daemon/plugins/bootstrap.h"
+		"${SOURCE_DIR}/daemon/plugins/localstorage.h"
+		"${SOURCE_DIR}/daemon/plugins/remotestorage.h"
+		"${SOURCE_DIR}/daemon/plugins/plugin.h"
+		"${SOURCE_DIR}/daemon/plugins/session.h"
+		"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
+		"${SOURCE_DIR}/daemon/main.cc"
 )
 
+
 add_executable(anDaemon ${DAEMON_SRC})
-add_dependencies(anDaemon jsonrpc logger)
+add_dependencies(anDaemon json logger rpc)
 target_link_libraries(anDaemon ${LIB} ${PLATFORM_LIB} json logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
-#add_custom_command(TARGET anDaemon POST_BUILD 
-#		   COMMAND ${COMMAND} -E copy_directory "${SOURCE_DIR}/daemon/config" "${BIN_DIR}/daemontest")
-#add_custom_command(TARGET anDaemon POST_BUILD 
-#		   COMMAND ${COMMAND} -E create_directory "~/.anarchNet")
 add_custom_command(TARGET anDaemon POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/anarchnet.conf" "${BIN_DIR}/anarchnet.conf")
 ################################################################################
@@ -149,7 +174,7 @@ list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
 
 add_library(an SHARED ${LIBRARY_SRC})
 add_dependencies(an rpc logger)
-target_link_libraries(an ${LIB} jsonrpc json logger rpc)
+target_link_libraries(an ${LIB} json logger rpc)
 
 ################################################################################
 # Python library search (style check)                                          #
@@ -168,27 +193,49 @@ endif ()
 # Tests
 ###################################################################################################
 file(GLOB T_MAIN  "${SOURCE_DIR}/tests/main.cc")
+file(GLOB T_MAIND  "${SOURCE_DIR}/tests/main_daemon.cc")
+
 file(GLOB T_BASE_C "${SOURCE_DIR}/tests/base/*.c*")
 file(GLOB T_BASE_H "${SOURCE_DIR}/tests/base/*.h*")
+list(APPEND T_BASE_DIR ${T_BASE_C} ${T_BASE_H})
+
 file(GLOB T_RPC_C "${SOURCE_DIR}/tests/rpc/*.c*")
 file(GLOB T_RPC_H "${SOURCE_DIR}/tests/rpc/*.h*")
-list(APPEND T_BASE_DIR ${T_BASE_C} ${T_BASE_H})
-list(APPEND T_RPC_DIR ${T_RPC_C} ${T_RPC_H} ${PB_DAEMON_FE})
+list(APPEND T_RPC_DIR ${T_RPC_C} ${T_RPC_H})
 
-add_executable(TESTbase ${T_MAIN} ${T_BASE_DIR})
-add_executable(TESTrpc ${T_MAIN} ${T_RPC_DIR})
+file(GLOB T_MD_C "${SOURCE_DIR}/tests/modules/*.c*")
+file(GLOB T_MD_H "${SOURCE_DIR}/tests/modules/*.h*")
+set(T_MD_D 	"${SOURCE_DIR}/daemon/module_manager.cc"
+		"${SOURCE_DIR}/daemon/db_manager.cc"
+		"${SOURCE_DIR}/daemon/daemon.cc"
+		"${SOURCE_DIR}/daemon/plugin_manager.cc"
+		"${SOURCE_DIR}/daemon/net_manager.cc"
+		"${SOURCE_DIR}/daemon/rpc_manager.cc"
+		"${SOURCE_DIR}/daemon/config_manager.cc"
+		"${SOURCE_DIR}/daemon/db.cc"
+		"${SOURCE_DIR}/daemon/crypto.cc"
+)
+list(APPEND T_MD_DIR ${T_MD_C} ${T_MD_H} ${T_MD_D})
 
-add_dependencies(TESTbase anDaemon logger)
-add_dependencies(TESTrpc anDaemon logger rpc)
+add_executable(TBase ${T_MAIN} ${T_BASE_DIR})
+add_executable(TRPC ${T_MAIN} ${T_RPC_DIR})
+add_executable(TModule ${T_MAIND} ${T_MD_DIR})
 
-target_link_libraries(TESTbase ${LIB} ${TEST_LIB} json an logger)
-target_link_libraries(TESTrpc ${LIB} ${TEST_LIB} json jsonrpc an logger rpc)
+add_dependencies(TBase anDaemon logger)
+add_dependencies(TRPC anDaemon logger rpc)
+add_dependencies(TModule anDaemon logger rpc)
+
+target_link_libraries(TBase ${LIB} ${TEST_LIB} json an logger)
+target_link_libraries(TRPC ${LIB} ${TEST_LIB} json an logger rpc)
+target_link_libraries(TModule ${LIB} ${TEST_LIB} json an logger rpc)
 
 enable_testing()
 add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
-add_test(Base ${BIN_DIR}/TESTbase)
-add_test(RPC ${BIN_DIR}/TESTrpc)
+add_test(Base ${BIN_DIR}/TBase)
+add_test(RPC ${BIN_DIR}/TRPC)
 add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
+
+add_test(Modules ${BIN_DIR}/TModule)
 
 if (PYTHONINTERP_FOUND)
   set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line,-build/include,-readability/streams")

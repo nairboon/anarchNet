@@ -45,6 +45,9 @@ try {
 		return true;
 	}
 	_db = new SQLDB("sqlite3","database="+_db_path);
+	_db->verbose = true;
+	if(_db->needsUpgrade())
+	_db->upgrade();
 	return true;
 }
 catch(Except e) {
@@ -57,17 +60,19 @@ catch(Except e) {
 
 bool Sqlstore::db_store_snapshot(an::db::SnapshotPtr sn) {
 	try {
-		_db->begin();
+		//_db->begin();
 		Snapshot ss(*_db);
 		ss.based = sn->based;
-		ss.id = sn->id;
+		ss.anID = sn->id;
+		ss.id = 0;
+		ss.content = sn->content;
 		ss.time = to_time_t(sn->time);
 		BOOST_FOREACH (an::db::DiffPtr diff, sn->diffs) {
 			boost::shared_ptr<db::Diff> d = _db_store_diff(diff);
 			ss.diffs().link(*d);
 		}
 		ss.update();
-		_db->commit();
+		//_db->commit();
 	}
 	catch(Except e) {
 		LOG(ERROR) << e;
@@ -78,32 +83,32 @@ bool Sqlstore::db_store_snapshot(an::db::SnapshotPtr sn) {
 
 boost::shared_ptr<db::ObjID> Sqlstore::_db_store_id(const an::db::ObjID& id)
 {
-	_db->begin();
 	boost::shared_ptr<db::ObjID> oi(new db::ObjID(*_db));
-	oi->aid = id;
+	oi->anID = id;
 	oi->update();
-	_db->commit();
 	return oi;
 }
 
 boost::shared_ptr<db::Diff> Sqlstore::_db_store_diff(an::db::DiffPtr ip)
 {
-	_db->begin();
 	boost::shared_ptr<db::Diff> diff(new db::Diff(*_db));
 	diff->snapshot = ip->snapshot;
-	diff->id = ip->id;
+	diff->anID = ip->id;
+	diff->content = ip->content;
+	diff->time = to_time_t(ip->time);
 	BOOST_FOREACH (an::db::ObjID prev, ip->prev) {
 		diff->prev().link(*_db_store_id(prev));
 	}
 	diff->update();
-	_db->commit();
 	return diff;
 }
 
 bool Sqlstore::db_store_diff(an::db::DiffPtr diff) 
 {
 	try {
+		_db->begin();
 		_db_store_diff(diff);
+		_db->commit();
 		return true;
 	}
 	catch(Except e) {
@@ -117,7 +122,7 @@ bool Sqlstore::db_remove(const an::db::ObjID& id)
 {
 	try {
 		_db->begin();
-		db::ObjID oi = select<db::ObjID>(*_db,db::ObjID::Aid == id).one();
+		db::ObjID oi = select<db::ObjID>(*_db,db::ObjID::AnID == id).one();
 		oi.del();
 		_db->commit();
 	}
@@ -131,12 +136,11 @@ bool Sqlstore::db_remove(const an::db::ObjID& id)
 bool Sqlstore::db_get_snapshot(const an::db::ObjID& id,an::db::SnapshotPtr res)
 {
 	try {
-		db::Snapshot ss = select<Snapshot>(*_db,Snapshot::Aid == id).one();
+		db::Snapshot ss = select<Snapshot>(*_db,Snapshot::AnID == id).one();
 		res->id = id;
-		res->based = ss.based;
-		res->time = boost::posix_time::from_time_t(ss.time.value().timeStamp());
-		
-		return true;
+		res->based = ss.based.value();
+		res->content = ss.content.value();
+		res->time = boost::posix_time::from_time_t(ss.time.value().timeStamp());		
 	}
 	catch(Except e) {
 		LOG(ERROR) << e;
@@ -148,7 +152,15 @@ bool Sqlstore::db_get_snapshot(const an::db::ObjID& id,an::db::SnapshotPtr res)
 bool Sqlstore::db_get_diff(const an::db::ObjID& id,an::db::DiffPtr res) 
 {
 	try {
-
+		db::Diff diff = select<Diff>(*_db,Diff::AnID == id).one();
+		res->id = id;
+		res->snapshot = diff.snapshot.value();
+		res->content = diff.content.value();
+		res->time = boost::posix_time::from_time_t(diff.time.value().timeStamp());		
+		std::vector<ObjID> prevs = diff.prev().get().all();
+		BOOST_FOREACH (db::ObjID previd, prevs) {
+			res->prev.push_back(previd.anID.value());
+		}		
 	}
 	catch(Except e) {
 		LOG(ERROR) << e;

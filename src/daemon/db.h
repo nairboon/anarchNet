@@ -33,21 +33,33 @@ namespace an {
 		typedef std::string String;
 
 		class Snapshot;
-		class Diff {
+		class needs_ObjID {
+			public:
+				ObjID id;
+				std::string content;
+				boost::posix_time::ptime time;
+				bool create_random_id();
+				bool create_content_id();
+				needs_ObjID() {}
+				needs_ObjID(const std::string& c) : content(c), time(boost::posix_time::second_clock::local_time()) {
+					create_content_id();
+				}
+		};
+		class Diff : public needs_ObjID {
 		public:
 			ObjID snapshot;
 			std::vector<ObjID> prev;
-			ObjID id;
+			Diff() {}
+			Diff(const ObjID& s, const std::string& c) : needs_ObjID(c), snapshot(s) {}
 		};
 		typedef boost::shared_ptr<Diff> DiffPtr;
 
-		class Snapshot {
+		class Snapshot : public needs_ObjID{
 		public:
 			std::vector<DiffPtr> diffs;
-			std::string content;
 			ObjID based;
-			ObjID id;
-			boost::posix_time::ptime time;
+			Snapshot() {}
+			Snapshot(const ObjID& b, const std::string& c) : needs_ObjID(c), based(b) {}
 			
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
@@ -74,7 +86,7 @@ namespace an {
 		private:
 		};
 		typedef boost::shared_ptr<Object> ObjPtr;
-		const ObjID create_ObjID(const String& input);
 	}
+	std::string sha512(const std::string& input);
 }
 #endif  // DAEMON_DB_H_

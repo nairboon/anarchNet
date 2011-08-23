@@ -19,6 +19,7 @@
  */
 
 #include "singleton.h"
+#include <iostream>
 //#include <boost/log/sources/record_ostream.hpp>
 //#include <boost/log/sources/severity_logger.hpp>
 
@@ -29,6 +30,7 @@
 
 namespace an
 {
+	namespace log {
 	enum severity_level
 	{
 		DEBUG,
@@ -50,10 +52,12 @@ namespace an
 	private:
 	//	boost::log::sources::severity_logger_mt< severity_level > _logger;
 	};
-	
+}
 //#define LOG(lvl)
 //BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),
 //(::boost::log::keywords::severity = ::an::lvl))
+#define INFO an::log::INFO
+#define ERROR an::log::ERROR
 #define LOG(lvl) std::cerr << std::endl; std::cerr
 }
 #endif  // DAEMON_LOG_H_
