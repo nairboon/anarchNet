@@ -39,23 +39,14 @@ namespace an
 	}
 	
 	
-	bool DBManager::store_object(const std::string& content,db::ObjPtr obj)
-	{
-		db::SnapshotPtr sn(new db::Snapshot("",content));
-
-		
-	/*	std::stringstream ss;
-    {
-			boost::archive::text_oarchive oa(ss);
-			oa << sn;
-    }*/
-		
-		if(ModuleManager::instance().db_store_snapshot(sn))
+	bool DBManager::create_object(const std::string& content, db::ObjPtr obj)
+	{		
+		if(ModuleManager::instance().db_store_obj(obj))
 			return true;
 	
 		return false;
 	}
-	bool DBManager::update_object(const db::ObjID& id,db::ObjPtr obj) 
+	bool DBManager::save_object(const db::ObjID& id,db::ObjPtr obj) 
 	{
 		return false;
 	}

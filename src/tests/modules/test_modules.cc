@@ -17,7 +17,8 @@ TEST(DaemonTest,initDaemon)
 		exit(EXIT_FAILURE);
 	}
 }
-TEST(DaemonTest,db_store_snapshot)
+
+TEST(DaemonTest,db_snapshot)
 {
 	std::string content = "ABCDEFGH";
 	std::string based = "ABC";
@@ -31,12 +32,19 @@ TEST(DaemonTest,db_store_snapshot)
 	ASSERT_EQ(ss->content,nss->content);
 	ASSERT_EQ(ss->based,nss->based);
 	ASSERT_EQ(ss->time,nss->time);
+	
+	std::string newcontent = "abcdefg";
+	nss->content = newcontent;
+	ASSERT_TRUE(ModuleManager::instance().db_store_snapshot(nss));
+	ASSERT_TRUE(ModuleManager::instance().db_get_snapshot(nss->id,ss));
+	ASSERT_EQ(newcontent,ss->content);
+
 
 	ASSERT_TRUE(ModuleManager::instance().db_remove(ss->id));
 	ASSERT_FALSE(ModuleManager::instance().db_get_snapshot(ss->id,nss));
 }
 
-TEST(DaemonTest,db_store_diff)
+TEST(DaemonTest,db_diff)
 {
 	std::string content = "ABCDEFGH";
 	std::string sid = "ABCDEFGH";
@@ -54,3 +62,18 @@ TEST(DaemonTest,db_store_diff)
 	ASSERT_FALSE(ModuleManager::instance().db_get_diff(diff->id,ndiff));
 }
 
+TEST(DaemonTest,db_obj)
+{
+	std::string content = "ABCDEFGH";
+	db::ObjPtr obj(new db::Object());
+	obj->create(content);
+	db::ObjPtr nobj(new db::Object());
+	
+	ASSERT_TRUE(ModuleManager::instance().db_get_obj(obj->id,nobj));
+	
+	ASSERT_EQ(obj->id,nobj->id);
+	ASSERT_EQ(obj->snapshots.size(),nobj->snapshots.size());
+	ASSERT_EQ(nobj->snapshots[0]->content,content);
+	ASSERT_TRUE(ModuleManager::instance().db_remove(obj->id));
+	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
+}

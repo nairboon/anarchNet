@@ -22,13 +22,15 @@ public:
 	bool db_get_snapshot(const an::db::ObjID& id,an::db::SnapshotPtr res);
 	bool db_get_diff(const an::db::ObjID& id,an::db::DiffPtr res);
 	bool db_get_obj(const an::db::ObjID& id,an::db::ObjPtr res);
-	bool db_update_obj(const an::db::ObjID& id,an::db::ObjPtr obj);
 	
 private:
 	db::SQLDB *_db;
 	std::string _db_path;
 	bool create_db();
 	boost::shared_ptr<db::Diff> _db_store_diff(an::db::DiffPtr diff);
+	boost::shared_ptr<db::Snapshot> _db_store_snapshot(an::db::SnapshotPtr ip);
+	bool _db_get_diff(const an::db::ObjID& id, db::Diff& diff, an::db::DiffPtr res);
+	bool _db_get_snapshot(const an::db::ObjID& id, db::Snapshot& ss, an::db::SnapshotPtr res);
 	boost::shared_ptr<db::ObjID> _db_store_id(const an::db::ObjID& id);
 };
 

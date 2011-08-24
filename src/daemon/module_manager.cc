@@ -129,18 +129,26 @@ bool ModuleManager::init()
 		
 		return false;
 	}
-	
-	bool ModuleManager::db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res) {
+
+	bool ModuleManager::db_store_diff(db::DiffPtr diff) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_snapshot(id,res))
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
+				return true;
+		
+		return false;
+	}
+
+	bool ModuleManager::db_store_obj(db::ObjPtr obj) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_obj(obj))
 				return true;
 		
 		return false;
 	}
 	
-	bool ModuleManager::db_store_diff(db::DiffPtr diff) {
+	bool ModuleManager::db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_snapshot(id,res))
 				return true;
 		
 		return false;
@@ -154,6 +162,14 @@ bool ModuleManager::init()
 		return false;
 	}
 
+	bool ModuleManager::db_get_obj(const db::ObjID& id,db::ObjPtr res) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_obj(id,res))
+				return true;
+		
+		return false;
+	}
+	
 	bool ModuleManager::db_remove(const db::ObjID& id) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_remove(id))

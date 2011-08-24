@@ -43,19 +43,15 @@ namespace an
 			id = ObjID(crypto::sha512(content));		
 			return true;
 		}
-		
-		Object::Object(std::string inp)
-		{
-			create(inp);
-		}
 
 		bool Object::create(std::string inp)
 		{
-			return DBManager::instance().store_object(inp,shared_from_this());
+			snapshots.push_back(SnapshotPtr(new Snapshot("",inp)));
+			return DBManager::instance().create_object(inp,shared_from_this());
 		}
 
 		bool Object::save() {
-			return DBManager::instance().update_object(id,shared_from_this());
+			return DBManager::instance().save_object(id,shared_from_this());
 		}
 		
 		bool Object::remove() {

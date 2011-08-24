@@ -31,8 +31,8 @@ class DBManager : public Singleton<DBManager>
 public:
 		bool init(const std::string&);
 		
-		bool store_object(const std::string& content, db::ObjPtr obj);
-		bool update_object(const db::ObjID& id, db::ObjPtr obj);
+		bool create_object(const std::string& content, db::ObjPtr obj);
+		bool save_object(const db::ObjID& id, db::ObjPtr obj);
 		bool delete_entry(const db::ObjID& id);
 		bool get_object(const db::ObjID& id,db::ObjPtr obj);
 		

@@ -40,13 +40,12 @@ public:
 		// db types
 		bool db_store_snapshot(db::SnapshotPtr ss);
 		bool db_store_diff(db::DiffPtr diff);
-		bool db_remove(const db::ObjID& id);
+		bool db_store_obj(db::ObjPtr obj);
 		bool db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res);
 		bool db_get_diff(const db::ObjID& id,db::DiffPtr res);
 		bool db_get_obj(const db::ObjID& id,db::ObjPtr res);
-		bool db_update_obj(const db::ObjID& id,db::ObjPtr obj);
+		bool db_remove(const db::ObjID& id);
 
-		
 		// key value store
 		bool kv_put(const std::string& key, const std::string& value);
 		const std::string kv_get(const std::string& key);

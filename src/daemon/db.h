@@ -36,12 +36,14 @@ namespace an {
 		class needs_ObjID {
 			public:
 				ObjID id;
+				int _db_id;
+				std::string _db_type;
 				std::string content;
 				boost::posix_time::ptime time;
 				bool create_random_id();
 				bool create_content_id();
-				needs_ObjID() {}
-				needs_ObjID(const std::string& c) : content(c), time(boost::posix_time::second_clock::local_time()) {
+				needs_ObjID() : _db_id(0), _db_type("") {}
+				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c), time(boost::posix_time::second_clock::local_time()) {
 					create_content_id();
 				}
 		};
@@ -75,14 +77,15 @@ namespace an {
 		class Object : public boost::enable_shared_from_this<Object> {
 		public:
 			ObjID id;
+			int _db_id;
+			std::string _db_type;
 			std::vector<SnapshotPtr> snapshots;
 			std::vector<DiffPtr> diffs;
 			bool save();
 			bool create(std::string inp);
 			bool load(const ObjID& id);
 			bool remove();
-			Object() {}
-			Object(std::string inp);
+			Object() : _db_id(0), _db_type("") {}
 		private:
 		};
 		typedef boost::shared_ptr<Object> ObjPtr;
