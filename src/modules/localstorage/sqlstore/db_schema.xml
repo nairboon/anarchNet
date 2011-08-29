@@ -10,7 +10,6 @@
         <field name="based" type="string"/>
         <field name="content" type="string"/>
         <field name="time" type="datetime"/>
-
     </object>
     <object name="Diff" inherits="ObjID">
         <field name="snapshot" type="string"/> 
@@ -33,4 +32,9 @@
             <relate object="Diff" handle="prev"/>
         	<relate object="ObjID"/>
        </relation>
+     <object name="HT">
+     	<field name="key" type="string"/>
+     	<field name="value" type="string"/>
+     	<field name="time" type="datetime"/>
+     </object>
 </database>

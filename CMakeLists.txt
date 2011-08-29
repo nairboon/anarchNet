@@ -31,8 +31,8 @@ endif()
 ###################################################################################################
 
 find_package(GTest REQUIRED)
-find_library(GCRYPT NAMES gcrypt REQUIRED)
-#find_library(CRYPTOPP NAMES cryptopp_d REQUIRED PATH)
+#find_library(GCRYPT NAMES gcrypt REQUIRED)
+find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
 find_library(LSQL NAMES litesql REQUIRED PATH)
 find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
@@ -64,11 +64,11 @@ include_directories(
  )
 set( LIB
 	${Boost_LIBRARIES}
-	#${CRYPTOPP}
+	${CRYPTOPP}
 	#${SQLITE}
 	${ARCHIVE}
 	${BOOST_LOG}
-	${GCRYPT}
+	#${GCRYPT}
 	)
 set( TEST_LIB
 	${GCOV}
@@ -135,8 +135,6 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/db.h"
 		"${SOURCE_DIR}/daemon/logger.h"
 		"${SOURCE_DIR}/daemon/daemon.h"
-		"${SOURCE_DIR}/daemon/crypto.cc"
-		"${SOURCE_DIR}/daemon/crypto.h"
 		"${SOURCE_DIR}/daemon/config_manager.cc"
 		"${SOURCE_DIR}/daemon/db_manager.cc"
 		"${SOURCE_DIR}/daemon/module_manager.cc"
@@ -158,7 +156,7 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 add_library(anDaemonInternal STATIC ${DAEMON_SRC})
 add_executable(anDaemon "${SOURCE_DIR}/daemon/main.cc")
 add_dependencies(anDaemon anDaemonInternal json logger rpc)
-target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} json logger rpc)
+target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} an json logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -170,7 +168,10 @@ add_custom_command(TARGET anDaemon POST_BUILD
 
 file(GLOB LIBRARY_C "${SOURCE_DIR}/library/*.c*")
 file(GLOB LIBRARY_H "${SOURCE_DIR}/library/*.h*")
-list(APPEND LIBRARY_SRC ${LIBRARY_C} ${LIBRARY_H})
+set(LIBRARY_SRC
+		"${SOURCE_DIR}/daemon/crypto.cc"
+		"${SOURCE_DIR}/daemon/crypto.h"
+		${LIBRARY_C} ${LIBRARY_H})
 
 add_library(an SHARED ${LIBRARY_SRC})
 add_dependencies(an rpc logger)

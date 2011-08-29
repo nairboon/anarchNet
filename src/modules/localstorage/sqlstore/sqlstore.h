@@ -1,17 +1,17 @@
-#ifndef PLG_SQLITE_H
-#define PLG_SQLITE_H
+#ifndef PLG_SQLSTORE_H
+#define PLG_SQLSTORE_H
 
 #include <boost/shared_ptr.hpp>
 #include "plugins/localstorage.h"
 #include "sqldb.h"
 
-#define PLG_SQLITE_VERSION 1
+#define PLG_SQLSTORE_VERSION 1
 
 class Sqlstore : public an::plg::LocalStorage
 {
 public:
 	const std::string getName() {return "sqlstore";}
-	const unsigned int getVersion() { return PLG_SQLITE_VERSION; }
+	const unsigned int getVersion() { return PLG_SQLSTORE_VERSION; }
 	bool initialise();
 	void shutdown();
 	
@@ -41,4 +41,4 @@ public:
 	Sqlstore* createPlugin() {return new Sqlstore();}
 };
 
-#endif // PLG_SQLITE_H
+#endif // PLG_SQLSTORE_H

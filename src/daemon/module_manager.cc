@@ -177,170 +177,31 @@ bool ModuleManager::init()
 		
 		return false;
 	}
-/*	bool ModuleManager::bootstrapp_from_cache() {
-		JoinCallback cb;
-
-		LOG(INFO) << "trying to bootstrap from cache";
-		node_->Join(ConfigManager::instance().kad_config(), boost::bind(&JoinCallback::Callback, &cb, _1));
-		while (!cb.result_arrived())
-      boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-		
-    if (cb.success()) 
-			return true;
-		
-			return false;
-	}
-	bool ModuleManager::bootstrapp_from_server() {
-		JoinCallback cb;
-		std::string res;
-		foreach (string server_url, ConfigManager::instance().config()["bs-list"].as< std::vector<string> >()) {
-			try {
-				if(!http_request(server_url,&res))
-					continue;
-			
-			
-			std::stringstream in(res);
-			
-			typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
-			std::vector< string > vec;
-			string line;
-			
-			while (getline(in,line))
-			{
-        Tokenizer tok(line);
-        vec.assign(tok.begin(),tok.end());
-				
-				write_to_kadconfig(ConfigManager::instance().kad_config(),
-													 vec[0], vec[1],
-													 atoi(vec[2].c_str()), "127.0.0.1", ANARCHNET_PORT);
-				
-				LOG(INFO) << "trying to bootstrap from "<< vec[1] <<":"<<vec[2];
-				node_->Join(ConfigManager::instance().kad_config(), boost::bind(&JoinCallback::Callback, &cb, _1));
-				while (!cb.result_arrived())
-					boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-				
-				if (cb.success()) {
-						LOG(INFO) << "connected!";
-					return true;
-				}
-			}
-			}
-			catch(...) {
-				LOG(WARNING) << "error occured while loading: " << server_url;
-			}
-		}
 	
+	bool ModuleManager::store_file(const std::string& path, std::string& res) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->store_file(path,res))
+				return true;
+		
 		return false;
 	}
 	
-	bool ModuleManager::kad_init()
-	{
-		trans_handler_.Register(new transport::TransportUDT, &trans_id_);
-		chmanager_ = new rpcprotocol::ChannelManager(&trans_handler_);
-		
-    node_ = new kad::KNode(chmanager_, &trans_handler_, kad::VAULT, kad::K,
-													 kad::kAlpha, kad::kBeta, kad::kRefreshTime, "", "", false,false);
-    node_->set_transport_id(trans_id_);
-    if (!chmanager_->RegisterNotifiersToTransport() ||
-        !trans_handler_.RegisterOnServerDown(boost::bind(
-																												 &kad::KNode::HandleDeadRendezvousServer, node_, _1))) {
-      return false;
-    }
-    if (0 != trans_handler_.Start(ANARCHNET_PORT, trans_id_) || 0!= chmanager_->Start()) {
-      LOG(ERROR) << "Unable to start node on port " << ANARCHNET_PORT;
-      return false;
-    }
-		
-    JoinCallback cb;
-				
-		bool online = false;
-		// something is in cache
-		if (!kadconfig_empty(ConfigManager::instance().kad_config())) 
-			if(bootstrapp_from_cache())
-				online = true;
-		
-		// no cache or chache bootstrapp failed
-		if(!online)
-			if(!bootstrapp_from_server()) { // bootstrapp failed
-				LOG(INFO) << "No bootstraping Info, start on " << ANARCHNET_PORT;
-				node_->Join(ConfigManager::instance().kad_config(), "127.0.0.1",
-										ANARCHNET_PORT, boost::bind(&JoinCallback::Callback, cb, _1));
-				while (!cb.result_arrived())
-					boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-				
-				if (!cb.success()) {
-					LOG(ERROR) <<"Node failed to create a network.";
-					trans_handler_.Stop(trans_id_);
-					chmanager_->Stop();
-					return false;
-				}
-			}
-				
-		LOG(INFO) << "Nodeid: " << base::EncodeToHex(node_->contact_info().node_id());
-		
-		write_to_kadconfig(ConfigManager::instance().kad_config(),
-											 node_->node_id().ToStringEncoded(), node_->host_ip(),
-											 node_->host_port(), node_->local_host_ip(), node_->local_host_port());
-		
-		return true;
-	}
-	void ModuleManager::create_network(JoinCallback* cb)
-	{
-		
-		
-	}
-	
-	bool ModuleManager::kad_shutdown()
-	{
-		trans_handler_.StopPingRendezvous();
-    node_->Leave();
-		trans_handler_.Stop(trans_id_);
-    chmanager_->Stop();
-		return true;
-	}
-	bool ModuleManager::kadconfig_empty(const std::string &path) {
-		base::KadConfig kadconfig;
-		try {
-			boost::filesystem::ifstream input(path.c_str(),
-																				std::ios::in | std::ios::binary);
-			if (!kadconfig.ParseFromIstream(&input)) {;
+	bool ModuleManager::get_file_path(const std::string& id,std::string& res) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->get_file_path(id,res))
 				return true;
-			}
-			input.close();
-			if (kadconfig.contact_size() == 0)
-				return true;
-		}
-		catch(const std::exception &) {
-			return true;
-		}
+		
 		return false;
 	}
 	
-	bool ModuleManager::write_to_kadconfig(const std::string &path, const std::string &node_id,
-																		const std::string &ip, const boost::uint16_t &port,
-																		const std::string &local_ip, const boost::uint16_t &local_port) {
-		base::KadConfig kadconfig;
-		try {
-			base::KadConfig::Contact *ctc = kadconfig.add_contact();
-			ctc->set_ip(ip);
-			ctc->set_node_id(node_id);
-			ctc->set_port(port);
-			ctc->set_local_ip(local_ip);
-			ctc->set_local_port(local_port);
-			boost::filesystem::fstream output(path.c_str(), std::ios::out |
-																				std::ios::trunc | std::ios::binary);
-			if (!kadconfig.SerializeToOstream(&output)) {
-				output.close();
-				return false;
-			}
-			output.close();
-		}
-    catch(const std::exception &) {
-			return false;
-		}
-		return boost::filesystem::exists(path);
+	bool ModuleManager::remove_file(const std::string& id) {
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->remove_file(id))
+				return true;
+		
+		return false;
 	}
-*/	
+	
 	/*bool ModuleManager::http_request(const std::string& _url,std::string *_response)
 	{
     std::size_t index = _url.find_first_of('/');

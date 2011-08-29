@@ -50,6 +50,10 @@ public:
 		bool kv_put(const std::string& key, const std::string& value);
 		const std::string kv_get(const std::string& key);
 
+		// binary file storage
+		bool store_file(const std::string& path, std::string& res);
+		bool get_file_path(const std::string& id,std::string& res);
+		bool remove_file(const std::string& id);
 		
 		static bool http_request(const std::string& url,std::string* response);
 protected:

@@ -77,3 +77,15 @@ TEST(DaemonTest,db_obj)
 	ASSERT_TRUE(ModuleManager::instance().db_remove(obj->id));
 	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }
+
+TEST(LocalStore,FileStore)
+{
+	std::string filehash = "2a8a0a3a7ddfbe9bf92113725eece0c5d9b450e1907eb496717a67bc755dc8798672c82b49ef448dba022c9f3db3d96e4b20ed0e20e62187bfc8f6a8eda8a8c4";
+	std::string filepath = "2a8a0a3a7ddfbe9bf92113725eece0c5d9b450e1907eb496717a67bc755dc8798672c82b49ef448dba022c9f3db3d96e4b20ed0e20e62187bfc8f6a8eda8a8c4";
+	std::string res;
+	ASSERT_TRUE(ModuleManager::instance().store_file("TESTFILE",res));
+	ASSERT_EQ(res,filehash);
+	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
+	ASSERT_EQ(res,filepath);
+	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
+}

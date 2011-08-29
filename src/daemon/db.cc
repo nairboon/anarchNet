@@ -36,11 +36,11 @@ namespace an
 			std::string stime = boost::posix_time::to_iso_string(time);
 			std::stringstream rndinp;
 			rndinp << stime << content << random();
-			id = ObjID(crypto::sha512(rndinp.str()));
+			id = ObjID(crypto::toHex(crypto::Hash(rndinp.str())));
 			return true;
 		}
 		bool needs_ObjID::create_content_id() {
-			id = ObjID(crypto::sha512(content));		
+			id = ObjID(crypto::toHex(crypto::Hash(content)));		
 			return true;
 		}
 
