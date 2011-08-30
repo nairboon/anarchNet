@@ -60,7 +60,6 @@ public:
 		bool get_file_path(const std::string& id,std::string& res);
 		bool remove_file(const std::string& id);
 		
-		static bool http_request(const std::string& url,std::string* response);
 protected:
 		ModuleManager() {}
 private:

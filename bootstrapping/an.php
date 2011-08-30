@@ -1,21 +1,21 @@
 <?php
 /*
  bootstrapping server script
-params: id, ip, port - to register a node
+params: id,port - to register a node
 			 none		  - just to get some nodes
-returns a list of 10 nodes
+returns a list of 10 random nodes
 
-todo:	check for ttl
+todo:		check for ttl
 			remove old entries
 			check for duplicates
+			random shuffling
 */
 
-if(isset($_GET['id']))
-	$node_id = $_GET['id'];
-if(isset($_GET['ip']))
-	$node_ip = $_GET['ip'];
+$node_ip = $_SERVER['REMOTE_ADDR'];
 if(isset($_GET['port']))
 	$node_port = $_GET['port'];
+if(isset($_GET['id']))
+	$node_id = $_GET['id'];
 	
 $ttl = 60*60*24; // 1 day
 $timestamp = time();
@@ -44,6 +44,7 @@ while( ($line =fgetcsv($fh,1024)) !== false) {
 fclose($fh);
 
 foreach(array_rand($lines,10) as $i )
-	echo $lines[$i][0] . ","  . $lines[$i][1] . ","  . $lines[$i][2] . "\n" ;
+	//echo $lines[$i][0] . ","  . $lines[$i][1] . ","  . $lines[$i][2] . "\n" ;
+	echo $lines[$i][1] . ":"  . $lines[$i][2] . "\n" ;
 
 ?>
