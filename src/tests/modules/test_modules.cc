@@ -91,3 +91,15 @@ TEST(LocalStore,FileStore)
 	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/filestore/"+filepath);
 	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
 }
+
+TEST(LocalStore,HT)
+{
+	std::string key = "mykey";
+	std::string value = "myvalue";
+	std::string res;
+	ASSERT_TRUE(ModuleManager::instance().kv_put(key,value));
+	ASSERT_TRUE(ModuleManager::instance().kv_get(key,res));
+	ASSERT_EQ(res,value);
+	ASSERT_TRUE(ModuleManager::instance().kv_remove(key));
+	ASSERT_FALSE(ModuleManager::instance().kv_get(key,res));
+}

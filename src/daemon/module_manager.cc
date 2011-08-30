@@ -112,14 +112,22 @@ bool ModuleManager::init()
 		return false;
 	}
 	
-	const std::string ModuleManager::kv_get(const std::string& key)
+	bool ModuleManager::kv_get(const std::string& key,std::string& res)
 	{
-		std::string res;
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && ( (res = (*it)->kv_get(key)) != ""))
-				return res;
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get(key,res))
+				return true;
 		
-		return "";
+		return false;
+	}
+
+	bool ModuleManager::kv_remove(const std::string& key)
+	{
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_remove(key))
+				return true;
+		
+		return false;
 	}
 	
 	bool ModuleManager::db_store_snapshot(db::SnapshotPtr ss) {

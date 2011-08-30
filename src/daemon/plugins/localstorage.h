@@ -52,8 +52,9 @@ public:
 	 * \param value value to store
 	 * \return true if successfuly stored
 	 */
-	virtual const bool kv_put(const std::string& key, const std::string& value) { return false; }
-	virtual const std::string kv_get(const std::string& key) { return ""; }
+	virtual bool kv_put(const std::string& key, const std::string& value) { return false; }
+	virtual bool kv_get(const std::string& key,std::string& res) { return false; }
+	virtual bool kv_remove(const std::string& key) { return false; }
 
 	/**
 	 * Binary File Storage

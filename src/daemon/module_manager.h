@@ -48,7 +48,8 @@ public:
 
 		// key value store
 		bool kv_put(const std::string& key, const std::string& value);
-		const std::string kv_get(const std::string& key);
+		bool kv_get(const std::string& key,std::string& res);
+		bool kv_remove(const std::string& key);
 
 		// binary file storage
 		bool store_file(const std::string& path, std::string& res);

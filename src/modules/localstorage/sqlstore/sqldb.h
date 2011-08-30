@@ -6,6 +6,7 @@ class ObjID;
 class Object;
 class Snapshot;
 class Diff;
+class HT;
 class ObjectSnapshotRelation {
 public:
     class Row {
@@ -270,6 +271,50 @@ public:
     std::auto_ptr<Diff> upcastCopy();
 };
 std::ostream & operator<<(std::ostream& os, Diff o);
+class HT : public litesql::Persistent {
+public:
+    class Own {
+    public:
+        static const litesql::FieldType Id;
+    };
+    static const std::string type__;
+    static const std::string table__;
+    static const std::string sequence__;
+    static const litesql::FieldType Id;
+    litesql::Field<int> id;
+    static const litesql::FieldType Type;
+    litesql::Field<std::string> type;
+    static const litesql::FieldType Key;
+    litesql::Field<std::string> key;
+    static const litesql::FieldType Value;
+    litesql::Field<std::string> value;
+    static const litesql::FieldType Time;
+    litesql::Field<litesql::DateTime> time;
+protected:
+    void defaults();
+public:
+    HT(const litesql::Database& db);
+    HT(const litesql::Database& db, const litesql::Record& rec);
+    HT(const HT& obj);
+    const HT& operator=(const HT& obj);
+protected:
+    std::string insert(litesql::Record& tables, litesql::Records& fieldRecs, litesql::Records& valueRecs);
+    void create();
+    virtual void addUpdates(Updates& updates);
+    virtual void addIDUpdates(Updates& updates);
+public:
+    static void getFieldTypes(std::vector<litesql::FieldType>& ftypes);
+protected:
+    virtual void delRecord();
+    virtual void delRelations();
+public:
+    virtual void update();
+    virtual void del();
+    virtual bool typeIsCorrect();
+    std::auto_ptr<HT> upcast();
+    std::auto_ptr<HT> upcastCopy();
+};
+std::ostream & operator<<(std::ostream& os, HT o);
 class SQLDB : public litesql::Database {
 public:
     SQLDB(std::string backendType, std::string connInfo);

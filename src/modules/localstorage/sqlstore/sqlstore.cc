@@ -267,3 +267,43 @@ bool Sqlstore::create_db() {
 
 void Sqlstore::shutdown() {
 }
+
+
+bool Sqlstore::kv_put(const std::string& key, const std::string& value) {
+	try {
+	HT ht(*_db);
+	ht.key = key;
+	ht.value = value;
+	ht.time = to_time_t(boost::posix_time::second_clock::local_time());
+	ht.update();
+	return true;
+}
+catch(Except e) {
+	LOG(ERROR) << e;
+	return false;
+}
+}
+
+bool Sqlstore::kv_get(const std::string& key,std::string& res) {
+	try {
+	db::HT ht = select<HT>(*_db, HT::Key == key).one();
+	res = ht.value.value();
+	return true;
+	}
+catch(Except e) {
+	LOG(ERROR) << e;
+	return false;
+}
+}
+
+bool Sqlstore::kv_remove(const std::string& key) {
+	try {
+		db::HT ht = select<HT>(*_db, HT::Key == key).one();
+		ht.del();
+		return true;
+	}
+	catch(Except e) {
+		LOG(ERROR) << e;
+		return false;
+	}
+}

@@ -815,6 +815,160 @@ std::ostream & operator<<(std::ostream& os, Diff o) {
     os << "-------------------------------------" << std::endl;
     return os;
 }
+const litesql::FieldType HT::Own::Id("id_","INTEGER","HT_");
+const std::string HT::type__("HT");
+const std::string HT::table__("HT_");
+const std::string HT::sequence__("HT_seq");
+const litesql::FieldType HT::Id("id_","INTEGER",table__);
+const litesql::FieldType HT::Type("type_","TEXT",table__);
+const litesql::FieldType HT::Key("key_","TEXT",table__);
+const litesql::FieldType HT::Value("value_","TEXT",table__);
+const litesql::FieldType HT::Time("time_","INTEGER",table__);
+void HT::defaults() {
+    id = 0;
+    time = 0;
+}
+HT::HT(const litesql::Database& db)
+     : litesql::Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
+    defaults();
+}
+HT::HT(const litesql::Database& db, const litesql::Record& rec)
+     : litesql::Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
+    defaults();
+    size_t size = (rec.size() > 5) ? 5 : rec.size();
+    switch(size) {
+    case 5: time = convert<const std::string&, litesql::DateTime>(rec[4]);
+        time.setModified(false);
+    case 4: value = convert<const std::string&, std::string>(rec[3]);
+        value.setModified(false);
+    case 3: key = convert<const std::string&, std::string>(rec[2]);
+        key.setModified(false);
+    case 2: type = convert<const std::string&, std::string>(rec[1]);
+        type.setModified(false);
+    case 1: id = convert<const std::string&, int>(rec[0]);
+        id.setModified(false);
+    }
+}
+HT::HT(const HT& obj)
+     : litesql::Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
+}
+const HT& HT::operator=(const HT& obj) {
+    if (this != &obj) {
+        id = obj.id;
+        type = obj.type;
+        key = obj.key;
+        value = obj.value;
+        time = obj.time;
+    }
+    litesql::Persistent::operator=(obj);
+    return *this;
+}
+std::string HT::insert(litesql::Record& tables, litesql::Records& fieldRecs, litesql::Records& valueRecs) {
+    tables.push_back(table__);
+    litesql::Record fields;
+    litesql::Record values;
+    fields.push_back(id.name());
+    values.push_back(id);
+    id.setModified(false);
+    fields.push_back(type.name());
+    values.push_back(type);
+    type.setModified(false);
+    fields.push_back(key.name());
+    values.push_back(key);
+    key.setModified(false);
+    fields.push_back(value.name());
+    values.push_back(value);
+    value.setModified(false);
+    fields.push_back(time.name());
+    values.push_back(time);
+    time.setModified(false);
+    fieldRecs.push_back(fields);
+    valueRecs.push_back(values);
+    return litesql::Persistent::insert(tables, fieldRecs, valueRecs, sequence__);
+}
+void HT::create() {
+    litesql::Record tables;
+    litesql::Records fieldRecs;
+    litesql::Records valueRecs;
+    type = type__;
+    std::string newID = insert(tables, fieldRecs, valueRecs);
+    if (id == 0)
+        id = newID;
+}
+void HT::addUpdates(Updates& updates) {
+    prepareUpdate(updates, table__);
+    updateField(updates, table__, id);
+    updateField(updates, table__, type);
+    updateField(updates, table__, key);
+    updateField(updates, table__, value);
+    updateField(updates, table__, time);
+}
+void HT::addIDUpdates(Updates& updates) {
+}
+void HT::getFieldTypes(std::vector<litesql::FieldType>& ftypes) {
+    ftypes.push_back(Id);
+    ftypes.push_back(Type);
+    ftypes.push_back(Key);
+    ftypes.push_back(Value);
+    ftypes.push_back(Time);
+}
+void HT::delRecord() {
+    deleteFromTable(table__, id);
+}
+void HT::delRelations() {
+}
+void HT::update() {
+    if (!inDatabase) {
+        create();
+        return;
+    }
+    Updates updates;
+    addUpdates(updates);
+    if (id != oldKey) {
+        if (!typeIsCorrect()) 
+            upcastCopy()->addIDUpdates(updates);
+    }
+    litesql::Persistent::update(updates);
+    oldKey = id;
+}
+void HT::del() {
+    if (typeIsCorrect() == false) {
+        std::auto_ptr<HT> p(upcastCopy());
+        p->delRelations();
+        p->onDelete();
+        p->delRecord();
+    } else {
+        onDelete();
+        delRecord();
+    }
+    inDatabase = false;
+}
+bool HT::typeIsCorrect() {
+    return type == type__;
+}
+std::auto_ptr<HT> HT::upcast() {
+    return auto_ptr<HT>(new HT(*this));
+}
+std::auto_ptr<HT> HT::upcastCopy() {
+    HT* np = new HT(*this);
+    np->id = id;
+    np->type = type;
+    np->key = key;
+    np->value = value;
+    np->time = time;
+    np->inDatabase = inDatabase;
+    return auto_ptr<HT>(np);
+}
+std::ostream & operator<<(std::ostream& os, HT o) {
+    os << "-------------------------------------" << std::endl;
+    os << o.id.name() << " = " << o.id << std::endl;
+    os << o.type.name() << " = " << o.type << std::endl;
+    os << o.key.name() << " = " << o.key << std::endl;
+    os << o.value.name() << " = " << o.value << std::endl;
+    os << o.time.name() << " = " << o.time << std::endl;
+    os << "-------------------------------------" << std::endl;
+    return os;
+}
 SQLDB::SQLDB(std::string backendType, std::string connInfo)
      : litesql::Database(backendType, connInfo) {
     initialize();
@@ -824,11 +978,13 @@ std::vector<litesql::Database::SchemaItem> SQLDB::getSchema() const {
     res.push_back(Database::SchemaItem("schema_","table","CREATE TABLE schema_ (name_ TEXT, type_ TEXT, sql_ TEXT);"));
     if (backend->supportsSequences()) {
         res.push_back(Database::SchemaItem("ObjID_seq","sequence","CREATE SEQUENCE ObjID_seq START 1 INCREMENT 1"));
+        res.push_back(Database::SchemaItem("HT_seq","sequence","CREATE SEQUENCE HT_seq START 1 INCREMENT 1"));
     }
     res.push_back(Database::SchemaItem("ObjID_","table","CREATE TABLE ObjID_ (id_ " + backend->getRowIDType() + ",type_ TEXT,anID_ TEXT)"));
     res.push_back(Database::SchemaItem("Object_","table","CREATE TABLE Object_ (id_ " + backend->getRowIDType() + ")"));
     res.push_back(Database::SchemaItem("Snapshot_","table","CREATE TABLE Snapshot_ (id_ " + backend->getRowIDType() + ",based_ TEXT,content_ TEXT,time_ INTEGER)"));
     res.push_back(Database::SchemaItem("Diff_","table","CREATE TABLE Diff_ (id_ " + backend->getRowIDType() + ",snapshot_ TEXT,content_ TEXT,time_ INTEGER)"));
+    res.push_back(Database::SchemaItem("HT_","table","CREATE TABLE HT_ (id_ " + backend->getRowIDType() + ",type_ TEXT,key_ TEXT,value_ TEXT,time_ INTEGER)"));
     res.push_back(Database::SchemaItem("__Object_Snapshot_","table","CREATE TABLE __Object_Snapshot_ (Object1 INTEGER,Snapshot2 INTEGER)"));
     res.push_back(Database::SchemaItem("__Diff_Object_","table","CREATE TABLE __Diff_Object_ (Diff1 INTEGER,Object2 INTEGER)"));
     res.push_back(Database::SchemaItem("__Diff_Snapshot_","table","CREATE TABLE __Diff_Snapshot_ (Diff1 INTEGER,Snapshot2 INTEGER)"));

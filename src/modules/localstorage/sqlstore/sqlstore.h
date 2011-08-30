@@ -23,6 +23,10 @@ public:
 	bool db_get_diff(const an::db::ObjID& id,an::db::DiffPtr res);
 	bool db_get_obj(const an::db::ObjID& id,an::db::ObjPtr res);
 	
+	bool kv_put(const std::string& key, const std::string& value);
+	bool kv_get(const std::string& key,std::string& res);
+	bool kv_remove(const std::string& key);
+	
 private:
 	db::SQLDB *_db;
 	std::string _db_path;
