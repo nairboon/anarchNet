@@ -43,7 +43,8 @@ using boost::shared_ptr;
 
 namespace an
 {
-/*	template< typename CharT, typename TraitsT >
+	namespace log {
+	template< typename CharT, typename TraitsT >
 	inline std::basic_ostream< CharT, TraitsT >& operator<< (
 																													 std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl)
 	{
@@ -61,9 +62,13 @@ namespace an
 			strm << static_cast< int >(lvl);
 		return strm;
 	}
-	*/
-/*	bool Logger::init(const std::string& logfile) {
-		//logging::init_log_to_console(std::clog, keywords::format = "%TimeStamp%: %_%");
+	
+		void Logger::log(const std::string& msg, severity_level lvl) 
+		{
+			BOOST_LOG_SEV(_logger,lvl) << msg;
+		}
+	bool Logger::init(const std::string& logfile) {
+		//logging::init_log_to_console(std::cout, keywords::format = "%TimeStamp%: %_%");
 		
 		// One can also use lambda expressions to setup filters and formatters
 		logging::init_log_to_file
@@ -80,7 +85,9 @@ namespace an
 		// Also let's add some commonly used attributes, like timestamp and record counter.
 		logging::add_common_attributes();
 		_logger.add_attribute("Uptime", attrs::timer());
-		return true;
-	}*/
+		BOOST_LOG_SEV(_logger,INFO) << "logger started";
 
+		return true;
+	}
+	}
 }
