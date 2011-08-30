@@ -30,14 +30,12 @@ endif()
 # Dependencies
 ###################################################################################################
 
-find_package(GTest REQUIRED)
-#find_library(GCRYPT NAMES gcrypt REQUIRED)
+find_package(GTest)
 find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
 find_library(LSQL NAMES litesql REQUIRED PATH)
 find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
-#find_library(SQLITE NAMES libsqlit3 sqlite3 REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
 find_library(BOOST_LOG NAMES libboost_log.a boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
 
@@ -65,10 +63,7 @@ include_directories(
 set( LIB
 	${Boost_LIBRARIES}
 	${CRYPTOPP}
-	#${SQLITE}
-	${ARCHIVE}
 	${BOOST_LOG}
-	#${GCRYPT}
 	)
 set( TEST_LIB
 	${GCOV}

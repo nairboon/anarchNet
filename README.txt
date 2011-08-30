@@ -5,11 +5,11 @@ cd build/<your os>/<Debug|Release>
 cmake ../../..
 
 Dependencies:
- * google-glog
- * google-gtest
- * google-protobuf >= 2.3
- * boost >= 1.42
- * maidsafe_dht	! requires gcc >= 4.3
+ * boost >= 1.47
+ * litesql: https://sourceforge.net/apps/trac/litesql/
+     * with this patch: https://sourceforge.net/apps/trac/litesql/ticket/43
+ * cryptopp >= 5.6
+ * boost.log
 
 on Mac:
  sudo fink install libcryptopp

@@ -31,9 +31,9 @@ cd ..
 }
 
 boost() {
-wget http://downloads.sourceforge.net/project/boost/boost/1.43.0/boost_1_43_0.tar.gz?use_mirror=puzzle
-tar -xzf boost_1_43_0.tar.gz
-cd boost_1_43_0
+wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.gz?use_mirror=puzzle
+tar -xzf boost_1_47_0.tar.gz
+cd boost_1_47_0
 sh bootstrap --without-libraries=graph,python,mpi,graph_parallel,wave
 ./bjam
 ./bjam install
@@ -49,11 +49,19 @@ sudo make install
 cd ..
 }
 
-glog
-gtest
-protobuf
+boostlog() {
+svn co https://boost-log.svn.sourceforge.net/svnroot/boost-log/trunk/boost-log
+cd boost-log
+cmake .
+make
+
+}
+#glog
+#gtest
+#protobuf
 boost
+boostlog
 
-ldconfig
+sudo ldconfig
 
-maidsafe
+#maidsafe
