@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -22,13 +22,12 @@
 #include "puggKernel.h"
 #include "puggServer.h"
 
-#ifndef DAEMON_PLUGIN_MANAGER_H_
-#define DAEMON_PLUGIN_MANAGER_H_
+#ifndef SRC_DAEMON_PLUGIN_MANAGER_H_
+#define SRC_DAEMON_PLUGIN_MANAGER_H_
 namespace an {
 	
-	class PluginManager : public Singleton<PluginManager>
-	{
-		friend class Singleton<PluginManager>;
+class PluginManager : public Singleton<PluginManager> {
+	friend class Singleton<PluginManager>;
 	public:
 		bool init();
 		bool loadPlugin(const std::string&,const std::string&,const std::string&);
@@ -37,4 +36,4 @@ namespace an {
 		pugg::Kernel _plugin_kernel;
 	};
 }
-#endif
+#endif  // SRC_DAEMON_PLUGIN_MANAGER_H_

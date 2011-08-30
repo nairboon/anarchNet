@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -19,20 +19,24 @@
  */
 #include "singleton.h"
 
-#ifndef DAEMON_NET_MANAGER_H_
-#define DAEMON_NET_MANAGER_H_
+#ifndef SRC_DAEMON_NET_MANAGER_H_
+#define SRC_DAEMON_NET_MANAGER_H_
 
 namespace an {
 	
-	class NetManager : public Singleton<NetManager>
-	{
-		friend class Singleton<NetManager>;
+class NetManager : public Singleton<NetManager> {
+	friend class Singleton<NetManager>;
 	public:
 		bool init();
 		void run();
 		NetManager() : _running(true) {}
 		~NetManager();
-		void stop(){ _mutex.lock(); _running = false; _io_service.stop(); _mutex.unlock();}
+		void stop() { 
+			_mutex.lock(); 
+			_running = false; 
+			_io_service.stop(); 
+			_mutex.unlock();
+		}
 	private:
 		an::RpcServer *_server;
 		boost::asio::io_service _io_service;
@@ -61,4 +65,4 @@ namespace an {
 			};
 	}
 }
-#endif  // DAEMON_NET_MANAGER_H_
+#endif  // SRC_DAEMON_NET_MANAGER_H_

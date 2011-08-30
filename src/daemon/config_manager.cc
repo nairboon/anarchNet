@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -27,16 +27,11 @@
 #include "config_manager.h"
 #include "logger.h"
 
-
-
-
 namespace fs = boost::filesystem;
 
-namespace an
-{
+namespace an {
 
-	bool ConfigManager::init(const std::string& directory)
-{
+	bool ConfigManager::init(const std::string& directory) {
 	
 	std::string config_file = directory + "/anarchnet.conf";
 
@@ -82,23 +77,21 @@ namespace an
 
 	if(!fs::exists(_dir)) {
 		 LOG(INFO)<< "creating anarchNet dir: " << _dir;
-		 if(!fs::create_directory(_dir)) {
+		 if (!fs::create_directory(_dir)) {
 			LOG(ERROR) << "Could not create: " << _dir;
 			return false;
 		 }
-	}
-	else if(!fs::is_directory(_dir)) {
+	} else if (!fs::is_directory(_dir)) {
 		 LOG(ERROR) << _dir << " is not a directory";
 		return false;
 	}
 	if(!fs::exists(_data_dir)) {
 		 LOG(INFO)<< "creating anarchNet data dir: " << _data_dir;
-		 if(!fs::create_directory(_data_dir)) {
+		 if (!fs::create_directory(_data_dir)) {
 			LOG(ERROR) << "Could not create: " << _data_dir;
 			return false;
 		 }		
-	}
-	else if(!fs::is_directory(_data_dir)) {
+	} else if (!fs::is_directory(_data_dir)) {
 	 LOG(ERROR) << _data_dir << " is not a directory";
 	 return false;
 	 }

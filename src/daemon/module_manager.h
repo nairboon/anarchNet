@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -22,12 +22,16 @@
 #include "singleton.h"
 #include "db.h"
 
-#ifndef DAEMON_MODULE_MANAGER_H_
-#define DAEMON_MODULE_MANAGER_H_
+#ifndef SRC_DAEMON_MODULE_MANAGER_H_
+#define SRC_DAEMON_MODULE_MANAGER_H_
 namespace an {
-	namespace plg { class Bootstrap; class LocalStorage; class RemoteStorage; class Session; }
-class ModuleManager : public Singleton<ModuleManager>
-	{
+	namespace plg { 
+		class Bootstrap; 
+		class LocalStorage; 
+		class RemoteStorage; 
+		class Session; 
+	}
+class ModuleManager : public Singleton<ModuleManager> {
 		friend class Singleton<ModuleManager>;
 public:
 		bool init();
@@ -66,4 +70,4 @@ private:
 		std::vector<plg::Session*> _sessions;
 	};
 }
-#endif  // DAEMON_MODULE_MANAGER_H_
+#endif  // SRC_DAEMON_MODULE_MANAGER_H_

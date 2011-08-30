@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -24,8 +24,8 @@
 #include <boost/serialization/string.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#ifndef DAEMON_DB_H_
-#define DAEMON_DB_H_
+#ifndef SRC_DAEMON_DB_H_
+#define SRC_DAEMON_DB_H_
 
 namespace an {
 	namespace db {
@@ -43,12 +43,13 @@ namespace an {
 				bool create_random_id();
 				bool create_content_id();
 				needs_ObjID() : _db_id(0), _db_type("") {}
-				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c), time(boost::posix_time::second_clock::local_time()) {
+				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c), 
+					time(boost::posix_time::second_clock::local_time()) {
 					create_content_id();
 				}
 		};
 		class Diff : public needs_ObjID {
-		public:
+		 public:
 			ObjID snapshot;
 			std::vector<ObjID> prev;
 			Diff() {}
@@ -57,7 +58,7 @@ namespace an {
 		typedef boost::shared_ptr<Diff> DiffPtr;
 
 		class Snapshot : public needs_ObjID{
-		public:
+		 public:
 			std::vector<DiffPtr> diffs;
 			ObjID based;
 			Snapshot() {}
@@ -75,7 +76,7 @@ namespace an {
 		typedef boost::shared_ptr<Snapshot> SnapshotPtr;
 		
 		class Object : public boost::enable_shared_from_this<Object> {
-		public:
+		 public:
 			ObjID id;
 			int _db_id;
 			std::string _db_type;
@@ -86,10 +87,10 @@ namespace an {
 			bool load(const ObjID& id);
 			bool remove();
 			Object() : _db_id(0), _db_type("") {}
-		private:
+		 private:
 		};
 		typedef boost::shared_ptr<Object> ObjPtr;
 	}
 	std::string sha512(const std::string& input);
 }
-#endif  // DAEMON_DB_H_
+#endif  // SRC_DAEMON_DB_H_

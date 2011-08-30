@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -23,15 +23,14 @@
 #include "plugins/plugin.h"
 #include "db.h"
 
-#ifndef DAEMON_PLUGIN_LOCALSTORAGE_H
-#define DAEMON_PLUGIN_LOCALSTORAGE_H
+#ifndef SRC_DAEMON_PLUGIN_LOCALSTORAGE_H
+#define SRC_DAEMON_PLUGIN_LOCALSTORAGE_H
 namespace an {
 
 #define PLG_LOCALSTORAGE_SERVER_NAME "LocalStorageServer"
 #define PLG_LOCALSTORAGE_SERVER_VERSION 1
 namespace plg {
-class LocalStorage : public Plugin
-{
+class LocalStorage : public Plugin {
 public:
 	enum StorageType { PLAIN, BINARY };
 
@@ -66,8 +65,7 @@ public:
 };
 }
 	namespace plgdrv {
-class LocalStorage : public pugg::Driver
-{
+class LocalStorage : public pugg::Driver {
 public:
 	virtual plg::LocalStorage* createPlugin() = 0;
 };

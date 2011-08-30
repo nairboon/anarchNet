@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -18,11 +18,10 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_PLUGIN_H
-#define DAEMON_PLUGIN_H
+#ifndef SRC_DAEMON_PLUGIN_H
+#define SRC_DAEMON_PLUGIN_H
 namespace an {
-	class Plugin
-		{
+	class Plugin {
 		public:
 			Plugin() {}
 			virtual ~Plugin() {}

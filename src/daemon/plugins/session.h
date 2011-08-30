@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -21,22 +21,20 @@
 #include "puggDriver.h"
 #include "plugins/plugin.h"
 
-#ifndef DAEMON_PLUGIN_SESSION_H
-#define DAEMON_PLUGIN_SESSION_H
+#ifndef SRC_DAEMON_PLUGIN_SESSION_H
+#define SRC_DAEMON_PLUGIN_SESSION_H
 namespace an {
 	namespace plg {
 #define PLG_SESSION_SERVER_NAME "SessionServer"
 #define PLG_SESSION_SERVER_VERSION 1
 
-class Session : public Plugin
-{
+class Session : public Plugin {
 public:
 	virtual const std::string getName() {return "generic session plugin";}
 };
 	}
 		namespace plgdrv {
-class Session : public pugg::Driver
-{
+class Session : public pugg::Driver {
 public:
 	virtual plg::Session* createPlugin() = 0;
 };

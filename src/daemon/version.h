@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -18,8 +18,8 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_VERSION_H_
-#define DAEMON_VERSION_H_
+#ifndef SRC_DAEMON_VERSION_H_
+#define SRC_DAEMON_VERSION_H_
 //  X_VERSION % 100 is the patch level
 //  X_VERSION / 100 % 1000 is the minor version
 //  X_VERSION / 100000 is the major version
@@ -31,4 +31,4 @@
 + ANARCHNET_VERSION_MINOR * 1000 \
 + ANARCHNET_VERSION_PATCH)
 
-#endif  // DAEMON_VERSION_H_
+#endif  // SRC_DAEMON_VERSION_H_

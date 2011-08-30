@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -21,15 +21,14 @@
 #include "puggDriver.h"
 #include "plugins/plugin.h"
 
-#ifndef DAEMON_PLUGIN_BOOTSTRAP_H
-#define DAEMON_PLUGIN_BOOTSTRAP_H
+#ifndef SRC_DAEMON_PLUGIN_BOOTSTRAP_H
+#define SRC_DAEMON_PLUGIN_BOOTSTRAP_H
 namespace an {
 	namespace plg {
 #define PLG_BOOTSTRAP_SERVER_NAME "BootstrapServer"
 #define PLG_BOOTSTRAP_SERVER_VERSION 1
 
-class Bootstrap : public Plugin
-{
+class Bootstrap : public Plugin {
 public:
 	virtual const std::string getName() {return "generic bootstrap plugin";}
 	virtual bool bootstrap(std::string args) { return false; }

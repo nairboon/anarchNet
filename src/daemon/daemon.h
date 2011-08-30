@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -18,21 +18,20 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_DAEMON_H_
-#define DAEMON_DAEMON_H_
+#ifndef SRC_DAEMON_DAEMON_H_
+#define SRC_DAEMON_DAEMON_H_
 namespace an {
 
 	
-class anDaemon
-{
-public:
+class anDaemon {
+ public:
 	anDaemon() : running_(true) {}
 	~anDaemon();
 	bool init(const std::string&);
 	void run();
 	void stop();
-private:
+ private:
 	bool running_;
 };
 }
-#endif  // DAEMON_DAEMON_H_
+#endif  // SRC_DAEMON_DAEMON_H_

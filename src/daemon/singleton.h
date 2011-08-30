@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Port4l
+ * Copyright (C) 2010, 2011 Port4l
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -20,8 +20,8 @@
 
 // Thread-safe lazy singleton template class - http://www.boostcookbook.com/Recipe:/1235044
 // written by Port4l, public domain?
-#ifndef DAEMON_SINGLETON_H_
-#define DAEMON_SINGLETON_H_
+#ifndef SRC_DAEMON_SINGLETON_H_
+#define SRC_DAEMON_SINGLETON_H_
 
 #include <boost/utility.hpp>
 #include <boost/thread/once.hpp>
@@ -32,12 +32,9 @@
 namespace an
 {
 	
-	template<class T>
-	
-	class Singleton : private boost::noncopyable
-	{
-		
-	public:
+ template<class T>	
+ class Singleton : private boost::noncopyable {
+  public:
     static T& instance()
     {
 			boost::call_once(init, flag);
@@ -49,19 +46,16 @@ namespace an
 			t.reset(new T());
     }
 		
-	protected:
+  protected:
     ~Singleton() {}
 		Singleton() {}
-		
-	private:
+  private:
 		static boost::scoped_ptr<T> t;
 		static boost::once_flag flag;
-		
 	};
-	
 }
 
 template<class T> boost::scoped_ptr<T> an::Singleton<T>::t(0);
 template<class T> boost::once_flag an::Singleton<T>::flag = BOOST_ONCE_INIT;
 
-#endif  // DAEMON_SINGLETON_H_
+#endif  // SRC_DAEMON_SINGLETON_H_

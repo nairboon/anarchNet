@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -18,7 +18,7 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_CONFIG_H_
-#define DAEMON_CONFIG_H_
+#ifndef SRC_DAEMON_CONFIG_H_
+#define SRC_DAEMON_CONFIG_H_
 
-#endif  // DAEMON_CONFIG_H_
+#endif  // SRC_DAEMON_CONFIG_H_

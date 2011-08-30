@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -21,12 +21,11 @@
 #include "db.h"
 #include "singleton.h"
 
-#ifndef DAEMON_DB_MANAGER_H_
-#define DAEMON_DB_MANAGER_H_
+#ifndef SRC_DAEMON_DB_MANAGER_H_
+#define SRC_DAEMON_DB_MANAGER_H_
 namespace an {
 
-class DBManager : public Singleton<DBManager>
-	{
+class DBManager : public Singleton<DBManager> {
 		friend class Singleton<DBManager>;
 public:
 		bool init(const std::string&);
@@ -41,4 +40,4 @@ private:
 	
 	};
 }
-#endif  // DAEMON_DB_MANAGER_H_
+#endif  // SRC_DAEMON_DB_MANAGER_H_

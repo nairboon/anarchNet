@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -36,14 +36,14 @@ namespace an
 
 bool ModuleManager::init()
 {
-	BOOST_FOREACH (std::string plugin_name, ConfigManager::instance().modules()) {
+	BOOST_FOREACH(std::string plugin_name, ConfigManager::instance().modules()) {
 		if(!PluginManager::instance().loadPlugin(plugin_name,plugin_name+".dylib",plugin_name))
 			return false;
 	}
 	
 	std::vector<plgdrv::Bootstrap*> bs_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Bootstrap>*>(PluginManager::instance().get_kernel().getServer(PLG_BOOTSTRAP_SERVER_NAME))->getAllDrivers(bs_drivers);
-	BOOST_FOREACH (plgdrv::Bootstrap* drv, bs_drivers) {
+	BOOST_FOREACH(plgdrv::Bootstrap* drv, bs_drivers) {
 		plg::Bootstrap* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
 		plg->initialise();
@@ -53,7 +53,7 @@ bool ModuleManager::init()
 	
 	std::vector<plgdrv::LocalStorage*> ls_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::LocalStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_LOCALSTORAGE_SERVER_NAME))->getAllDrivers(ls_drivers);
-	BOOST_FOREACH (plgdrv::LocalStorage* drv, ls_drivers) {
+	BOOST_FOREACH(plgdrv::LocalStorage* drv, ls_drivers) {
 		plg::LocalStorage* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
 		plg->initialise();
@@ -63,7 +63,7 @@ bool ModuleManager::init()
 	
 	std::vector<plgdrv::RemoteStorage*> rs_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::RemoteStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_REMOTESTORAGE_SERVER_NAME))->getAllDrivers(rs_drivers);
-	BOOST_FOREACH (plgdrv::RemoteStorage* drv, rs_drivers) {
+	BOOST_FOREACH(plgdrv::RemoteStorage* drv, rs_drivers) {
 		plg::RemoteStorage* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
 		plg->initialise();
@@ -73,7 +73,7 @@ bool ModuleManager::init()
 	
 	std::vector<plgdrv::Session*> s_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Session>*>(PluginManager::instance().get_kernel().getServer(PLG_SESSION_SERVER_NAME))->getAllDrivers(s_drivers);
-	BOOST_FOREACH (plgdrv::Session* drv, s_drivers) {
+	BOOST_FOREACH(plgdrv::Session* drv, s_drivers) {
 		plg::Session* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
 		plg->initialise();

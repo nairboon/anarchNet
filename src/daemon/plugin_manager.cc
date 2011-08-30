@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -33,10 +33,14 @@ namespace an
 	
 	bool PluginManager::init()
 	{
-		pugg::Server<an::plgdrv::Bootstrap>* bootstrap_server = new pugg::Server<plgdrv::Bootstrap>(PLG_BOOTSTRAP_SERVER_NAME,PLG_BOOTSTRAP_SERVER_VERSION);
-		pugg::Server<an::plgdrv::LocalStorage>* localstorage_server = new pugg::Server<plgdrv::LocalStorage>(PLG_LOCALSTORAGE_SERVER_NAME,PLG_LOCALSTORAGE_SERVER_VERSION);
-		pugg::Server<an::plgdrv::RemoteStorage>* remotestorage_server = new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
-		pugg::Server<an::plgdrv::Session>* session_server = new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
+		pugg::Server<an::plgdrv::Bootstrap>* bootstrap_server = 
+			new pugg::Server<plgdrv::Bootstrap>(PLG_BOOTSTRAP_SERVER_NAME,PLG_BOOTSTRAP_SERVER_VERSION);
+		pugg::Server<an::plgdrv::LocalStorage>* localstorage_server = 
+			new pugg::Server<plgdrv::LocalStorage>(PLG_LOCALSTORAGE_SERVER_NAME,PLG_LOCALSTORAGE_SERVER_VERSION);
+		pugg::Server<an::plgdrv::RemoteStorage>* remotestorage_server = 
+			new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
+		pugg::Server<an::plgdrv::Session>* session_server = 
+			new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
 
 		_plugin_kernel.addServer(bootstrap_server);
 		_plugin_kernel.addServer(localstorage_server);

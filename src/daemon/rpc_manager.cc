@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -32,20 +32,31 @@ namespace an
 bool	RPCManager::init() {
 	_server = new RpcServer(_io_service, ConfigManager::instance().rpc_port());
 	
-  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, &rpc::Bootstrap::BootstrapFromPeer, std::string("BootstrapFromPeer")));
-  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, &rpc::Bootstrap::BootstrapFromHostlist, std::string("BootstrapFromHostlist")));
+  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, 
+										&rpc::Bootstrap::BootstrapFromPeer, std::string("BootstrapFromPeer")));
+  _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Bootstrap>(_bs, 
+										&rpc::Bootstrap::BootstrapFromHostlist, std::string("BootstrapFromHostlist")));
 
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::CreateObject, std::string("object.create")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::GetObject, std::string("object.get")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::UpdateObject, std::string("object.update")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, &rpc::LocalStorage::DeleteObject, std::string("object.delete")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, 
+										&rpc::LocalStorage::CreateObject, std::string("object.create")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, 
+										&rpc::LocalStorage::GetObject, std::string("object.get")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, 
+										&rpc::LocalStorage::UpdateObject, std::string("object.update")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls, 
+										&rpc::LocalStorage::DeleteObject, std::string("object.delete")));
 	
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::kv_get, std::string("kv.get")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::kv_put, std::string("kv.put")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::kv_get, std::string("kv.get")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::kv_put, std::string("kv.put")));
 
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_join, std::string("session.t.join")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_leave, std::string("session.t.leave")));
-	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, &rpc::anStore::session_t_update, std::string("session.t.update")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::session_t_join, std::string("session.t.join")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::session_t_leave, std::string("session.t.leave")));
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::session_t_update, std::string("session.t.update")));
 
 	return true;
 }	
@@ -56,7 +67,7 @@ bool	RPCManager::init() {
 			_io_service.run();
 			LOG(INFO) << "Stop JSON-RPC TCP server";
 		}
-		catch (std::exception& e)
+		catch(std::exception& e)
 		{
 			LOG(ERROR) << "Exception: " << e.what() << "\n";
 		}

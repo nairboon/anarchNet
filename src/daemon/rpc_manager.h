@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -20,17 +20,16 @@
 
 #include "singleton.h"
 
-#ifndef DAEMON_RPC_SERVICE_H_
-#define DAEMON_RPC_SERVICE_H_
+#ifndef SRC_DAEMON_RPC_MANAGER_H_
+#define SRC_DAEMON_RPC_MANAGER_H_
 
 #define identify LOG(INFO) << __FUNCTION__ << " request"
 
 namespace an {
 
 	namespace rpc {
-	class Bootstrap
-		{
-		public:
+	class Bootstrap {
+	 public:
 			/**
 			 * \brief Reply with success.
 			 * \param root JSON-RPC request
@@ -53,18 +52,16 @@ namespace an {
 			}
 		};
 	
-	class LocalStorage
-		{
-		public:
+	class LocalStorage {
+	 public:
 			bool CreateObject(const boost::json::Value& root, boost::json::Value& response);
 			bool GetObject(const boost::json::Value& root, boost::json::Value& response);
 			bool DeleteObject(const boost::json::Value& root, boost::json::Value& response);
 			bool UpdateObject(const boost::json::Value& root, boost::json::Value& response);
 		};
 		
-	class anStore
-		{
-		public:
+	class anStore {
+	 public:
 			bool kv_get(const boost::json::Value& root, boost::json::Value& response);
 			bool kv_put(const boost::json::Value& root, boost::json::Value& response);
 			
@@ -75,16 +72,15 @@ namespace an {
 		};
 };
 
-	class RPCManager : public Singleton<RPCManager>
-	{
+class RPCManager : public Singleton<RPCManager>	{
 		friend class Singleton<RPCManager>;
-	public:
+ public:
 		bool init();
 		void run();
 		void stop(){ _io_service.stop(); }
 		~RPCManager();
 		RPCManager() : _running(true) {}
-	private:
+ private:
 		an::RpcServer *_server;
 		boost::asio::io_service _io_service;
 		bool _running;
@@ -127,4 +123,4 @@ private:
 
 };*/
 }
-#endif  // DAEMON_RPC_SERVICE_H_
+#endif  // SRC_DAEMON_RPC_MANAGER_H_

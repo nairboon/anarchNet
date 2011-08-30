@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -21,15 +21,14 @@
 #include "puggDriver.h"
 #include "plugins/plugin.h"
 
-#ifndef DAEMON_PLUGIN_REMOTESTORAGE_H
-#define DAEMON_PLUGIN_REMOTESTORAGE_H
+#ifndef SRC_DAEMON_PLUGIN_REMOTESTORAGE_H
+#define SRC_DAEMON_PLUGIN_REMOTESTORAGE_H
 namespace an {
 	namespace plg {
 #define PLG_REMOTESTORAGE_SERVER_NAME "RemoteStorageServer"
 #define PLG_REMOTESTORAGE_SERVER_VERSION 1
 		
-class RemoteStorage : public Plugin
-{
+class RemoteStorage : public Plugin {
 	public:
 		enum StorageType { NORMAL, ENCRYPTED, ANONYM };
 

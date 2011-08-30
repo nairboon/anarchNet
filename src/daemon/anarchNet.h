@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -44,16 +44,15 @@
  *  \brief standard plugins distributed with anarchNet
  */
 
-#ifndef DAEMON_ANARCHNET_H_
-#define DAEMON_ANARCHNET_H_
+#ifndef SRC_DAEMON_ANARCHNET_H_
+#define SRC_DAEMON_ANARCHNET_H_
 #include "config.h"
 
 /*!
  *  \namespace an
  *  \brief     Namespace of all AnarchNet framework classes and global functions.
  */
-namespace an
-{
+namespace an {
 #define ANARCHNET_RPC_PORT 23666
 #define ANARCHNET_PORT 23555
 
@@ -64,11 +63,11 @@ namespace an
 
 #if defined( __WIN32__ ) || defined( _WIN32 )
 #   define ANARCHNET_PLATFORM ANARCHNET_PLATFORM_WIN32
-#elif defined( __APPLE_CC__)
+#elif defined(__APPLE_CC__)
 #   define ANARCHNET_PLATFORM ANARCHNET_PLATFORM_APPLE
 #else
 #   define ANARCHNET_PLATFORM ANARCHNET_PLATFORM_LINUX
 #endif
 
 }
-#endif  // DAEMON_ANARCHNET_H_
+#endif  // SRC_DAEMON_ANARCHNET_H_

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -24,8 +24,8 @@
 #include <boost/log/sources/severity_logger.hpp>
 
 
-#ifndef DAEMON_LOG_H_
-#define DAEMON_LOG_H_
+#ifndef SRC_DAEMON_LOGGER_H_
+#define SRC_DAEMON_LOGGER_H_
 
 
 namespace an
@@ -41,15 +41,14 @@ namespace an
 	};
 
 	
-	class Logger : public Singleton<Logger>
-	{
+	class Logger : public Singleton<Logger> {
 		friend class Singleton<Logger>;
-	public:
+	 public:
 
 		bool init(const std::string& logfile);
 		boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
 		void log(const std::string& msg, severity_level lvl);
-	private:
+	 private:
 		boost::log::sources::severity_logger_mt< severity_level > _logger;
 	};
 }
@@ -60,4 +59,4 @@ namespace an
 #define ERROR an::log::ERROR
 #define LOG(lvl) std::cerr << std::endl; std::cerr
 }
-#endif  // DAEMON_LOG_H_
+#endif  // SRC_DAEMON_LOGGER_H_

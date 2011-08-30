@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -23,21 +23,20 @@
 #include <boost/property_tree/ptree.hpp>
 #include "singleton.h"
 
-#ifndef DAEMON_CONFIG_MANAGER_H_
-#define DAEMON_CONFIG_MANAGER_H_
+#ifndef SRC_DAEMON_CONFIG_MANAGER_H_
+#define SRC_DAEMON_CONFIG_MANAGER_H_
 namespace an {
 	
-class ConfigManager : public Singleton<ConfigManager>
-	{
+class ConfigManager : public Singleton<ConfigManager> {
 		friend class Singleton<ConfigManager>;
-public:
+ public:
 		bool init(const std::string&);
 		const 	boost::property_tree::ptree& config() { return _pt; }
 		const std::set<std::string>& modules() { return _modules; }
 		int port() { return _port; }
 		int rpc_port() { return _rpc_port; }
 		std::string datadir() { return _data_dir; }
-private:
+ private:
 		boost::property_tree::ptree _pt;
 		std::set<std::string> _modules;
 		int _port;
@@ -46,4 +45,4 @@ private:
 		std::string _dir;
 	};
 }
-#endif  // DAEMON_CONFIG_MANAGER_H_
+#endif  // SRC_DAEMON_CONFIG_MANAGER_H_
