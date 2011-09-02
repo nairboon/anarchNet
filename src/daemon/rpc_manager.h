@@ -64,6 +64,7 @@ namespace an {
 	 public:
 			bool kv_get(const boost::json::Value& root, boost::json::Value& response);
 			bool kv_put(const boost::json::Value& root, boost::json::Value& response);
+			bool kv_remove(const boost::json::Value& root, boost::json::Value& response);
 			
 			bool session_t_join(const boost::json::Value& root, boost::json::Value& response);
 			bool session_t_leave(const boost::json::Value& root, boost::json::Value& response);

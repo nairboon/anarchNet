@@ -46,16 +46,31 @@ namespace an
 	
 		return false;
 	}
-	bool DBManager::save_object(const db::ObjID& id,db::ObjPtr obj) 
+	bool DBManager::save_object(const db::ObjID& id,const std::string& diff) 
 	{
+		db::ObjPtr obj;
+		if(!ModuleManager::instance().db_get(id,obj))
+			return false;
+		
+		db::DiffPtr ddiff(new db::Diff(obj->snapshot[0],diff));
+
+		if(!ModuleManager::instance().db_store_diff(ddiff))
+			return false;
+		
+		obj->diffs.push_back(
 		return false;
 	}
 	bool DBManager::delete_entry(const db::ObjID& id)
 	{
+		if(ModuleManager::instance().db_remove(obj))
+			return true;
+		
 		return false;
 	}
 	bool DBManager::get_object(const db::ObjID& id,db::ObjPtr obj)
 	{
+		if(ModuleManager::instance().db_get_obj(id,obj))
+			return true;
 		
 		return false;
 	}

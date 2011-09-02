@@ -50,7 +50,8 @@ bool	RPCManager::init() {
 										&rpc::anStore::kv_get, std::string("kv.get")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
 										&rpc::anStore::kv_put, std::string("kv.put")));
-
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
+										&rpc::anStore::kv_remove, std::string("kv.remove")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
 										&rpc::anStore::session_t_join, std::string("session.t.join")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans, 
@@ -104,6 +105,12 @@ namespace rpc {
 	}
 	
 	bool anStore::kv_put(const boost::json::Value& root, boost::json::Value& response)
+	{
+		
+		return false;
+	}
+	
+	bool anStore::kv_remove(const boost::json::Value& root, boost::json::Value& response)
 	{
 		
 		return false;
