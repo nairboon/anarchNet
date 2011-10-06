@@ -105,7 +105,7 @@ file(GLOB RPC_H "${SOURCE_DIR}/rpc/*.h*")
 list(APPEND RPC_SRC ${RPC_C} ${RPC_H} ${JSON_RPC_H} "${ROOT_DIR}/third-party/jsonrpc/src/jsonrpc_handler.cpp")
 
 add_library(rpc ${RPC_SRC})
-
+target_link_libraries(rpc json)
 add_dependencies(rpc json logger)
 ################################################################################
 # logger
@@ -151,6 +151,7 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 add_library(anDaemonInternal STATIC ${DAEMON_SRC})
 add_executable(anDaemon "${SOURCE_DIR}/daemon/main.cc")
 add_dependencies(anDaemon anDaemonInternal json logger rpc)
+target_link_libraries(anDaemonInternal ${LIB} ${PLATFORM_LIB})
 target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} an json logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)

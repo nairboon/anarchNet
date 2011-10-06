@@ -18,11 +18,13 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <sys/stat.h>
+#include <signal.h>
+#include <cstdio>
 #include <iostream>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 #include "logger.h"
-#include "anarchnet.h"
+#include "anarchNet.h"
 #include "version.h"
 #include "daemon.h"
 
