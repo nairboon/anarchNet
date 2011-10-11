@@ -66,7 +66,7 @@ boost::shared_ptr<db::Snapshot> Sqlstore::_db_store_snapshot(an::db::SnapshotPtr
 		ss->id = sn->_db_id;
 		ss->set_id(sn->_db_id);
 		ss->type = sn->_db_type;
-		ss->isInDatabase(true);
+		ss->set_inDatabase(true);
 	}
 	ss->content = sn->content;
 	ss->time = to_time_t(sn->time);
@@ -108,7 +108,7 @@ boost::shared_ptr<db::Diff> Sqlstore::_db_store_diff(an::db::DiffPtr ip)
 		diff->id = ip->_db_id;
 		diff->set_id(ip->_db_id);
 		diff->type = ip->_db_type;
-		diff->isInDatabase(true);
+		diff->set_inDatabase(true);
 	}
 	diff->content = ip->content;
 	diff->time = to_time_t(ip->time);
@@ -241,7 +241,7 @@ bool Sqlstore::db_store_obj(an::db::ObjPtr obj)
 			dobj.id = obj->_db_id;
 			dobj.set_id(obj->_db_id);
 			dobj.type = obj->_db_type;
-			dobj.isInDatabase(true);
+			dobj.set_inDatabase(true);
 		}
 		dobj.update();
 		BOOST_FOREACH (an::db::SnapshotPtr ss, obj->snapshots) {

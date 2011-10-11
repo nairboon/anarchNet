@@ -3,14 +3,13 @@
 
 #include "plugins/bootstrap.h"
 
-#define PLG_MAIDSAFE_DHT_VERSION 364 //svn revision
-#define PLG_MAIDSAFE_DHT_A_VERSION 1 // algorithm version
+#define PLG_HOSTLIST_VERSION 1
 
 class Hostlist : public an::plg::Bootstrap
 {
 public:
 	const std::string getName() {return "hostlist";}
-	const unsigned int getVersion() { return PLG_MAIDSAFE_DHT_VERSION; }
+	const unsigned int getVersion() { return PLG_HOSTLIST_VERSION; }
 	bool initialise();
 	void shutdown();
 	bool bootstrapFromPeer(std::string ip, int port);

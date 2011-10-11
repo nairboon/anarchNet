@@ -35,10 +35,21 @@ namespace an
 
 bool ModuleManager::init()
 {
+	#ifdef ANARCHNET_PLATFORM_MACOS
+	  std::string plugin_suffix = ".dylib";
+	#endif
+	#ifdef ANARCHNET_PLATFORM_LINUX
+	  std::string plugin_suffix = ".so";
+	#endif
+	
+	bool failed = false;
 	BOOST_FOREACH(std::string plugin_name, ConfigManager::instance().modules()) {
-		if(!PluginManager::instance().loadPlugin(plugin_name,plugin_name+".dylib",plugin_name))
-			return false;
+		if(!PluginManager::instance().loadPlugin(plugin_name,"./"+plugin_name+plugin_suffix,plugin_name))
+			failed = true;
 	}
+	
+	if(failed)
+	  return false;
 	
 	std::vector<plgdrv::Bootstrap*> bs_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Bootstrap>*>(PluginManager::instance().get_kernel().getServer(PLG_BOOTSTRAP_SERVER_NAME))->getAllDrivers(bs_drivers);

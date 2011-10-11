@@ -8,12 +8,11 @@ daemon
 	* 
 
 
-
-
-
-
-
-
+modules
+ * dc
+ * loger
+ * automatic updater
+ * trust
 
 
 

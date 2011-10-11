@@ -37,7 +37,7 @@ find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
-find_library(BOOST_LOG NAMES libboost_log.a boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
+find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
@@ -158,6 +158,8 @@ configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
 add_custom_command(TARGET anDaemon POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/anarchnet.conf" "${BIN_DIR}/anarchnet.conf")
+add_custom_command(TARGET anDaemon POST_BUILD
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/an.log.conf" "${BIN_DIR}/an.log.conf")
 ################################################################################
 # Library
 ################################################################################
@@ -251,7 +253,9 @@ endif ()
    ENDIF()
  ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
 
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/util")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/bootstrap")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/localstorage")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/remotestorage")
 MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/session")
+

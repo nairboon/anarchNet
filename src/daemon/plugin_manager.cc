@@ -26,6 +26,7 @@
 #include "plugins/localstorage.h"
 #include "plugins/remotestorage.h"
 #include "plugins/session.h"
+#include "plugins/util.h"
 
 
 namespace an
@@ -41,11 +42,14 @@ namespace an
 			new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
 		pugg::Server<an::plgdrv::Session>* session_server = 
 			new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
+		pugg::Server<an::plgdrv::Util>* util_server = 
+			new pugg::Server<plgdrv::Util>(PLG_UTIL_SERVER_NAME,PLG_UTIL_SERVER_VERSION);
 
 		_plugin_kernel.addServer(bootstrap_server);
 		_plugin_kernel.addServer(localstorage_server);
 		_plugin_kernel.addServer(remotestorage_server);
 		_plugin_kernel.addServer(session_server);
+		_plugin_kernel.addServer(util_server);
 
 		return true;
 	}

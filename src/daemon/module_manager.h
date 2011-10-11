@@ -60,6 +60,12 @@ public:
 		bool get_file_path(const std::string& id,std::string& res);
 		bool remove_file(const std::string& id);
 		
+		
+		// util
+		bool log(const int level, const std::string message);
+		bool on_kv_put(const std::string &key);
+		bool on_kv_remove(const std::string &key);
+		
 protected:
 		ModuleManager() {}
 private:
