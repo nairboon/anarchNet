@@ -30,6 +30,7 @@ namespace an {
 		class LocalStorage; 
 		class RemoteStorage; 
 		class Session; 
+		class Util;
 	}
 class ModuleManager : public Singleton<ModuleManager> {
 		friend class Singleton<ModuleManager>;
@@ -62,9 +63,10 @@ public:
 		
 		
 		// util
-		bool log(const int level, const std::string message);
-		bool on_kv_put(const std::string &key);
-		bool on_kv_remove(const std::string &key);
+		bool log(log::severity_level level, const std::string message);
+		bool on_kv_put(const db::ObjID &key);
+		bool on_kv_remove(const db::ObjID &key);
+		bool on_db_update(const db::ObjID &key);
 		
 protected:
 		ModuleManager() {}
@@ -73,6 +75,7 @@ private:
 		std::vector<plg::LocalStorage*> _localstorages;
 		std::vector<plg::RemoteStorage*> _remotestorages;
 		std::vector<plg::Session*> _sessions;
+		std::vector<plg::Util*> _utils;
 	};
 }
 #endif  // SRC_DAEMON_MODULE_MANAGER_H_

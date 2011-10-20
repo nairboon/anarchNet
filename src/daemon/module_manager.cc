@@ -22,13 +22,14 @@
 #include <boost/foreach.hpp>
 #include "anarchNet.h"
 #include "logger.h"
-#include "module_manager.h"
-#include "plugin_manager.h"
-#include "config_manager.h"
 #include "plugins/bootstrap.h"
 #include "plugins/localstorage.h"
 #include "plugins/remotestorage.h"
 #include "plugins/session.h"
+#include "plugins/util.h"
+#include "module_manager.h"
+#include "plugin_manager.h"
+#include "config_manager.h"
 
 namespace an
 {
@@ -218,5 +219,45 @@ bool ModuleManager::init()
 				return true;
 		
 		return false;
+	}
+	
+	
+	/* UTIL */
+	bool ModuleManager::log(log::severity_level level, const std::string message)
+	{
+		bool worked = false;
+		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
+		  if((*it)->log(level,message))
+		     worked = true;
+	      if(!worked)
+		std::cerr << message << std::endl;
+	}
+
+
+	bool ModuleManager::on_db_update(const db::ObjID &key) 
+	{
+		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
+			if( (*it)->on_db_update(key))
+				return true;
+		
+		return false;	  
+	}
+	
+	bool ModuleManager::on_kv_put(const db::ObjID &key)
+	{
+		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
+			if( (*it)->on_kv_put(key))
+				return true;
+		
+		return false;	  
+	}
+	
+	bool ModuleManager::on_kv_remove(const db::ObjID &key)
+	{
+		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
+			if( (*it)->on_kv_remove(key))
+				return true;
+		
+		return false;	  
 	}
 }

@@ -68,12 +68,16 @@ namespace an {
 	_rpc_port = _pt.get("daemon.rpc_port", ANARCHNET_RPC_PORT);
 	_dir = _pt.get("daemon.dir", "~/.anarchNet");
 	_data_dir = _pt.get("daemon.datadir", "~/.anarchNet/data");
+	_log_dir = _pt.get("daemon.logdir", "~/.anarchNet/log");
 
 	if (_dir[0] == '~') 
 		_dir = std::string(getenv("HOME")) + _dir.substr(1);
 
 	if (_data_dir[0] == '~') 
 		_data_dir = std::string(getenv("HOME")) + _data_dir.substr(1);
+
+	if (_log_dir[0] == '~') 
+	_log_dir = std::string(getenv("HOME")) + _log_dir.substr(1);
 
 	if(!fs::exists(_dir)) {
 		 LOG(INFO)<< "creating anarchNet dir: " << _dir;
@@ -95,7 +99,17 @@ namespace an {
 	 LOG(ERROR) << _data_dir << " is not a directory";
 	 return false;
 	 }
-		 
+	 
+	if(!fs::exists(_log_dir)) {
+		 LOG(INFO)<< "creating anarchNet log dir: " << _log_dir;
+		 if (!fs::create_directory(_log_dir)) {
+			LOG(ERROR) << "Could not create: " << _log_dir;
+			return false;
+		 }		
+	} else if (!fs::is_directory(_log_dir)) {
+	 LOG(ERROR) << _log_dir << " is not a directory";
+	 return false;
+	 }		 
 	return true;
 }
 	

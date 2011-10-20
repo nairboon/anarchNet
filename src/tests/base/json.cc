@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "logger.h"
 #include "module_manager.h"
 #include "crypto.h"
 

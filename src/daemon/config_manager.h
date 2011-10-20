@@ -36,12 +36,14 @@ class ConfigManager : public Singleton<ConfigManager> {
 		int port() { return _port; }
 		int rpc_port() { return _rpc_port; }
 		std::string datadir() { return _data_dir; }
+		std::string logdir() { return _log_dir; }
  private:
 		boost::property_tree::ptree _pt;
 		std::set<std::string> _modules;
 		int _port;
 		int _rpc_port;
 		std::string _data_dir;
+		std::string _log_dir;
 		std::string _dir;
 	};
 }

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include "daemon.h"
+#include "logger.h"
 #include "module_manager.h"
 #include "config_manager.h"
 #include "crypto.h"
-#include "logger.h"
 
 using namespace an;
 
