@@ -91,6 +91,16 @@ bool ModuleManager::init()
 		LOG(INFO)<< plg->getName() << " initialized";
 		_sessions.push_back(plg);
 	}
+	
+	std::vector<plgdrv::Util*> u_drivers;
+	dynamic_cast<pugg::Server<an::plgdrv::Util>*>(PluginManager::instance().get_kernel().getServer(PLG_UTIL_SERVER_NAME))->getAllDrivers(u_drivers);
+	BOOST_FOREACH(plgdrv::Util* drv, u_drivers) {
+		plg::Util* plg = drv->createPlugin();
+		LOG(INFO)<< plg->getName() << " created";
+		plg->initialise();
+		LOG(INFO)<< plg->getName() << " initialized";
+		_utils.push_back(plg);
+	}
 	return true;
 }
 

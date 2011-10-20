@@ -1,0 +1,4 @@
+project(anarchNet)
+
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( file_logger)
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( pdb_updater)

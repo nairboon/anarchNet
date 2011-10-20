@@ -58,5 +58,6 @@ namespace an
 #define INFO an::log::INFO
 #define ERROR an::log::ERROR
 #define LOG(lvl) std::cerr << std::endl; std::cerr
+//#define LOG(lvl) an::ModuleManager::instance().log(
 }
 #endif  // SRC_DAEMON_LOGGER_H_

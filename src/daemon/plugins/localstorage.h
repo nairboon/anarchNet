@@ -51,8 +51,16 @@ public:
 	 * \param value value to store
 	 * \return true if successfuly stored
 	 */
+	struct KV_Stat {
+	  std::string key;
+	  boost::posix_time::ptime last_check;
+	  int n_successful_checks;
+	};
 	virtual bool kv_put(const std::string& key, const std::string& value) { return false; }
-	virtual bool kv_get(const std::string& key,std::string& res) { return false; }
+	virtual bool kv_get(const std::string& key, std::string& res) { return false; }
+	virtual bool kv_get_stats(const std::string& key, KV_Stat& res) { return false; }
+	virtual bool kv_get_unsuccessful(int n, KV_Stat& res) { return false; }
+	virtual bool kv_get_unchecked_since(boost::posix_time::ptime& t , KV_Stat& res) { return false; }
 	virtual bool kv_remove(const std::string& key) { return false; }
 
 	/**
