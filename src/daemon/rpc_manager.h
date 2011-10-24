@@ -41,7 +41,7 @@ namespace an {
 		_init();
 	      }
 	      RPC_Response(boost::json::Value& id) { _init(); _json["id"] = id; }
-	      boost::json::Value& string() { return _json; }
+	      boost::json::Value& json() { return _json; }
 	  };
 
 	  class RPC_Request {
@@ -61,9 +61,9 @@ namespace an {
 	      }
 	      return true;
 	    }
-
+	    boost::json::Value& json() { return _json; }
 	    RPC_Response createResponse() { return RPC_Response(_json["id"]); }
-	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"]); res.string()["errMsg"] = _error; return res; }
+	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"]); res.json()["errMsg"] = _error; return res; }
 
 	  };
 
