@@ -13,10 +13,12 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <map>
 
 #include "singleton.h"
 
@@ -28,30 +30,44 @@
 namespace an {
 
 	namespace rpc {
-	  
-	  
+
+
 	  class RPC_Response {
 	     boost::json::Value _json;
-	     
+
 	     inline void _init() { _json["jsonrpc"] = "2.0"; }
 	    public:
-	      RCP_Response() {
+	      RPC_Response() {
 		_init();
 	      }
 	      RPC_Response(boost::json::Value& id) { _init(); _json["id"] = id; }
 	      boost::json::Value& string() { return _json; }
 	  };
-	  
+
 	  class RPC_Request {
 	    boost::json::Value _json;
+	    std::string _error;
 	    public:
-	    RCP_Request() {}
+	      typedef std::map<std::string,boost::json::Value_type> Parameters;
+	    RPC_Request() {}
 	    RPC_Request(const boost::json::Value& inp) : _json(inp) { }
-	    bool valid() { return false; }
-	    RPC_Request createResponse() { return RPC_Response(_json["id"]); }
+
+	    bool valid( Parameters& param) {
+	      for(Parameters::iterator it = param.begin(); it != param.end(); it++) {
+		if( _json[(*it).first].type() != (*it).second) {
+		  _error = (*it).first + " has the wrong type";
+		  return false;
+		}
+	      }
+	      return true;
+	    }
+
+	    RPC_Response createResponse() { return RPC_Response(_json["id"]); }
+	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"]); res.string()["errMsg"] = _error; return res; }
+
 	  };
-	  
-	  
+
+
 	class Bootstrap {
 	 public:
 			/**
@@ -68,14 +84,14 @@ namespace an {
 				response["result"] = "success";
 				return true;
 			}
-			
+
 			bool BootstrapFromHostlist(const boost::json::Value& root, boost::json::Value& response)
 			{
 				std::cout << "Notification: " << root.get_str() << std::endl;
 				return true;
 			}
 		};
-	
+
 	class LocalStorage {
 	 public:
 			bool CreateObject(const boost::json::Value& root, boost::json::Value& response);
@@ -83,13 +99,13 @@ namespace an {
 			bool DeleteObject(const boost::json::Value& root, boost::json::Value& response);
 			bool UpdateObject(const boost::json::Value& root, boost::json::Value& response);
 		};
-		
+
 	class anStore {
 	 public:
 			bool kv_get(const boost::json::Value& root, boost::json::Value& response);
 			bool kv_put(const boost::json::Value& root, boost::json::Value& response);
 			bool kv_remove(const boost::json::Value& root, boost::json::Value& response);
-			
+
 			bool session_t_join(const boost::json::Value& root, boost::json::Value& response);
 			bool session_t_leave(const boost::json::Value& root, boost::json::Value& response);
 			bool session_t_update(const boost::json::Value& root, boost::json::Value& response);
@@ -115,7 +131,7 @@ class RPCManager : public Singleton<RPCManager>	{
 		//rpc::RemoteStorage _rs;
 		//rpc::Session _s;
 	};
-	
+
 	/*class anRPCService : public RPCService {
 	public:
 		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }
@@ -140,7 +156,7 @@ class RPCManager : public Singleton<RPCManager>	{
 						 CRUDResponse* response,
 						 google::protobuf::Closure* done);*
 private:
-	
+
 //	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
 //	void putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done);
 

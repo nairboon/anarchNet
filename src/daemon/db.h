@@ -67,7 +67,7 @@ namespace an {
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
 			{
-        ar & id;
+				ar & id;
 				ar & based;
 				ar & content;
 				ar & time;
