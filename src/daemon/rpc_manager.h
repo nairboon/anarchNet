@@ -28,6 +28,30 @@
 namespace an {
 
 	namespace rpc {
+	  
+	  
+	  class RPC_Response {
+	     boost::json::Value _json;
+	     
+	     inline void _init() { _json["jsonrpc"] = "2.0"; }
+	    public:
+	      RCP_Response() {
+		_init();
+	      }
+	      RPC_Response(boost::json::Value& id) { _init(); _json["id"] = id; }
+	      boost::json::Value& string() { return _json; }
+	  };
+	  
+	  class RPC_Request {
+	    boost::json::Value _json;
+	    public:
+	    RCP_Request() {}
+	    RPC_Request(const boost::json::Value& inp) : _json(inp) { }
+	    bool valid() { return false; }
+	    RPC_Request createResponse() { return RPC_Response(_json["id"]); }
+	  };
+	  
+	  
 	class Bootstrap {
 	 public:
 			/**

@@ -22,12 +22,13 @@
 #include <boost/foreach.hpp>
 #include "anarchNet.h"
 #include "logger.h"
+#include "module_manager.h"
+
 #include "plugins/bootstrap.h"
 #include "plugins/localstorage.h"
 #include "plugins/remotestorage.h"
 #include "plugins/session.h"
 #include "plugins/util.h"
-#include "module_manager.h"
 #include "plugin_manager.h"
 #include "config_manager.h"
 
@@ -150,7 +151,20 @@ bool ModuleManager::init()
 		
 		return false;
 	}
-	
+
+
+		bool ModuleManager::kv_get_stats(const std::string& key, KV_Stat& res) {
+		  
+		}
+		bool ModuleManager::kv_get_unsuccessful(int n, KV_StatsPtr& res) {
+		  
+		}
+		bool ModuleManager::kv_get_unchecked_since(boost::posix_time::time_duration t , KV_StatsPtr& res)
+		{
+		  
+		}
+
+
 	bool ModuleManager::db_store_snapshot(db::SnapshotPtr ss) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_snapshot(ss))

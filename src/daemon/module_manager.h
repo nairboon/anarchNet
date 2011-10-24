@@ -19,6 +19,7 @@
  */
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include "singleton.h"
 #include "db.h"
 
@@ -27,11 +28,21 @@
 namespace an {
 	namespace plg { 
 		class Bootstrap; 
-		class LocalStorage; 
+		class LocalStorage;
 		class RemoteStorage; 
 		class Session; 
 		class Util;
+
 	}
+	
+			
+	  struct KV_Stat {
+	    std::string key;
+	    boost::posix_time::ptime last_check;
+	    int n_successful_checks;
+	  };
+	  typedef boost::shared_ptr<std::vector<KV_Stat> > KV_StatsPtr;
+	
 class ModuleManager : public Singleton<ModuleManager> {
 		friend class Singleton<ModuleManager>;
 public:
@@ -55,6 +66,9 @@ public:
 		bool kv_put(const std::string& key, const std::string& value);
 		bool kv_get(const std::string& key,std::string& res);
 		bool kv_remove(const std::string& key);
+		bool kv_get_stats(const std::string& key, KV_Stat& res);
+		bool kv_get_unsuccessful(int n, KV_StatsPtr& res);
+		bool kv_get_unchecked_since(boost::posix_time::time_duration t , KV_StatsPtr& res);
 
 		// binary file storage
 		bool store_file(const std::string& path, std::string& res);

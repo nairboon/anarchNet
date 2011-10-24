@@ -3,6 +3,7 @@
 #include "puggKernel.h"
 #include "db.h"
 #include <boost/thread.hpp>
+#include <boost/date_time/time_duration.hpp>
 #include "pdb_updater.h"
 #include "crypto.h"
 #include "config_manager.h"
@@ -10,7 +11,7 @@
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/log/common.hpp>
-
+#include "module_manager.h"
 
 
 namespace fs = boost::filesystem;
@@ -20,41 +21,49 @@ using namespace an;
 
 #define PATH "/sqlite_store.db"
 extern "C" //__declspec(dllexport)
-void registerPlugin(Kernel &K) 
+    void registerPlugin(Kernel &K)
 {
-	Server<an::plgdrv::Util>* server = CastToServerType<an::plgdrv::Util>(K.getServer(PLG_UTIL_SERVER_NAME));
-	assert(server != NULL);
-	server->addDriver(new PDBDriver(),PLG_UTIL_SERVER_VERSION);
+    Server<an::plgdrv::Util>* server = CastToServerType<an::plgdrv::Util>(K.getServer(PLG_UTIL_SERVER_NAME));
+    assert(server != NULL);
+    server->addDriver(new PDBDriver(),PLG_UTIL_SERVER_VERSION);
 }
 
-  bool PDB::initialise() {
-	//_path = an::ConfigManager::instance().datadir() + "/filestore";
-	_run = true;
-	// create checker thread
-	// run
-	_checker = boost::shared_ptr<boost::thread>(new boost::thread(&PDB::check,this));
-	//checker.detach();
-	//sleep(2);
-	return true;
+bool PDB::initialise() {
+    //_path = an::ConfigManager::instance().datadir() + "/filestore";
+    _run = true;
+    // create checker thread
+    // run
+    _checker = boost::shared_ptr<boost::thread>(new boost::thread(&PDB::check,this));
+    //checker.detach();
+    return true;
 }
 
 void PDB::check() {
-  do {
-    
+    do {
+
+        an::KV_StatsPtr res(new std::vector<an::KV_Stat>);
+
+        an::ModuleManager::instance().kv_get_unchecked_since(boost::posix_time::minutes(15),res);
 
 
-  boost::this_thread::sleep(boost::posix_time::seconds(1));
-  } while(_run);
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
+    } while (_run);
 
 }
 void PDB::shutdown() {
-  _mutex.lock();
+    _mutex.lock();
     _run=false;
-  _mutex.unlock();
-  _checker->join();
+    _mutex.unlock();
+    _checker->join();
 }
 
 
-bool PDB::on_kv_put(const db::ObjID &key) { return false;}
-bool PDB::on_kv_remove(const db::ObjID &key) { return false;}
-bool PDB::on_db_update(const db::ObjID &key) { return false;}
+bool PDB::on_kv_put(const db::ObjID &key) {
+    return false;
+}
+bool PDB::on_kv_remove(const db::ObjID &key) {
+    return false;
+}
+bool PDB::on_db_update(const db::ObjID &key) {
+    return false;
+}

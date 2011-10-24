@@ -7,14 +7,15 @@ daemon
 	* async workers
 	* 
 
+parannus -> an interface
+
+
 
 modules
  * dc
  * loger
  * automatic updater
  * trust
-
-
 
 
 Deployment

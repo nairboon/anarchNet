@@ -21,6 +21,7 @@
 #include <string>
 #include "logger.h"
 #include "anarchNet.h"
+#include "module_manager.h"
 #include "plugin_manager.h"
 #include "plugins/bootstrap.h"
 #include "plugins/localstorage.h"
