@@ -1,12 +1,8 @@
-
-
 #include <gtest/gtest.h>
 #include <boost/json/value.hpp>
 #include "rpc_server.h"
 #include "rpc_manager.h"
-/*#include "library/client.h"
-#include "library/info.h"
-#include "daemon/version.h" */
+
 using namespace an;
 using namespace boost;
 using namespace std;
@@ -38,4 +34,6 @@ TEST(rpc,request)
 
   rules2["testtype"] = boost::json::str_type;
   ASSERT_TRUE(r.valid(rules2));
+
+  rpc::RPC_Response res = r.createResponse();
 }

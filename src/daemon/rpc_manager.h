@@ -50,46 +50,26 @@ namespace an {
 	    public:
 	      typedef std::map<std::string,boost::json::Value_type> Parameters;
 	    RPC_Request() {}
-	    RPC_Request(const boost::json::Value& inp) : _json(inp) { }
+	    RPC_Request(const boost::json::Value& inp) : _json(inp) { LOG(INFO) << inp.get_str(); }
 
-	    bool valid( Parameters& param) {
-	      for(Parameters::iterator it = param.begin(); it != param.end(); it++) {
-		if( _json[(*it).first].type() != (*it).second) {
-		  _error = (*it).first + " has the wrong type";
-		  return false;
-		}
-	      }
-	      return true;
-	    }
+	    bool valid( Parameters& param);
 	    boost::json::Value& json() { return _json; }
 	    RPC_Response createResponse() { return RPC_Response(_json["id"]); }
 	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"]); res.json()["errMsg"] = _error; return res; }
-
 	  };
 
 
-	class Bootstrap {
+	class Util {
 	 public:
 			/**
-			 * \brief Reply with success.
-			 * \param root JSON-RPC request
-			 * \param response JSON-RPC response
+			 * \brief  Use another peer to bootstrap
+			 * \param ip IP of the User
+			 * \param port port of the User
 			 * \return true if correctly processed, false otherwise
 			 */
-			bool BootstrapFromPeer(const boost::json::Value& root, boost::json::Value& response)
-			{
-				std::cout << "Receive query: " << root.get_str() << std::endl;
-				response["jsonrpc"] = "2.0";
-				response["id"] = root["id"];
-				response["result"] = "success";
-				return true;
-			}
-
-			bool BootstrapFromHostlist(const boost::json::Value& root, boost::json::Value& response)
-			{
-				std::cout << "Notification: " << root.get_str() << std::endl;
-				return true;
-			}
+			bool BootstrapFromPeer(const boost::json::Value& root, boost::json::Value& response);
+			bool BootstrapFromHostlist(const boost::json::Value& root, boost::json::Value& response);
+			bool RuntimeInfo(const boost::json::Value& root, boost::json::Value& response);
 		};
 
 	class LocalStorage {
@@ -125,43 +105,11 @@ class RPCManager : public Singleton<RPCManager>	{
 		an::RpcServer *_server;
 		boost::asio::io_service _io_service;
 		bool _running;
-		rpc::Bootstrap _bs;
+		rpc::Util _bs;
 		rpc::anStore _ans;
 		rpc::LocalStorage _ls;
 		//rpc::RemoteStorage _rs;
 		//rpc::Session _s;
 	};
-
-	/*class anRPCService : public RPCService {
-	public:
-		explicit anRPCService() { cryobj_.set_hash_algorithm(crypto::SHA_512); }
-		void getInfo(awk::protobuf::RpcController* controller,
-								 const Void* request,
-								 InfoResponse* response,
-								 google::protobuf::Closure* done);
-/		void get(awk::protobuf::RpcController* controller,
-								 const GetRequest* request,
-								 GetResponse* response,
-								 google::protobuf::Closure* done);
-		void put(awk::protobuf::RpcController* controller,
-						 const PutRequest* request,
-						 PutResponse* response,
-						 google::protobuf::Closure* done);
-		void storeObject(awk::protobuf::RpcController* controller,
-						 const StoreObjectRequest* request,
-						 CRUDResponse* response,
-						 google::protobuf::Closure* done);
-		void deleteObject(awk::protobuf::RpcController* controller,
-						 const DeleteObjectRequest* request,
-						 CRUDResponse* response,
-						 google::protobuf::Closure* done);*
-private:
-
-//	void getCallback(const std::string &result, GetResponse* response,google::protobuf::Closure* done);
-//	void putCallback(const std::string &result, PutResponse* response,google::protobuf::Closure* done);
-
-	crypto::Crypto cryobj_;
-
-};*/
 }
 #endif  // SRC_DAEMON_RPC_MANAGER_H_
