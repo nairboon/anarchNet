@@ -4,6 +4,7 @@ module.exports = {
 	,sessionsecret: 'your secret here'
 	,port: 3000
 	,anarchnet_port: 23666
+	,anarchnet_url: 'localhost'
 	,filestore: './filestore'
 	,ssl_key: './ssl/privatekey.pem'
 	,ssl_cert: './ssl/certificate.pem'

@@ -1,3 +1,5 @@
+async interface
+
 
 
 
@@ -8,23 +10,23 @@ use bcrypt
 	get - get the document or the data
 		apply patches
 		cache??
-		
+
 	store - adds a new document
 	update
 		check owner
 		check mergeconflict
 		apply patch
-		
+
 	data:
 		mainbranch id
 		list of branches
-		
 
-		
+
+
 		branch
 			list of snapshots
 			list of diffs
-			
+
 add a new document
 	d(
 		owner: me
@@ -34,15 +36,15 @@ add a new document
 				none
 			)
 			diffs (
-					myfirstedit ( 
+					myfirstedit (
 						prev: none
 						date:1.11.
 						data: "LLLADS")
 				)
 		)
-	
+
 	)
-	
+
 edit document
 diff + ( new edit())
 	merge error:
@@ -51,9 +53,8 @@ diff + ( new edit())
 owner checking:
 	single owner: username
 	group owner: link to groupaccess list
-	
-	
+
+
 vote process
 flagvoteprotected?
 	create new document vote, entries
-	

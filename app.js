@@ -1,7 +1,7 @@
 /**
  * Parannus
  * http://rbose.org/wiki/Parannus
- * Copyright 2011 nairboon - Licensed under: GNU Public License 3 or later 
+ * Copyright 2011 nairboon - Licensed under: GNU Public License 3 or later
  */
 
 var express = require('express'),
@@ -18,25 +18,26 @@ var express = require('express'),
 	apploader = require('./lib/apploader.js'),
 	sharejs = require('share').server,
 	config = require('./config.js');
-	
+
 var db_handle = mongoose.connect(config.dburl).db;
 
-var options = {
+
+if(config.use_ssl) {
+  var options = {
   key: fs.readFileSync(config.ssl_key),
   cert: fs.readFileSync(config.ssl_cert)
 };
-
-if(config.use_ssl)
 	var app = module.exports = express.createServer(options);
+}
 else
 	var app = module.exports = express.createServer();
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
+  app.use(express.errorHandler());
 });
 
 app.configure(function(){
@@ -52,7 +53,7 @@ app.configure(function(){
 });
 
 
-app.get('/', function(req, res){  
+app.get('/', function(req, res){
   res.render('index', {
     title: 'Parannus',
     session: req.session
@@ -62,10 +63,10 @@ app.get('/', function(req, res){
 app.get('/app/:id/js/:package.js',apploader.loadCode);
 
 app.get('/app/*', function(req, res,next){
-	if(req.params[0].search("index.html") > 0) 
+	if(req.params[0].search("index.html") > 0)
 		next();
 	else	// resource request
-		apploader.loadResource(req,res); 
+		apploader.loadResource(req,res);
 });
 
 app.get('/app/:id/index.html', apploader.loadApp);
@@ -105,7 +106,7 @@ app.namespace('/edit',function(){
 	app.get(':id/del', editor.destroy);
 });
 
-app.namespace('/auth', function() {	
+app.namespace('/auth', function() {
 	app.get('login',auth.login);
 	app.get('register',auth.register);
 	app.post('register',auth.register_form,auth.register_post);
@@ -114,7 +115,7 @@ app.namespace('/auth', function() {
 });
 
 if (!module.parent) {
-  	Settings  = mongoose.model('settings');	
+  	Settings  = mongoose.model('settings');
 	Settings.findOne({key:"masterlist"},function(err,res){
 		if(err || !res)
 			throw new Error("No masterlist, run setup.js!");
