@@ -35,12 +35,16 @@ namespace an {
 	  class RPC_Response {
 	     boost::json::Value _json;
 
-	     inline void _init() { _json["jsonrpc"] = "2.0"; }
+	     inline void _init() {
+	       boost::json::Object obj;
+	       obj.push_back(boost::json::Pair("jsonrpc","2.0"));
+	       _json = obj;
+	     }
 	    public:
 	      RPC_Response() {
 		_init();
 	      }
-	      RPC_Response(boost::json::Value& id) { _init(); _json["id"] = id; }
+	      RPC_Response(const std::string& id) { _init(); boost::json::Config::add(_json.get_obj(),"id",id); }
 	      boost::json::Value& json() { return _json; }
 	  };
 
@@ -50,12 +54,12 @@ namespace an {
 	    public:
 	      typedef std::map<std::string,boost::json::Value_type> Parameters;
 	    RPC_Request() {}
-	    RPC_Request(const boost::json::Value& inp) : _json(inp) { LOG(INFO) << inp.get_str(); }
+	    RPC_Request(const boost::json::Value& inp) : _json(inp) { LOG(INFO) << boost::json::write(inp); }
 
 	    bool valid( Parameters& param);
 	    boost::json::Value& json() { return _json; }
-	    RPC_Response createResponse() { return RPC_Response(_json["id"]); }
-	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"]); res.json()["errMsg"] = _error; return res; }
+	    RPC_Response createResponse() { return RPC_Response(_json["id"].get_str()); }
+	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"].get_str()); res.json()["errMsg"] = _error; return res; }
 	  };
 
 

@@ -39,6 +39,11 @@ bool	RPCManager::init() {
   _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Util>(_bs,
 										&rpc::Util::BootstrapFromHostlist, std::string("an.BootstrapFromHostlist")));
 
+	/*
+	  @param: data content of the object
+	  @param: owner id of the creator
+	  @return: id the object id
+	*/
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls,
 										&rpc::LocalStorage::CreateObject, std::string("object.create")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls,
@@ -161,7 +166,21 @@ namespace rpc {
 
 
 
-      	    bool RPC_Request::valid( Parameters& param) {
+      bool RPC_Request::valid( Parameters& param) {
+      	    //valid rpc
+	    if(_json["jsonrpc"].is_null() || _json["jsonrpc"].type() != boost::json::str_type || _json["jsonrpc"].get_str() != "2.0") {
+	      _error = "jsonrpc != 2.0";
+	      LOG(INFO) << "rpcrequest: " << _error;
+	      return false;
+	    }
+
+	    if(_json["id"].is_null() || _json["id"].type() != boost::json::str_type || _json["id"].get_str() == "") {
+	      _error = "no id";
+	      LOG(INFO) << "rpcrequest: " << _error;
+	      return false;
+	    }
+
+	    // valid req
 	      for(Parameters::iterator it = param.begin(); it != param.end(); it++) {
 		if( _json[(*it).first].type() != (*it).second) {
 		  _error = (*it).first + " has the wrong type";
@@ -169,6 +188,6 @@ namespace rpc {
 		}
 	      }
 	      return true;
-	    }
+      }
 }
 }

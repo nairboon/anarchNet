@@ -91,7 +91,7 @@ namespace Json
       {
         methods[(*it)->GetName()] = (*it)->GetDescription();
       }
-      
+
       response["result"] = methods;
       return true;
     }
@@ -104,13 +104,13 @@ namespace Json
     bool Handler::Check(const boost::json::Value& root, boost::json::Value& error)
     {
       boost::json::Object err;
-      
+
       /* check the JSON-RPC version => 2.0 */
-      if(root.is_null() || !root.contains("jsonrpc") || root["jsonrpc"].get_str() != "2.0") 
+      if(root.is_null() || !root.contains("jsonrpc") || root["jsonrpc"].get_str() != "2.0")
       {
         error["id"] = "0";
         error["jsonrpc"] = "2.0";
-        
+
         err.push_back(boost::json::Pair("code",INVALID_REQUEST));
        // err["message"] = "Invalid JSON-RPC request.";
       //  error["error"] = err;
@@ -158,9 +158,9 @@ namespace Json
         return false;
       }
 			LOG(INFO) << "check passed";
-			
+
       method = root["method"].get_str();
-      
+
       if(method != "")
       {
         CallbackMethod* rpc = Lookup(method);
@@ -189,6 +189,7 @@ namespace Json
       boost::json::Value error;
       bool parsing = false;
 
+      LOG(INFO) << "parsing msg";
       /* parsing */
       parsing = boost::json::read(msg, root);
 
@@ -197,13 +198,13 @@ namespace Json
         /* request or batched call is not in JSON format */
         response["id"] = NULL;
         response["jsonrpc"] = "2.0";
-        
+
         error["code"] = PARSING_ERROR;
         error["message"] = "Parse error.";
-        response["error"] = error; 
+        response["error"] = error;
         return false;
       }
-      
+
       if(root.type()==boost::json::array_type)
       {
         /* batched call */
@@ -214,7 +215,7 @@ namespace Json
         {
           boost::json::Value ret;
           Process(arr[i], ret);
-          
+
           if(!ret.is_null())
           {
             /* it is not a notification, add to array of responses */
