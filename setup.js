@@ -6,12 +6,18 @@
 var mongoose = require('mongoose'),
 	common = require('./models/common.js'),
 	config = require('./config.js'),
-	setup = require("./lib/setup.js");	
+	setup = require("./lib/setup.js");
 
-	
+
 mongoose.connect(config.dburl);
-Settings  = mongoose.model('settings');	 
+Settings  = mongoose.model('settings');
 
+
+var an = require("./lib/an.js");
+an.call("an.info","",function(err,data) {
+  console.log(err,data.uptime);
+});
+/*
 	setup.UserCreation(function(err,user){
 		if(err)
 			throw new Error(err);
@@ -27,15 +33,15 @@ Settings  = mongoose.model('settings');
 					s.save(function(err){
 						if(err)
 							throw new Error("could not save settings");
-							
+
 							setup.createDefaultRepo(mlid,function(err,res){
 								if(err)
 									throw new Error("could not create a repo");
 
-								mongoose.disconnect();	
+								mongoose.disconnect();
 							});
 					});
-							
+
 				}
 				else { // update mlid
 					console.log("update settings");
@@ -43,17 +49,18 @@ Settings  = mongoose.model('settings');
 					res.save(function(err){
 							if(err)
 								throw new Error("could not save settings");
-								
-								
+
+
 								setup.createDefaultRepo(mlid,function(err,res){
 									if(err)
 										throw new Error("could not create a repo");
 									console.log("repo created");
 									mongoose.disconnect();
-								});	
+								});
 					});
 				}
 			});
 		});
 	});
 
+*/
