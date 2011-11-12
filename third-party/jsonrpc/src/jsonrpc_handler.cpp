@@ -148,27 +148,29 @@ namespace Json
 
     bool Handler::Process(const boost::json::Value& root, boost::json::Value& response)
     {
-			LOG(INFO) << "process json: " << root["id"].type();
+			LOG(INFO) << "process json: " << root["id"].get_int();
       boost::json::Value error;
       std::string method;
 
       if(!Check(root, error))
       {
         response = error;
+	LOG(INFO) << "check failed: " << error.get_str();
         return false;
       }
 			LOG(INFO) << "check passed";
 
       method = root["method"].get_str();
-
       if(method != "")
       {
         CallbackMethod* rpc = Lookup(method);
         if(rpc)
         {
+	  LOG(INFO) << "call: " << method;
           return rpc->Call(root, response);
         }
       }
+      LOG(INFO) << "method not found: " << method;
 			boost::json::Object res;
 			boost::json::Object err;
 

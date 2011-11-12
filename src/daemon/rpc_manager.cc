@@ -102,11 +102,15 @@ namespace rpc {
 
 	bool Util::RuntimeInfo(const boost::json::Value& root, boost::json::Value& response)
 	{
-	std::cout << "Notification: " << root.get_str() << std::endl;
-			response["jsonrpc"] = "2.0";
+	LOG(INFO) << "runtime info";
+	RPC_Response res = RPC_Request(root).createResponse();
+	boost::json::Config::add(res.data(),"uptime","1");
+	response = res.json();
+		/*	response["jsonrpc"] = "2.0";
 		response["id"] = root["id"];
 		response["result"] = "success";
-		response["status"] = "running";
+		response["status"] = "running";*/
+	LOG(INFO) << "sent:" << boost::json::write(response);
 		return true;
 	}
 
@@ -174,7 +178,7 @@ namespace rpc {
 	      return false;
 	    }
 
-	    if(_json["id"].is_null() || _json["id"].type() != boost::json::str_type || _json["id"].get_str() == "") {
+	    if(_json["id"].is_null() || _json["id"].type() != boost::json::int_type || _json["id"].get_int() == 0) {
 	      _error = "no id";
 	      LOG(INFO) << "rpcrequest: " << _error;
 	      return false;

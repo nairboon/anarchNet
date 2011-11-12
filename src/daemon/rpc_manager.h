@@ -26,6 +26,7 @@
 #define SRC_DAEMON_RPC_MANAGER_H_
 
 #define identify LOG(INFO) << __FUNCTION__ << " request"
+#include <boost/json/value.hpp>
 
 namespace an {
 
@@ -36,16 +37,20 @@ namespace an {
 	     boost::json::Value _json;
 
 	     inline void _init() {
-	       boost::json::Object obj;
+	       boost::json::Object obj,err,data;
 	       obj.push_back(boost::json::Pair("jsonrpc","2.0"));
+	       obj.push_back(boost::json::Pair("data",data));
+	       obj.push_back(boost::json::Pair("err",""));
+
 	       _json = obj;
 	     }
 	    public:
 	      RPC_Response() {
 		_init();
 	      }
-	      RPC_Response(const std::string& id) { _init(); boost::json::Config::add(_json.get_obj(),"id",id); }
+	      RPC_Response(int id) { _init(); boost::json::Config::add(_json.get_obj(),"id",id); }
 	      boost::json::Value& json() { return _json; }
+	      boost::json::Object& data() { return _json["data"].get_obj(); }
 	  };
 
 	  class RPC_Request {
@@ -58,8 +63,8 @@ namespace an {
 
 	    bool valid( Parameters& param);
 	    boost::json::Value& json() { return _json; }
-	    RPC_Response createResponse() { return RPC_Response(_json["id"].get_str()); }
-	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"].get_str()); res.json()["errMsg"] = _error; return res; }
+	    RPC_Response createResponse() { return RPC_Response(_json["id"].get_int()); }
+	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"].get_int()); res.json()["err"] = _error; return res; }
 	  };
 
 
