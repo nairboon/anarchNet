@@ -123,7 +123,8 @@ namespace rpc {
 		}
 
 		db::ObjPtr obj(new db::Object());
-		if(!DBManager::instance().create_object(req.params()["content"].get_str(),obj)) {
+		obj->create(req.params()["content"].get_str());
+		if(!DBManager::instance().create_object(obj)) {
 			LOG(INF) << "could not store";
 
 		 response = req.createErrorResponse().json()["err"] = "create_object failed";

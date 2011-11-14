@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,24 +40,26 @@ namespace an
 			return true;
 		}
 		bool needs_ObjID::create_content_id() {
-			id = ObjID(crypto::toHex(crypto::Hash(content)));		
+			id = ObjID(crypto::toHex(crypto::Hash(content)));
 			return true;
 		}
 
 		bool Object::create(std::string inp)
 		{
-			snapshots.push_back(SnapshotPtr(new Snapshot("",inp)));
-			return DBManager::instance().create_object(inp,shared_from_this());
+			SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
+			snapshots.push_back(ss);
+			id = ObjID(crypto::toHex(crypto::Hash("OBJECT"+ss->id)));
+			return DBManager::instance().create_object(shared_from_this());
 		}
 
 		bool Object::save() {
 			return DBManager::instance().save_object(id,shared_from_this());
 		}
-		
+
 		bool Object::remove() {
 			return DBManager::instance().delete_entry(id);
 		}
-		
+
 		bool Object::load(const ObjID& id)
 		{
 			return DBManager::instance().get_object(id,shared_from_this());

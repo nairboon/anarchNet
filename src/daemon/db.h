@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ namespace an {
 				bool create_random_id();
 				bool create_content_id();
 				needs_ObjID() : _db_id(0), _db_type("") {}
-				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c), 
+				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c),
 					time(boost::posix_time::second_clock::local_time()) {
 					create_content_id();
 				}
@@ -63,7 +63,7 @@ namespace an {
 			ObjID based;
 			Snapshot() {}
 			Snapshot(const ObjID& b, const std::string& c) : needs_ObjID(c), based(b) {}
-			
+
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
 			{
@@ -74,7 +74,7 @@ namespace an {
 			}
 		};
 		typedef boost::shared_ptr<Snapshot> SnapshotPtr;
-		
+
 		class Object : public boost::enable_shared_from_this<Object> {
 		 public:
 			ObjID id;

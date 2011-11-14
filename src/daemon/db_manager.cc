@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,33 +34,33 @@ namespace an
 {
 	bool DBManager::init(const string& db_path)
 	{
-		
+
 		return true;
 	}
-	
-	
-	bool DBManager::create_object(const std::string& content, db::ObjPtr obj)
-	{		
+
+
+	bool DBManager::create_object(db::ObjPtr obj)
+	{
 		if(ModuleManager::instance().db_store_obj(obj))
 			return true;
-	
+
 		return false;
 	}
 	bool DBManager::save_object(const db::ObjID& id,db::ObjPtr obj)
 	{
 	  return false;
 	}
-	bool DBManager::save_object(const db::ObjID& id,const std::string& diff) 
+	bool DBManager::save_object(const db::ObjID& id,const std::string& diff)
 	{
 		db::ObjPtr obj;
 		if(!ModuleManager::instance().db_get_obj(id,obj))
 			return false;
-		
+
 		db::DiffPtr ddiff(new db::Diff(obj->snapshots[0]->id,diff));
 
 		if(!ModuleManager::instance().db_store_diff(ddiff))
 			return false;
-		
+
 		//obj->diffs.push_back(
 		return false;
 	}
@@ -68,16 +68,16 @@ namespace an
 	{
 		if(ModuleManager::instance().db_remove(id))
 			return true;
-		
+
 		return false;
 	}
 	bool DBManager::get_object(const db::ObjID& id,db::ObjPtr obj)
 	{
 		if(ModuleManager::instance().db_get_obj(id,obj))
 			return true;
-		
+
 		return false;
 	}
-	
+
 
 }
