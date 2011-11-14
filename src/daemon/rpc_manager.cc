@@ -20,10 +20,12 @@
 
 #include <iostream>
 #include <boost/asio.hpp>
+#include "db_manager.h"
 #include "version.h"
 #include "rpc_server.h"
 #include "rpc_manager.h"
 #include "config_manager.h"
+#include "db.h"
 #include "logger.h"
 
 namespace an
@@ -106,17 +108,35 @@ namespace rpc {
 	RPC_Response res = RPC_Request(root).createResponse();
 	boost::json::Config::add(res.data(),"uptime","1");
 	response = res.json();
-		/*	response["jsonrpc"] = "2.0";
-		response["id"] = root["id"];
-		response["result"] = "success";
-		response["status"] = "running";*/
-	LOG(INFO) << "sent:" << boost::json::write(response);
-		return true;
+	return true;
 	}
 
 	bool LocalStorage::CreateObject(const boost::json::Value& root, boost::json::Value& response)
 	{
-		return false;
+	  	RPC_Request req(root);
+		rpc::RPC_Request::Parameters rules;
+		rules["content"] = boost::json::str_type;
+		if(!req.valid(rules)) {
+		  LOG(INF) << "invalid request";
+		 response = req.createErrorResponse().json();
+		  return false;
+		}
+
+		db::ObjPtr obj(new db::Object());
+		if(!DBManager::instance().create_object(req.params()["content"].get_str(),obj)) {
+			LOG(INF) << "could not store";
+
+		 response = req.createErrorResponse().json()["err"] = "create_object failed";
+		 return false;
+		}
+
+
+
+		RPC_Response res = req.createResponse();
+		LOG(INFO) << "stored under: " << obj->id;
+		boost::json::Config::add(res.data(),"id",obj->id);
+		response = res.json();
+		return true;
 	}
 
 	bool LocalStorage::GetObject(const boost::json::Value& root, boost::json::Value& response)
@@ -184,9 +204,11 @@ namespace rpc {
 	      return false;
 	    }
 
+	    boost::json::Value params = _json["params"];
 	    // valid req
 	      for(Parameters::iterator it = param.begin(); it != param.end(); it++) {
-		if( _json[(*it).first].type() != (*it).second) {
+		if( params[(*it).first].type() != (*it).second) {
+		  LOG(INFO) << params[(*it).first].type() << " != " << (*it).second;
 		  _error = (*it).first + " has the wrong type";
 		  return false;
 		}

@@ -1,5 +1,5 @@
 #
-# anarchNet 
+# anarchNet
 #
 
 project(anarchNet)
@@ -32,6 +32,7 @@ endif()
 
 find_package(GTest)
 find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
+find_library(SQLITE NAMES sqlite3 REQUIRED PATH)
 find_library(LSQL NAMES litesql REQUIRED PATH)
 find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
@@ -45,10 +46,10 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_NO_SYSTEM_PATHS TRUE)
 find_package(Boost 1.47 COMPONENTS system program_options thread filesystem date_time serialization REQUIRED)
 
-include_directories( 
+include_directories(
 	"${SOURCE_DIR}/daemon"
 	"${SOURCE_DIR}/library"
-	${Boost_INCLUDE_DIRS} 
+	${Boost_INCLUDE_DIRS}
 	${GTEST_INCLUDE_DIRS}
 	"${SOURCE_DIR}/rpc"
 	"${CMAKE_SOURCE_DIR}/third-party/"
@@ -64,6 +65,7 @@ set( LIB
 	${Boost_LIBRARIES}
 	${CRYPTOPP}
 	${BOOST_LOG}
+	${SQLITE}
 	)
 set( TEST_LIB
 	${GCOV}
@@ -145,7 +147,7 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/plugins/plugin.h"
 		"${SOURCE_DIR}/daemon/plugins/session.h"
 		"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
-		
+
 )
 
 add_library(anDaemonInternal STATIC ${DAEMON_SRC})
