@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <boost/asio.hpp>
+#include <boost/foreach.hpp>
 #include "db_manager.h"
 #include "version.h"
 #include "rpc_server.h"
@@ -117,7 +118,7 @@ namespace rpc {
 		rpc::RPC_Request::Parameters rules;
 		rules["content"] = boost::json::str_type;
 		if(!req.valid(rules)) {
-		  LOG(INF) << "invalid request";
+		  LOG(INFO) << "invalid request";
 		 response = req.createErrorResponse().json();
 		  return false;
 		}
@@ -127,11 +128,9 @@ namespace rpc {
 		if(!DBManager::instance().create_object(obj)) {
 			LOG(INF) << "could not store";
 
-		 response = req.createErrorResponse().json()["err"] = "create_object failed";
+		 response = req.createErrorResponse().json()["err"] = "create object failed";
 		 return false;
 		}
-
-
 
 		RPC_Response res = req.createResponse();
 		LOG(INFO) << "stored under: " << obj->id;
@@ -142,7 +141,61 @@ namespace rpc {
 
 	bool LocalStorage::GetObject(const boost::json::Value& root, boost::json::Value& response)
 	{
-		return false;
+	  	RPC_Request req(root);
+		rpc::RPC_Request::Parameters rules;
+		rules["id"] = boost::json::str_type;
+		if(!req.valid(rules)) {
+		  LOG(INFO) << "invalid request";
+		 response = req.createErrorResponse().json();
+		  return false;
+		}
+		RPC_Response res = req.createResponse();
+
+		db::ObjPtr obj(new db::Object());
+		db::ObjID id = req.params()["id"].get_str();
+		if(!DBManager::instance().get_object(id,obj)) {
+			LOG(INF) << "could not get obj: "<< id;
+		 response = req.createErrorResponse().json()["err"] = "get object failed";
+		 return false;
+		}
+
+		bool full = false;
+		if(req.params().contains("full")) {
+		  full = req.params()["full"].get_bool();
+		}
+
+		if(full) {
+		RPC_Response res = req.createResponse();
+		LOG(INFO) << "got object: " << obj->id;
+		boost::json::Array diffs,snapshots;
+		/*BOOST_FOREACH (db::SnapshotPtr ss, obj->snapshots) {
+		  diffs.push_back(ss->c);
+		  //boost::json::Config::add(snapshots,
+			boost::shared_ptr<db::Snapshot> s = _db_store_snapshot(ss);
+			dobj.snapshots().link(*s);
+		}
+		BOOST_FOREACH (an::db::DiffPtr ss, obj->diffs) {
+			boost::shared_ptr<db::Snapshot> s = _db_store_snapshot(ss);
+			dobj.snapshots().link(*s);
+
+		}*/
+				boost::json::Config::add(res.data(),"content",obj->id);
+
+		response = res.json();
+
+		}
+		else {
+		  std::string content;
+		  if(!DBManager::instance().get_lastRevision(obj,content))
+		  {
+		    LOG(INFO) << "get_lastRevision failed: " << content;
+		    response = req.createErrorResponse().json()["err"] = "get last revision failed";
+		    return false;
+		  }
+		  boost::json::Config::add(res.data(),"content",content);
+		}
+		response = res.json();
+		return true;
 	}
 
 	bool LocalStorage::DeleteObject(const boost::json::Value& root, boost::json::Value& response)

@@ -21,6 +21,7 @@
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/foreach.hpp>
 #include "logger.h"
 #include "anarchNet.h"
 #include "db_manager.h"
@@ -61,8 +62,12 @@ namespace an
 		if(!ModuleManager::instance().db_store_diff(ddiff))
 			return false;
 
-		//obj->diffs.push_back(
-		return false;
+		obj->diffs.push_back(ddiff);
+
+		if(!ModuleManager::instance().db_store_obj(obj))
+			return false;
+
+		return true;
 	}
 	bool DBManager::delete_entry(const db::ObjID& id)
 	{
@@ -77,6 +82,20 @@ namespace an
 			return true;
 
 		return false;
+	}
+	bool DBManager::get_lastRevision(const db::ObjPtr obj,std::string& lastRev)
+	{
+	  db::SnapshotPtr ss = obj->snapshots.back();
+	  std::string res = ss->content;
+	  diff_match_patch<std::string> dmp;
+
+	  BOOST_FOREACH (an::db::DiffPtr diff, ss->diffs) {
+	      std::pair<std::string, std::vector<bool> > out =
+	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
+	      res = out.first;
+	  }
+	  lastRev = res;
+	  return false;
 	}
 
 

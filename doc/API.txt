@@ -1,3 +1,17 @@
+JSON-RPC INTERFACE
+
+object.create
+      params: 	content:(str) data to store
+      returns:	id:(str) id of the new object
+
+object.get
+      params:	id:(str) id of the object
+		full:(bool)(optional) true to get the full history with all snapshots and diffs
+      return:	full=false: content(str): actual revision
+		full=true: snapshot(array): 
+			   diffs(array):
+
+
 Anarchnet provides the following interfaces:
 
 low level:
