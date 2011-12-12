@@ -208,11 +208,11 @@ void ObjID::defaults() {
     id = 0;
 }
 ObjID::ObjID(const litesql::Database& db)
-     : litesql::Persistent(db), id(Id), type(Type), anID(AnID) {
+     : Persistent(db), id(Id), type(Type), anID(AnID) {
     defaults();
 }
 ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
-     : litesql::Persistent(db, rec), id(Id), type(Type), anID(AnID) {
+     : Persistent(db, rec), id(Id), type(Type), anID(AnID) {
     defaults();
     size_t size = (rec.size() > 3) ? 3 : rec.size();
     switch(size) {
@@ -225,7 +225,7 @@ ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 ObjID::ObjID(const ObjID& obj)
-     : litesql::Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
+     : Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
 }
 const ObjID& ObjID::operator=(const ObjID& obj) {
     if (this != &obj) {
@@ -289,7 +289,7 @@ void ObjID::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect()) 
+        if (!typeIsCorrect())
             upcastCopy()->addIDUpdates(updates);
     }
     litesql::Persistent::update(updates);
@@ -445,7 +445,7 @@ void Object::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect()) 
+        if (!typeIsCorrect())
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -604,7 +604,7 @@ void Snapshot::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect()) 
+        if (!typeIsCorrect())
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -770,7 +770,7 @@ void Diff::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect()) 
+        if (!typeIsCorrect())
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -829,11 +829,11 @@ void HT::defaults() {
     time = 0;
 }
 HT::HT(const litesql::Database& db)
-     : litesql::Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
 }
 HT::HT(const litesql::Database& db, const litesql::Record& rec)
-     : litesql::Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
     size_t size = (rec.size() > 5) ? 5 : rec.size();
     switch(size) {
@@ -850,7 +850,7 @@ HT::HT(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 HT::HT(const HT& obj)
-     : litesql::Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
+     : Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
 }
 const HT& HT::operator=(const HT& obj) {
     if (this != &obj) {
@@ -925,7 +925,7 @@ void HT::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect()) 
+        if (!typeIsCorrect())
             upcastCopy()->addIDUpdates(updates);
     }
     litesql::Persistent::update(updates);

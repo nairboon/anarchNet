@@ -90,9 +90,9 @@ namespace an
 	  diff_match_patch<std::string> dmp;
 
 	  BOOST_FOREACH (an::db::DiffPtr diff, ss->diffs) {
-	      std::pair<std::string, std::vector<bool> > out =
-	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
-	      res = out.first;
+	   //   std::pair<std::string, std::vector<bool> > out =
+//	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
+//	      res = out.first;
 	  }
 	  lastRev = res;
 	  return false;

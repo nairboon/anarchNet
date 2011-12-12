@@ -2,6 +2,26 @@
 #define sqldb_hpp
 #include "litesql.hpp"
 namespace db {
+
+  class Persistent : public litesql::Persistent {
+    public:
+       Persistent(const litesql::Persistent & p)
+        : litesql::Persistent(p) {}
+    Persistent(const litesql::Database & _db, const litesql::Record & row)
+        : litesql::Persistent(_db,row) {
+    }
+    /** creates empty Persistent */
+    Persistent(const litesql::Database & _db)
+    : litesql::Persistent(_db) {
+    }
+      void set_inDatabase(bool i) {
+	inDatabase = i;
+    }
+      void set_id(int k) {
+      oldKey = k;
+    }
+  };
+
 class ObjID;
 class Object;
 class Snapshot;
@@ -83,7 +103,7 @@ public:
 ;
 ;
 };
-class ObjID : public litesql::Persistent {
+class ObjID : public Persistent {
 public:
     class Own {
     public:
@@ -271,7 +291,7 @@ public:
     std::auto_ptr<Diff> upcastCopy();
 };
 std::ostream & operator<<(std::ostream& os, Diff o);
-class HT : public litesql::Persistent {
+class HT : public Persistent {
 public:
     class Own {
     public:
