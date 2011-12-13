@@ -6,6 +6,7 @@
 var mongoose = require('mongoose'),
 	common = require('./models/common.js'),
 	config = require('./config.js'),
+	db = require('./lib/db.js'),
 	setup = require("./lib/setup.js");
 
 
@@ -14,9 +15,16 @@ Settings  = mongoose.model('settings');
 
 
 var an = require("./lib/an.js");
-an.call("an.info","",function(err,data) {
-  console.log(err,data.uptime);
+
+
+db.store("lamekey","mycontnet",function(err,data){
+  console.log("calling get for:",data.id);
+  db.get(data.id, function(err,data) {
+    console.log("got:",data);
+  });
+
 });
+
 /*
 	setup.UserCreation(function(err,user){
 		if(err)

@@ -46,7 +46,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: config.sessionsecret, store: new MongoStore({handle: db_handle})}));
+  app.use(express.session({ secret: config.sessionsecret }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
