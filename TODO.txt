@@ -5,11 +5,12 @@ daemon
  * moduleMgr
 	* loads Modules
 	* async workers
-	* 
+	*
 
 parannus -> an interface
 
-
+adaptive module chooser: stats about success rate and execution speed
+query types: abort on first result, timeout, forever search
 
 modules
  * dc

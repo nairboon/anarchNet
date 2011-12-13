@@ -189,7 +189,9 @@ namespace rpc {
 		  if(!DBManager::instance().get_lastRevision(obj,content))
 		  {
 		    LOG(INFO) << "get_lastRevision failed: " << content;
-		    response = req.createErrorResponse().json()["err"] = "get last revision failed";
+		    res = req.createErrorResponse();
+		    res.json()["err"] = "get last revision failed";
+		    response = res.json();
 		    return false;
 		  }
 		  boost::json::Config::add(res.data(),"content",content);
