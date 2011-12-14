@@ -22,6 +22,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/foreach.hpp>
+#include "config.h"
 #include "logger.h"
 #include "anarchNet.h"
 #include "db_manager.h"
@@ -51,7 +52,7 @@ namespace an
 	{
 	  return false;
 	}
-	bool DBManager::save_object(const db::ObjID& id,const std::string& diff)
+	bool DBManager::save_object(const db::ObjID& id,const String& diff)
 	{
 		db::ObjPtr obj;
 		if(!ModuleManager::instance().db_get_obj(id,obj))
@@ -83,19 +84,19 @@ namespace an
 
 		return false;
 	}
-	bool DBManager::get_lastRevision(const db::ObjPtr obj,std::string& lastRev)
+	bool DBManager::get_lastRevision(const db::ObjPtr obj,String& lastRev)
 	{
 	  db::SnapshotPtr ss = obj->snapshots.back();
-	  std::string res = ss->content;
-	  diff_match_patch<std::string> dmp;
+	  String res = ss->content;
+	  diff_match_patch<String> dmp;
 
 	  BOOST_FOREACH (an::db::DiffPtr diff, ss->diffs) {
-	   //   std::pair<std::string, std::vector<bool> > out =
-//	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
-//	      res = out.first;
+	      std::pair<String, std::vector<bool> > out =
+	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
+	      res = out.first;
 	  }
 	  lastRev = res;
-	  return false;
+	  return true;
 	}
 
 

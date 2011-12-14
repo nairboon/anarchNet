@@ -32,10 +32,10 @@ public:
 
 		bool create_object(db::ObjPtr obj);
 		bool save_object(const db::ObjID& id,db::ObjPtr obj);
-		bool save_object(const db::ObjID& id,const std::string& diff);
+		bool save_object(const db::ObjID& id,const String& diff);
 		bool delete_entry(const db::ObjID& id);
 		bool get_object(const db::ObjID& id,db::ObjPtr obj);
-		bool get_lastRevision(const db::ObjPtr obj,std::string& lastRev);
+		bool get_lastRevision(const db::ObjPtr obj,String& lastRev);
 
 		std::vector<std::string> get_unchecked_keys_since(int);
 private:

@@ -44,7 +44,7 @@ namespace an
 			return true;
 		}
 
-		bool Object::create(std::string inp)
+		bool Object::create(String inp)
 		{
 			SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
 			snapshots.push_back(ss);

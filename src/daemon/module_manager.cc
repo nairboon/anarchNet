@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,16 +43,16 @@ bool ModuleManager::init()
 	#ifdef ANARCHNET_PLATFORM_LINUX
 	  std::string plugin_suffix = ".so";
 	#endif
-	
+
 	bool failed = false;
 	BOOST_FOREACH(std::string plugin_name, ConfigManager::instance().modules()) {
 		if(!PluginManager::instance().loadPlugin(plugin_name,"./"+plugin_name+plugin_suffix,plugin_name))
 			failed = true;
 	}
-	
+
 	if(failed)
 	  return false;
-	
+
 	std::vector<plgdrv::Bootstrap*> bs_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Bootstrap>*>(PluginManager::instance().get_kernel().getServer(PLG_BOOTSTRAP_SERVER_NAME))->getAllDrivers(bs_drivers);
 	BOOST_FOREACH(plgdrv::Bootstrap* drv, bs_drivers) {
@@ -62,7 +62,7 @@ bool ModuleManager::init()
 		LOG(INFO)<< plg->getName() << " initialized";
 		_bootstrapers.push_back(plg);
 	}
-	
+
 	std::vector<plgdrv::LocalStorage*> ls_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::LocalStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_LOCALSTORAGE_SERVER_NAME))->getAllDrivers(ls_drivers);
 	BOOST_FOREACH(plgdrv::LocalStorage* drv, ls_drivers) {
@@ -72,7 +72,7 @@ bool ModuleManager::init()
 		LOG(INFO)<< plg->getName() << " initialized";
 		_localstorages.push_back(plg);
 	}
-	
+
 	std::vector<plgdrv::RemoteStorage*> rs_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::RemoteStorage>*>(PluginManager::instance().get_kernel().getServer(PLG_REMOTESTORAGE_SERVER_NAME))->getAllDrivers(rs_drivers);
 	BOOST_FOREACH(plgdrv::RemoteStorage* drv, rs_drivers) {
@@ -82,7 +82,7 @@ bool ModuleManager::init()
 		LOG(INFO)<< plg->getName() << " initialized";
 		_remotestorages.push_back(plg);
 	}
-	
+
 	std::vector<plgdrv::Session*> s_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Session>*>(PluginManager::instance().get_kernel().getServer(PLG_SESSION_SERVER_NAME))->getAllDrivers(s_drivers);
 	BOOST_FOREACH(plgdrv::Session* drv, s_drivers) {
@@ -92,7 +92,7 @@ bool ModuleManager::init()
 		LOG(INFO)<< plg->getName() << " initialized";
 		_sessions.push_back(plg);
 	}
-	
+
 	std::vector<plgdrv::Util*> u_drivers;
 	dynamic_cast<pugg::Server<an::plgdrv::Util>*>(PluginManager::instance().get_kernel().getServer(PLG_UTIL_SERVER_NAME))->getAllDrivers(u_drivers);
 	BOOST_FOREACH(plgdrv::Util* drv, u_drivers) {
@@ -111,35 +111,35 @@ bool ModuleManager::init()
 		for(std::vector<plg::Bootstrap*>::iterator it = _bootstrapers.begin(); it != _bootstrapers.end(); it++)
 			if( (*it)->bootstrapFromPeer(ip,port))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::bootstrapFromHostlist(const std::string&url)
 	{
 		for(std::vector<plg::Bootstrap*>::iterator it = _bootstrapers.begin(); it != _bootstrapers.end(); it++)
 			if( (*it)->bootstrapFromHostlist(url))
 				return true;
-		
+
 		return false;
 	}
 
-	
+
 	bool ModuleManager::kv_put(const std::string& key, const std::string& value)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_put(key,value))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::kv_get(const std::string& key,std::string& res)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get(key,res))
 				return true;
-		
+
 		return false;
 	}
 
@@ -148,20 +148,21 @@ bool ModuleManager::init()
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_remove(key))
 				return true;
-		
+
 		return false;
 	}
 
 
 		bool ModuleManager::kv_get_stats(const std::string& key, KV_Stat& res) {
-		  
+		    return false;
 		}
 		bool ModuleManager::kv_get_unsuccessful(int n, KV_StatsPtr& res) {
-		  
+		    return false;
+
 		}
 		bool ModuleManager::kv_get_unchecked_since(boost::posix_time::time_duration t , KV_StatsPtr& res)
 		{
-		  
+		    return false;
 		}
 
 
@@ -169,7 +170,7 @@ bool ModuleManager::init()
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_snapshot(ss))
 				return true;
-		
+
 		return false;
 	}
 
@@ -177,7 +178,7 @@ bool ModuleManager::init()
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_diff(diff))
 				return true;
-		
+
 		return false;
 	}
 
@@ -185,23 +186,23 @@ bool ModuleManager::init()
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_store_obj(obj))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::db_get_snapshot(const db::ObjID& id,db::SnapshotPtr res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_snapshot(id,res))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::db_get_diff(const db::ObjID& id,db::DiffPtr res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_diff(id,res))
 				return true;
-		
+
 		return false;
 	}
 
@@ -209,43 +210,43 @@ bool ModuleManager::init()
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_get_obj(id,res))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::db_remove(const db::ObjID& id) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->db_remove(id))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::store_file(const std::string& path, std::string& res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->store_file(path,res))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::get_file_path(const std::string& id,std::string& res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->get_file_path(id,res))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	bool ModuleManager::remove_file(const std::string& id) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->remove_file(id))
 				return true;
-		
+
 		return false;
 	}
-	
-	
+
+
 	/* UTIL */
 	bool ModuleManager::log(log::severity_level level, const std::string message)
 	{
@@ -258,30 +259,30 @@ bool ModuleManager::init()
 	}
 
 
-	bool ModuleManager::on_db_update(const db::ObjID &key) 
+	bool ModuleManager::on_db_update(const db::ObjID &key)
 	{
 		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
 			if( (*it)->on_db_update(key))
 				return true;
-		
-		return false;	  
+
+		return false;
 	}
-	
+
 	bool ModuleManager::on_kv_put(const db::ObjID &key)
 	{
 		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
 			if( (*it)->on_kv_put(key))
 				return true;
-		
-		return false;	  
+
+		return false;
 	}
-	
+
 	bool ModuleManager::on_kv_remove(const db::ObjID &key)
 	{
 		for(std::vector<plg::Util*>::iterator it = _utils.begin(); it != _utils.end(); it++)
 			if( (*it)->on_kv_remove(key))
 				return true;
-		
-		return false;	  
+
+		return false;
 	}
 }

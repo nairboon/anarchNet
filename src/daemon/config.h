@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,4 +21,15 @@
 #ifndef SRC_DAEMON_CONFIG_H_
 #define SRC_DAEMON_CONFIG_H_
 
+//#define USE_WSTRING
+
+namespace an {
+
+#ifdef USE_WSTRING
+typedef std::wstring String;
+#else
+typedef std::string String;
+#endif
+
+}
 #endif  // SRC_DAEMON_CONFIG_H_

@@ -23,6 +23,7 @@
 #include <boost/date_time/posix_time/time_serialize.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include "config.h"
 
 #ifndef SRC_DAEMON_DB_H_
 #define SRC_DAEMON_DB_H_
@@ -30,7 +31,6 @@
 namespace an {
 	namespace db {
 		typedef std::string ObjID;
-		typedef std::string String;
 
 		class Snapshot;
 		class needs_ObjID {
@@ -38,12 +38,12 @@ namespace an {
 				ObjID id;
 				int _db_id;
 				std::string _db_type;
-				std::string content;
+				String content;
 				boost::posix_time::ptime time;
 				bool create_random_id();
 				bool create_content_id();
 				needs_ObjID() : _db_id(0), _db_type("") {}
-				needs_ObjID(const std::string& c) : _db_id(0), _db_type(""), content(c),
+				needs_ObjID(const String& c) : _db_id(0), _db_type(""), content(c),
 					time(boost::posix_time::second_clock::local_time()) {
 					create_content_id();
 				}
@@ -53,7 +53,7 @@ namespace an {
 			ObjID snapshot;
 			std::vector<ObjID> prev;
 			Diff() {}
-			Diff(const ObjID& s, const std::string& c) : needs_ObjID(c), snapshot(s) {}
+			Diff(const ObjID& s, const String& c) : needs_ObjID(c), snapshot(s) {}
 		};
 		typedef boost::shared_ptr<Diff> DiffPtr;
 
@@ -62,7 +62,7 @@ namespace an {
 			std::vector<DiffPtr> diffs;
 			ObjID based;
 			Snapshot() {}
-			Snapshot(const ObjID& b, const std::string& c) : needs_ObjID(c), based(b) {}
+			Snapshot(const ObjID& b, const String& c) : needs_ObjID(c), based(b) {}
 
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
@@ -83,7 +83,7 @@ namespace an {
 			std::vector<SnapshotPtr> snapshots;
 			std::vector<DiffPtr> diffs;
 			bool save();
-			bool create(std::string inp);
+			bool create(String inp);
 			bool load(const ObjID& id);
 			bool remove();
 			Object() : _db_id(0), _db_type("") {}
