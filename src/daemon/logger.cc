@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,14 +62,14 @@ namespace an
 			strm << static_cast< int >(lvl);
 		return strm;
 	}
-	
-		void Logger::log(const std::string& msg, severity_level lvl) 
+
+		void Logger::log(const std::string& msg, severity_level lvl)
 		{
 			BOOST_LOG_SEV(_logger,lvl) << msg;
 		}
 	bool Logger::init(const std::string& logfile) {
 		//logging::init_log_to_console(std::cout, keywords::format = "%TimeStamp%: %_%");
-		
+
 		// One can also use lambda expressions to setup filters and formatters
 		logging::init_log_to_file
 		(
@@ -81,7 +81,7 @@ namespace an
 		 % fmt::attr< severity_level >("Severity", std::nothrow)
 		 % fmt::message()
 		 );
-		
+
 		// Also let's add some commonly used attributes, like timestamp and record counter.
 		logging::add_common_attributes();
 		_logger.add_attribute("Uptime", attrs::timer());

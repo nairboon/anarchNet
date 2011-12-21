@@ -38,12 +38,12 @@ find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
-find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
+#find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost-log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_NO_SYSTEM_PATHS TRUE)
+#set(Boost_NO_SYSTEM_PATHS FALSE)
 find_package(Boost 1.47 COMPONENTS system program_options thread filesystem date_time serialization REQUIRED)
 
 include_directories(
@@ -56,7 +56,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/pugg/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsoncpp/include"
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
-	"${CMAKE_SOURCE_DIR}/third-party/boost-log"
+	"${CMAKE_SOURCE_DIR}/third-party/boost/log"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
 	"/usr/local/include"
 	"/sw/include"
