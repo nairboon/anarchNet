@@ -26,7 +26,6 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/utility/explicit_operator_bool.hpp>
 #if defined(BOOST_NO_RVALUE_REFERENCES)
@@ -74,20 +73,11 @@ public:
     typedef ResultT result_type;
 
 private:
-    struct implementation_base
+    struct BOOST_LOG_NO_VTABLE implementation_base
     {
-        typedef result_type (*invoke_type)(implementation_base* BOOST_PP_ENUM_TRAILING_PARAMS(BOOST_PP_ITERATION(), ArgT));
-        const invoke_type invoke;
-
-        typedef implementation_base* (*clone_type)(const implementation_base*);
-        const clone_type clone;
-
-        typedef void (*destroy_type)(implementation_base*);
-        const destroy_type destroy;
-
-        implementation_base(invoke_type inv, clone_type cl, destroy_type dstr) : invoke(inv), clone(cl), destroy(dstr)
-        {
-        }
+        virtual ~implementation_base() {}
+        virtual implementation_base* clone() const = 0;
+        virtual result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg)) = 0;
     };
 
 #if !defined(BOOST_LOG_NO_MEMBER_TEMPLATE_FRIENDS)
@@ -104,23 +94,17 @@ private:
         FunT m_Function;
 
     public:
-        explicit implementation(FunT const& fun) :
-            implementation_base(&implementation::invoke_impl, &implementation::clone_impl, &implementation::destroy_impl),
-            m_Function(fun)
+        explicit implementation(FunT const& fun) : m_Function(fun)
         {
         }
 
-        static void destroy_impl(implementation_base* self)
+        implementation_base* clone() const
         {
-            delete static_cast< implementation* >(self);
+            return new implementation(m_Function);
         }
-        static implementation_base* clone_impl(const implementation_base* self)
+        result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg))
         {
-            return new implementation(static_cast< const implementation* >(self)->m_Function);
-        }
-        static result_type invoke_impl(implementation_base* self BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg))
-        {
-            return static_cast< implementation* >(self)->m_Function(BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
+            return m_Function(BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
         }
     };
 
@@ -134,7 +118,7 @@ public:
     BOOST_LOG_LWFUNCTION_NAME(this_type const& that)
     {
         if (that.m_pImpl)
-            m_pImpl = that.m_pImpl->clone(that.m_pImpl);
+            m_pImpl = that.m_pImpl->clone();
         else
             m_pImpl = NULL;
     }
@@ -160,7 +144,7 @@ public:
     }
     ~BOOST_LOG_LWFUNCTION_NAME()
     {
-        clear();
+        delete m_pImpl;
     }
 
     BOOST_LOG_LWFUNCTION_NAME& operator= (BOOST_RV_REF(this_type) that)
@@ -197,7 +181,7 @@ public:
 
     result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg)) const
     {
-        return m_pImpl->invoke(m_pImpl BOOST_PP_ENUM_TRAILING_PARAMS(BOOST_PP_ITERATION(), arg));
+        return m_pImpl->operator() (BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
     }
 
     BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
@@ -205,11 +189,8 @@ public:
     bool empty() const { return (m_pImpl == NULL); }
     void clear()
     {
-        if (m_pImpl)
-        {
-            m_pImpl->destroy(m_pImpl);
-            m_pImpl = NULL;
-        }
+        delete m_pImpl;
+        m_pImpl = NULL;
     }
 
     void swap(this_type& that)
@@ -235,20 +216,11 @@ public:
     typedef void result_type;
 
 private:
-    struct implementation_base
+    struct BOOST_LOG_NO_VTABLE implementation_base
     {
-        typedef void (*invoke_type)(implementation_base* BOOST_PP_ENUM_TRAILING_PARAMS(BOOST_PP_ITERATION(), ArgT));
-        const invoke_type invoke;
-
-        typedef implementation_base* (*clone_type)(const implementation_base*);
-        const clone_type clone;
-
-        typedef void (*destroy_type)(implementation_base*);
-        const destroy_type destroy;
-
-        implementation_base(invoke_type inv, clone_type cl, destroy_type dstr) : invoke(inv), clone(cl), destroy(dstr)
-        {
-        }
+        virtual ~implementation_base() {}
+        virtual implementation_base* clone() const = 0;
+        virtual result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg)) = 0;
     };
 
 #if !defined(BOOST_LOG_NO_MEMBER_TEMPLATE_FRIENDS)
@@ -265,23 +237,17 @@ private:
         FunT m_Function;
 
     public:
-        explicit implementation(FunT const& fun) :
-            implementation_base(&implementation::invoke_impl, &implementation::clone_impl, &implementation::destroy_impl),
-            m_Function(fun)
+        explicit implementation(FunT const& fun) : m_Function(fun)
         {
         }
 
-        static void destroy_impl(implementation_base* self)
+        implementation_base* clone() const
         {
-            delete static_cast< implementation* >(self);
+            return new implementation(m_Function);
         }
-        static implementation_base* clone_impl(const implementation_base* self)
+        result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg))
         {
-            return new implementation(static_cast< const implementation* >(self)->m_Function);
-        }
-        static result_type invoke_impl(implementation_base* self BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg))
-        {
-            static_cast< implementation* >(self)->m_Function(BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
+            m_Function(BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
         }
     };
 
@@ -295,7 +261,7 @@ public:
     BOOST_LOG_LWFUNCTION_NAME(this_type const& that)
     {
         if (that.m_pImpl)
-            m_pImpl = that.m_pImpl->clone(that.m_pImpl);
+            m_pImpl = that.m_pImpl->clone();
         else
             m_pImpl = NULL;
     }
@@ -321,7 +287,7 @@ public:
     }
     ~BOOST_LOG_LWFUNCTION_NAME()
     {
-        clear();
+        delete m_pImpl;
     }
 
     BOOST_LOG_LWFUNCTION_NAME& operator= (BOOST_RV_REF(this_type) that)
@@ -358,7 +324,7 @@ public:
 
     result_type operator() (BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ITERATION(), ArgT, arg)) const
     {
-        m_pImpl->invoke(m_pImpl BOOST_PP_ENUM_TRAILING_PARAMS(BOOST_PP_ITERATION(), arg));
+        m_pImpl->operator() (BOOST_PP_ENUM_PARAMS(BOOST_PP_ITERATION(), arg));
     }
 
     BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
@@ -366,11 +332,8 @@ public:
     bool empty() const { return (m_pImpl == NULL); }
     void clear()
     {
-        if (m_pImpl)
-        {
-            m_pImpl->destroy(m_pImpl);
-            m_pImpl = NULL;
-        }
+        delete m_pImpl;
+        m_pImpl = NULL;
     }
 
     void swap(this_type& that)

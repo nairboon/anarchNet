@@ -19,11 +19,9 @@
 #ifndef BOOST_LOG_SINKS_TEXT_OSTREAM_BACKEND_HPP_INCLUDED_
 #define BOOST_LOG_SINKS_TEXT_OSTREAM_BACKEND_HPP_INCLUDED_
 
-#include <ostream>
 #include <boost/shared_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/sinks/basic_sink_backend.hpp>
-#include <boost/log/sinks/frontend_requirements.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -46,32 +44,22 @@ namespace sinks {
  */
 template< typename CharT >
 class basic_text_ostream_backend :
-    public basic_formatting_sink_backend<
-        CharT,
-        CharT,
-        combine_requirements< synchronized_feeding, flushing >::type
-    >
+    public basic_formatting_sink_backend< CharT >
 {
     //! Base type
-    typedef basic_formatting_sink_backend<
-        CharT,
-        CharT,
-        combine_requirements< synchronized_feeding, flushing >::type
-    > base_type;
+    typedef basic_formatting_sink_backend< CharT > base_type;
 
 public:
     //! Character type
     typedef typename base_type::char_type char_type;
     //! String type to be used as a message text holder
     typedef typename base_type::string_type string_type;
-    //! Target character type
-    typedef typename base_type::target_char_type target_char_type;
     //! String type to be used as a message text holder
     typedef typename base_type::target_string_type target_string_type;
     //! Log record type
     typedef typename base_type::record_type record_type;
     //! Output stream type
-    typedef std::basic_ostream< target_char_type > stream_type;
+    typedef typename base_type::stream_type stream_type;
 
 private:
     //! \cond
@@ -110,15 +98,11 @@ public:
      */
     BOOST_LOG_EXPORT void auto_flush(bool f = true);
 
-    /*!
-     * The method writes the message to the sink
-     */
-    BOOST_LOG_EXPORT void consume(record_type const& record, target_string_type const& formatted_message);
-
-    /*!
-     * The method flushes the associated streams
-     */
-    BOOST_LOG_EXPORT void flush();
+private:
+#ifndef BOOST_LOG_DOXYGEN_PASS
+    //! The method writes the message to the sink
+    BOOST_LOG_EXPORT void do_consume(record_type const& record, target_string_type const& formatted_message);
+#endif // BOOST_LOG_DOXYGEN_PASS
 };
 
 #ifdef BOOST_LOG_USE_CHAR

@@ -27,8 +27,7 @@
 #if !defined(BOOST_LOG_NO_THREADS)
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/async_frontend.hpp>
-#include <boost/log/sinks/unbounded_fifo_queue.hpp>
-#include <boost/log/sinks/unbounded_ordering_queue.hpp>
+#include <boost/log/sinks/ordering_async_frontend.hpp>
 #endif // !defined(BOOST_LOG_NO_THREADS)
 
 #include <boost/log/sinks/syslog_backend.hpp>
