@@ -1,4 +1,4 @@
-#include "sqldb.h"
+#include "sqldb.hpp"
 namespace db {
 using namespace litesql;
 ObjectSnapshotRelation::Row::Row(const litesql::Database& db, const litesql::Record& rec)
@@ -10,9 +10,9 @@ ObjectSnapshotRelation::Row::Row(const litesql::Database& db, const litesql::Rec
         object = rec[0];
     }
 }
-const std::string ObjectSnapshotRelation::table__("__Object_Snapshot_");
-const litesql::FieldType ObjectSnapshotRelation::Object("Object1","INTEGER",table__);
-const litesql::FieldType ObjectSnapshotRelation::Snapshot("Snapshot2","INTEGER",table__);
+const std::string ObjectSnapshotRelation::table__("Object_Snapshot_");
+const litesql::FieldType ObjectSnapshotRelation::Object("Object1_",A_field_type_integer,table__);
+const litesql::FieldType ObjectSnapshotRelation::Snapshot("Snapshot2_",A_field_type_integer,table__);
 void ObjectSnapshotRelation::link(const litesql::Database& db, const db::Object& o0, const db::Snapshot& o1) {
     Record values;
     Split fields;
@@ -59,9 +59,9 @@ DiffObjectRelation::Row::Row(const litesql::Database& db, const litesql::Record&
         diff = rec[0];
     }
 }
-const std::string DiffObjectRelation::table__("__Diff_Object_");
-const litesql::FieldType DiffObjectRelation::Diff("Diff1","INTEGER",table__);
-const litesql::FieldType DiffObjectRelation::Object("Object2","INTEGER",table__);
+const std::string DiffObjectRelation::table__("Diff_Object_");
+const litesql::FieldType DiffObjectRelation::Diff("Diff1_",A_field_type_integer,table__);
+const litesql::FieldType DiffObjectRelation::Object("Object2_",A_field_type_integer,table__);
 void DiffObjectRelation::link(const litesql::Database& db, const db::Diff& o0, const db::Object& o1) {
     Record values;
     Split fields;
@@ -108,9 +108,9 @@ DiffSnapshotRelation::Row::Row(const litesql::Database& db, const litesql::Recor
         diff = rec[0];
     }
 }
-const std::string DiffSnapshotRelation::table__("__Diff_Snapshot_");
-const litesql::FieldType DiffSnapshotRelation::Diff("Diff1","INTEGER",table__);
-const litesql::FieldType DiffSnapshotRelation::Snapshot("Snapshot2","INTEGER",table__);
+const std::string DiffSnapshotRelation::table__("Diff_Snapshot_");
+const litesql::FieldType DiffSnapshotRelation::Diff("Diff1_",A_field_type_integer,table__);
+const litesql::FieldType DiffSnapshotRelation::Snapshot("Snapshot2_",A_field_type_integer,table__);
 void DiffSnapshotRelation::link(const litesql::Database& db, const db::Diff& o0, const db::Snapshot& o1) {
     Record values;
     Split fields;
@@ -157,9 +157,9 @@ DiffObjIDRelation::Row::Row(const litesql::Database& db, const litesql::Record& 
         diff = rec[0];
     }
 }
-const std::string DiffObjIDRelation::table__("__Diff_ObjID_");
-const litesql::FieldType DiffObjIDRelation::Diff("Diff1","INTEGER",table__);
-const litesql::FieldType DiffObjIDRelation::ObjID("ObjID2","INTEGER",table__);
+const std::string DiffObjIDRelation::table__("Diff_ObjID_");
+const litesql::FieldType DiffObjIDRelation::Diff("Diff1_",A_field_type_integer,table__);
+const litesql::FieldType DiffObjIDRelation::ObjID("ObjID2_",A_field_type_integer,table__);
 void DiffObjIDRelation::link(const litesql::Database& db, const db::Diff& o0, const db::ObjID& o1) {
     Record values;
     Split fields;
@@ -197,22 +197,22 @@ template <> litesql::DataSource<db::ObjID> DiffObjIDRelation::get(const litesql:
     sel.where(srcExpr);
     return DataSource<db::ObjID>(db, db::ObjID::Id.in(sel) && expr);
 }
-const litesql::FieldType ObjID::Own::Id("id_","INTEGER","ObjID_");
+const litesql::FieldType ObjID::Own::Id("id_",A_field_type_integer,"ObjID_");
 const std::string ObjID::type__("ObjID");
 const std::string ObjID::table__("ObjID_");
 const std::string ObjID::sequence__("ObjID_seq");
-const litesql::FieldType ObjID::Id("id_","INTEGER",table__);
-const litesql::FieldType ObjID::Type("type_","TEXT",table__);
-const litesql::FieldType ObjID::AnID("anID_","TEXT",table__);
+const litesql::FieldType ObjID::Id("id_",A_field_type_integer,table__);
+const litesql::FieldType ObjID::Type("type_",A_field_type_string,table__);
+const litesql::FieldType ObjID::AnID("anID_",A_field_type_string,table__);
 void ObjID::defaults() {
     id = 0;
 }
 ObjID::ObjID(const litesql::Database& db)
-     : Persistent(db), id(Id), type(Type), anID(AnID) {
+     : litesql::Persistent(db), id(Id), type(Type), anID(AnID) {
     defaults();
 }
 ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
-     : Persistent(db, rec), id(Id), type(Type), anID(AnID) {
+     : litesql::Persistent(db, rec), id(Id), type(Type), anID(AnID) {
     defaults();
     size_t size = (rec.size() > 3) ? 3 : rec.size();
     switch(size) {
@@ -225,7 +225,7 @@ ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 ObjID::ObjID(const ObjID& obj)
-     : Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
+     : litesql::Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
 }
 const ObjID& ObjID::operator=(const ObjID& obj) {
     if (this != &obj) {
@@ -289,7 +289,7 @@ void ObjID::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect())
+        if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
     }
     litesql::Persistent::update(updates);
@@ -341,7 +341,7 @@ std::ostream & operator<<(std::ostream& os, ObjID o) {
     os << "-------------------------------------" << std::endl;
     return os;
 }
-const litesql::FieldType Object::Own::Id("id_","INTEGER","Object_");
+const litesql::FieldType Object::Own::Id("id_",A_field_type_integer,"Object_");
 Object::SnapshotsHandle::SnapshotsHandle(const Object& owner)
          : litesql::RelationHandle<Object>(owner) {
 }
@@ -445,7 +445,7 @@ void Object::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect())
+        if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -484,7 +484,7 @@ std::ostream & operator<<(std::ostream& os, Object o) {
     os << "-------------------------------------" << std::endl;
     return os;
 }
-const litesql::FieldType Snapshot::Own::Id("id_","INTEGER","Snapshot_");
+const litesql::FieldType Snapshot::Own::Id("id_",A_field_type_integer,"Snapshot_");
 Snapshot::DiffsHandle::DiffsHandle(const Snapshot& owner)
          : litesql::RelationHandle<Snapshot>(owner) {
 }
@@ -505,9 +505,9 @@ litesql::DataSource<DiffSnapshotRelation::Row> Snapshot::DiffsHandle::getRows(co
 }
 const std::string Snapshot::type__("Snapshot");
 const std::string Snapshot::table__("Snapshot_");
-const litesql::FieldType Snapshot::Based("based_","TEXT",table__);
-const litesql::FieldType Snapshot::Content("content_","TEXT",table__);
-const litesql::FieldType Snapshot::Time("time_","INTEGER",table__);
+const litesql::FieldType Snapshot::Based("based_",A_field_type_string,table__);
+const litesql::FieldType Snapshot::Content("content_",A_field_type_string,table__);
+const litesql::FieldType Snapshot::Time("time_",A_field_type_datetime,table__);
 void Snapshot::defaults() {
     time = 0;
 }
@@ -604,7 +604,7 @@ void Snapshot::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect())
+        if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -649,7 +649,7 @@ std::ostream & operator<<(std::ostream& os, Snapshot o) {
     os << "-------------------------------------" << std::endl;
     return os;
 }
-const litesql::FieldType Diff::Own::Id("id_","INTEGER","Diff_");
+const litesql::FieldType Diff::Own::Id("id_",A_field_type_integer,"Diff_");
 Diff::PrevHandle::PrevHandle(const Diff& owner)
          : litesql::RelationHandle<Diff>(owner) {
 }
@@ -670,9 +670,9 @@ litesql::DataSource<DiffObjIDRelation::Row> Diff::PrevHandle::getRows(const lite
 }
 const std::string Diff::type__("Diff");
 const std::string Diff::table__("Diff_");
-const litesql::FieldType Diff::Snapshot("snapshot_","TEXT",table__);
-const litesql::FieldType Diff::Content("content_","TEXT",table__);
-const litesql::FieldType Diff::Time("time_","INTEGER",table__);
+const litesql::FieldType Diff::Snapshot("snapshot_",A_field_type_string,table__);
+const litesql::FieldType Diff::Content("content_",A_field_type_string,table__);
+const litesql::FieldType Diff::Time("time_",A_field_type_datetime,table__);
 void Diff::defaults() {
     time = 0;
 }
@@ -770,7 +770,7 @@ void Diff::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect())
+        if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
         else
             addIDUpdates(updates);
@@ -815,25 +815,25 @@ std::ostream & operator<<(std::ostream& os, Diff o) {
     os << "-------------------------------------" << std::endl;
     return os;
 }
-const litesql::FieldType HT::Own::Id("id_","INTEGER","HT_");
+const litesql::FieldType HT::Own::Id("id_",A_field_type_integer,"HT_");
 const std::string HT::type__("HT");
 const std::string HT::table__("HT_");
 const std::string HT::sequence__("HT_seq");
-const litesql::FieldType HT::Id("id_","INTEGER",table__);
-const litesql::FieldType HT::Type("type_","TEXT",table__);
-const litesql::FieldType HT::Key("key_","TEXT",table__);
-const litesql::FieldType HT::Value("value_","TEXT",table__);
-const litesql::FieldType HT::Time("time_","INTEGER",table__);
+const litesql::FieldType HT::Id("id_",A_field_type_integer,table__);
+const litesql::FieldType HT::Type("type_",A_field_type_string,table__);
+const litesql::FieldType HT::Key("key_",A_field_type_string,table__);
+const litesql::FieldType HT::Value("value_",A_field_type_string,table__);
+const litesql::FieldType HT::Time("time_",A_field_type_datetime,table__);
 void HT::defaults() {
     id = 0;
     time = 0;
 }
 HT::HT(const litesql::Database& db)
-     : Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : litesql::Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
 }
 HT::HT(const litesql::Database& db, const litesql::Record& rec)
-     : Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : litesql::Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
     size_t size = (rec.size() > 5) ? 5 : rec.size();
     switch(size) {
@@ -850,7 +850,7 @@ HT::HT(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 HT::HT(const HT& obj)
-     : Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
+     : litesql::Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
 }
 const HT& HT::operator=(const HT& obj) {
     if (this != &obj) {
@@ -925,7 +925,7 @@ void HT::update() {
     Updates updates;
     addUpdates(updates);
     if (id != oldKey) {
-        if (!typeIsCorrect())
+        if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
     }
     litesql::Persistent::update(updates);
@@ -975,32 +975,36 @@ SQLDB::SQLDB(std::string backendType, std::string connInfo)
 }
 std::vector<litesql::Database::SchemaItem> SQLDB::getSchema() const {
     vector<Database::SchemaItem> res;
-    res.push_back(Database::SchemaItem("schema_","table","CREATE TABLE schema_ (name_ TEXT, type_ TEXT, sql_ TEXT);"));
+    string TEXT = backend->getSQLType(A_field_type_string);
+    string rowIdType = backend->getRowIDType();
+    res.push_back(Database::SchemaItem("schema_","table","CREATE TABLE schema_ (name_ "+TEXT+", type_ "+TEXT+", sql_ "+TEXT+")"));
     if (backend->supportsSequences()) {
-        res.push_back(Database::SchemaItem("ObjID_seq","sequence","CREATE SEQUENCE ObjID_seq START 1 INCREMENT 1"));
-        res.push_back(Database::SchemaItem("HT_seq","sequence","CREATE SEQUENCE HT_seq START 1 INCREMENT 1"));
+        res.push_back(Database::SchemaItem("ObjID_seq","sequence",backend->getCreateSequenceSQL("ObjID_seq")));
+        res.push_back(Database::SchemaItem("HT_seq","sequence",backend->getCreateSequenceSQL("HT_seq")));
     }
-    res.push_back(Database::SchemaItem("ObjID_","table","CREATE TABLE ObjID_ (id_ " + backend->getRowIDType() + ",type_ TEXT,anID_ TEXT)"));
-    res.push_back(Database::SchemaItem("Object_","table","CREATE TABLE Object_ (id_ " + backend->getRowIDType() + ")"));
-    res.push_back(Database::SchemaItem("Snapshot_","table","CREATE TABLE Snapshot_ (id_ " + backend->getRowIDType() + ",based_ TEXT,content_ TEXT,time_ INTEGER)"));
-    res.push_back(Database::SchemaItem("Diff_","table","CREATE TABLE Diff_ (id_ " + backend->getRowIDType() + ",snapshot_ TEXT,content_ TEXT,time_ INTEGER)"));
-    res.push_back(Database::SchemaItem("HT_","table","CREATE TABLE HT_ (id_ " + backend->getRowIDType() + ",type_ TEXT,key_ TEXT,value_ TEXT,time_ INTEGER)"));
-    res.push_back(Database::SchemaItem("__Object_Snapshot_","table","CREATE TABLE __Object_Snapshot_ (Object1 INTEGER,Snapshot2 INTEGER)"));
-    res.push_back(Database::SchemaItem("__Diff_Object_","table","CREATE TABLE __Diff_Object_ (Diff1 INTEGER,Object2 INTEGER)"));
-    res.push_back(Database::SchemaItem("__Diff_Snapshot_","table","CREATE TABLE __Diff_Snapshot_ (Diff1 INTEGER,Snapshot2 INTEGER)"));
-    res.push_back(Database::SchemaItem("__Diff_ObjID_","table","CREATE TABLE __Diff_ObjID_ (Diff1 INTEGER,ObjID2 INTEGER)"));
-    res.push_back(Database::SchemaItem("__Object_Snapshot_Object1idx","index","CREATE INDEX __Object_Snapshot_Object1idx ON __Object_Snapshot_ (Object1)"));
-    res.push_back(Database::SchemaItem("__Object_Snapshot_Snapshot2idx","index","CREATE INDEX __Object_Snapshot_Snapshot2idx ON __Object_Snapshot_ (Snapshot2)"));
-    res.push_back(Database::SchemaItem("__Object_Snapshot__all_idx","index","CREATE INDEX __Object_Snapshot__all_idx ON __Object_Snapshot_ (Object1,Snapshot2)"));
-    res.push_back(Database::SchemaItem("__Diff_Object_Diff1idx","index","CREATE INDEX __Diff_Object_Diff1idx ON __Diff_Object_ (Diff1)"));
-    res.push_back(Database::SchemaItem("__Diff_Object_Object2idx","index","CREATE INDEX __Diff_Object_Object2idx ON __Diff_Object_ (Object2)"));
-    res.push_back(Database::SchemaItem("__Diff_Object__all_idx","index","CREATE INDEX __Diff_Object__all_idx ON __Diff_Object_ (Diff1,Object2)"));
-    res.push_back(Database::SchemaItem("__Diff_Snapshot_Diff1idx","index","CREATE INDEX __Diff_Snapshot_Diff1idx ON __Diff_Snapshot_ (Diff1)"));
-    res.push_back(Database::SchemaItem("__Diff_Snapshot_Snapshot2idx","index","CREATE INDEX __Diff_Snapshot_Snapshot2idx ON __Diff_Snapshot_ (Snapshot2)"));
-    res.push_back(Database::SchemaItem("__Diff_Snapshot__all_idx","index","CREATE INDEX __Diff_Snapshot__all_idx ON __Diff_Snapshot_ (Diff1,Snapshot2)"));
-    res.push_back(Database::SchemaItem("__Diff_ObjID_Diff1idx","index","CREATE INDEX __Diff_ObjID_Diff1idx ON __Diff_ObjID_ (Diff1)"));
-    res.push_back(Database::SchemaItem("__Diff_ObjID_ObjID2idx","index","CREATE INDEX __Diff_ObjID_ObjID2idx ON __Diff_ObjID_ (ObjID2)"));
-    res.push_back(Database::SchemaItem("__Diff_ObjID__all_idx","index","CREATE INDEX __Diff_ObjID__all_idx ON __Diff_ObjID_ (Diff1,ObjID2)"));
+    res.push_back(Database::SchemaItem("ObjID_","table","CREATE TABLE ObjID_ (id_ " + rowIdType + ",type_ " + backend->getSQLType(A_field_type_string) + "" +",anID_ " + backend->getSQLType(A_field_type_string) + "" +")"));
+    res.push_back(Database::SchemaItem("Object_","table","CREATE TABLE Object_ (id_ " + rowIdType + ")"));
+    res.push_back(Database::SchemaItem("Snapshot_","table","CREATE TABLE Snapshot_ (id_ " + rowIdType + ",based_ " + backend->getSQLType(A_field_type_string) + "" +",content_ " + backend->getSQLType(A_field_type_string) + "" +",time_ " + backend->getSQLType(A_field_type_datetime) + "" +")"));
+    res.push_back(Database::SchemaItem("Diff_","table","CREATE TABLE Diff_ (id_ " + rowIdType + ",snapshot_ " + backend->getSQLType(A_field_type_string) + "" +",content_ " + backend->getSQLType(A_field_type_string) + "" +",time_ " + backend->getSQLType(A_field_type_datetime) + "" +")"));
+    res.push_back(Database::SchemaItem("HT_","table","CREATE TABLE HT_ (id_ " + rowIdType + ",type_ " + backend->getSQLType(A_field_type_string) + "" +",key_ " + backend->getSQLType(A_field_type_string) + "" +",value_ " + backend->getSQLType(A_field_type_string) + "" +",time_ " + backend->getSQLType(A_field_type_datetime) + "" +")"));
+    res.push_back(Database::SchemaItem("Object_Snapshot_","table","CREATE TABLE Object_Snapshot_ (Object1_ " + backend->getSQLType(A_field_type_integer) + "" +",Snapshot2_ " + backend->getSQLType(A_field_type_integer) + "" +")"));
+    res.push_back(Database::SchemaItem("Diff_Object_","table","CREATE TABLE Diff_Object_ (Diff1_ " + backend->getSQLType(A_field_type_integer) + "" +",Object2_ " + backend->getSQLType(A_field_type_integer) + "" +")"));
+    res.push_back(Database::SchemaItem("Diff_Snapshot_","table","CREATE TABLE Diff_Snapshot_ (Diff1_ " + backend->getSQLType(A_field_type_integer) + "" +",Snapshot2_ " + backend->getSQLType(A_field_type_integer) + "" +")"));
+    res.push_back(Database::SchemaItem("Diff_ObjID_","table","CREATE TABLE Diff_ObjID_ (Diff1_ " + backend->getSQLType(A_field_type_integer) + "" +",ObjID2_ " + backend->getSQLType(A_field_type_integer) + "" +")"));
+    res.push_back(Database::SchemaItem("ObjID_id_idx","index","CREATE INDEX ObjID_id_idx ON ObjID_ (id_)"));
+    res.push_back(Database::SchemaItem("HT_id_idx","index","CREATE INDEX HT_id_idx ON HT_ (id_)"));
+    res.push_back(Database::SchemaItem("Object_Snapshot_Object1_idx","index","CREATE INDEX Object_Snapshot_Object1_idx ON Object_Snapshot_ (Object1_)"));
+    res.push_back(Database::SchemaItem("Object_Snapshot_Snapshot2_idx","index","CREATE INDEX Object_Snapshot_Snapshot2_idx ON Object_Snapshot_ (Snapshot2_)"));
+    res.push_back(Database::SchemaItem("Object_Snapshot__all_idx","index","CREATE INDEX Object_Snapshot__all_idx ON Object_Snapshot_ (Object1_,Snapshot2_)"));
+    res.push_back(Database::SchemaItem("Diff_Object_Diff1_idx","index","CREATE INDEX Diff_Object_Diff1_idx ON Diff_Object_ (Diff1_)"));
+    res.push_back(Database::SchemaItem("Diff_Object_Object2_idx","index","CREATE INDEX Diff_Object_Object2_idx ON Diff_Object_ (Object2_)"));
+    res.push_back(Database::SchemaItem("Diff_Object__all_idx","index","CREATE INDEX Diff_Object__all_idx ON Diff_Object_ (Diff1_,Object2_)"));
+    res.push_back(Database::SchemaItem("Diff_Snapshot_Diff1_idx","index","CREATE INDEX Diff_Snapshot_Diff1_idx ON Diff_Snapshot_ (Diff1_)"));
+    res.push_back(Database::SchemaItem("Diff_Snapshot_Snapshot2_idx","index","CREATE INDEX Diff_Snapshot_Snapshot2_idx ON Diff_Snapshot_ (Snapshot2_)"));
+    res.push_back(Database::SchemaItem("Diff_Snapshot__all_idx","index","CREATE INDEX Diff_Snapshot__all_idx ON Diff_Snapshot_ (Diff1_,Snapshot2_)"));
+    res.push_back(Database::SchemaItem("Diff_ObjID_Diff1_idx","index","CREATE INDEX Diff_ObjID_Diff1_idx ON Diff_ObjID_ (Diff1_)"));
+    res.push_back(Database::SchemaItem("Diff_ObjID_ObjID2_idx","index","CREATE INDEX Diff_ObjID_ObjID2_idx ON Diff_ObjID_ (ObjID2_)"));
+    res.push_back(Database::SchemaItem("Diff_ObjID__all_idx","index","CREATE INDEX Diff_ObjID__all_idx ON Diff_ObjID_ (Diff1_,ObjID2_)"));
     return res;
 }
 void SQLDB::initialize() {
