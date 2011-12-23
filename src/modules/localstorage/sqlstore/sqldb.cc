@@ -1,4 +1,4 @@
-#include "sqldb.hpp"
+#include "sqldb.h"
 namespace db {
 using namespace litesql;
 ObjectSnapshotRelation::Row::Row(const litesql::Database& db, const litesql::Record& rec)
@@ -208,11 +208,11 @@ void ObjID::defaults() {
     id = 0;
 }
 ObjID::ObjID(const litesql::Database& db)
-     : litesql::Persistent(db), id(Id), type(Type), anID(AnID) {
+     : Persistent(db), id(Id), type(Type), anID(AnID) {
     defaults();
 }
 ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
-     : litesql::Persistent(db, rec), id(Id), type(Type), anID(AnID) {
+     : Persistent(db, rec), id(Id), type(Type), anID(AnID) {
     defaults();
     size_t size = (rec.size() > 3) ? 3 : rec.size();
     switch(size) {
@@ -225,7 +225,7 @@ ObjID::ObjID(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 ObjID::ObjID(const ObjID& obj)
-     : litesql::Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
+     : Persistent(obj), id(obj.id), type(obj.type), anID(obj.anID) {
 }
 const ObjID& ObjID::operator=(const ObjID& obj) {
     if (this != &obj) {
@@ -233,7 +233,7 @@ const ObjID& ObjID::operator=(const ObjID& obj) {
         type = obj.type;
         anID = obj.anID;
     }
-    litesql::Persistent::operator=(obj);
+    Persistent::operator=(obj);
     return *this;
 }
 std::string ObjID::insert(litesql::Record& tables, litesql::Records& fieldRecs, litesql::Records& valueRecs) {
@@ -251,7 +251,7 @@ std::string ObjID::insert(litesql::Record& tables, litesql::Records& fieldRecs, 
     anID.setModified(false);
     fieldRecs.push_back(fields);
     valueRecs.push_back(values);
-    return litesql::Persistent::insert(tables, fieldRecs, valueRecs, sequence__);
+    return Persistent::insert(tables, fieldRecs, valueRecs, sequence__);
 }
 void ObjID::create() {
     litesql::Record tables;
@@ -292,7 +292,7 @@ void ObjID::update() {
         if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
     }
-    litesql::Persistent::update(updates);
+    Persistent::update(updates);
     oldKey = id;
 }
 void ObjID::del() {
@@ -450,7 +450,7 @@ void Object::update() {
         else
             addIDUpdates(updates);
     }
-    litesql::Persistent::update(updates);
+    Persistent::update(updates);
     oldKey = id;
 }
 void Object::del() {
@@ -609,7 +609,7 @@ void Snapshot::update() {
         else
             addIDUpdates(updates);
     }
-    litesql::Persistent::update(updates);
+    Persistent::update(updates);
     oldKey = id;
 }
 void Snapshot::del() {
@@ -775,7 +775,7 @@ void Diff::update() {
         else
             addIDUpdates(updates);
     }
-    litesql::Persistent::update(updates);
+    Persistent::update(updates);
     oldKey = id;
 }
 void Diff::del() {
@@ -829,11 +829,11 @@ void HT::defaults() {
     time = 0;
 }
 HT::HT(const litesql::Database& db)
-     : litesql::Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : Persistent(db), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
 }
 HT::HT(const litesql::Database& db, const litesql::Record& rec)
-     : litesql::Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
+     : Persistent(db, rec), id(Id), type(Type), key(Key), value(Value), time(Time) {
     defaults();
     size_t size = (rec.size() > 5) ? 5 : rec.size();
     switch(size) {
@@ -850,7 +850,7 @@ HT::HT(const litesql::Database& db, const litesql::Record& rec)
     }
 }
 HT::HT(const HT& obj)
-     : litesql::Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
+     : Persistent(obj), id(obj.id), type(obj.type), key(obj.key), value(obj.value), time(obj.time) {
 }
 const HT& HT::operator=(const HT& obj) {
     if (this != &obj) {
@@ -860,7 +860,7 @@ const HT& HT::operator=(const HT& obj) {
         value = obj.value;
         time = obj.time;
     }
-    litesql::Persistent::operator=(obj);
+    Persistent::operator=(obj);
     return *this;
 }
 std::string HT::insert(litesql::Record& tables, litesql::Records& fieldRecs, litesql::Records& valueRecs) {
@@ -884,7 +884,7 @@ std::string HT::insert(litesql::Record& tables, litesql::Records& fieldRecs, lit
     time.setModified(false);
     fieldRecs.push_back(fields);
     valueRecs.push_back(values);
-    return litesql::Persistent::insert(tables, fieldRecs, valueRecs, sequence__);
+    return Persistent::insert(tables, fieldRecs, valueRecs, sequence__);
 }
 void HT::create() {
     litesql::Record tables;
@@ -928,7 +928,7 @@ void HT::update() {
         if (!typeIsCorrect()) 
             upcastCopy()->addIDUpdates(updates);
     }
-    litesql::Persistent::update(updates);
+    Persistent::update(updates);
     oldKey = id;
 }
 void HT::del() {

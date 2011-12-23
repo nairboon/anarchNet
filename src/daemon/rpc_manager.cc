@@ -28,6 +28,7 @@
 #include "config_manager.h"
 #include "db.h"
 #include "logger.h"
+#include "module_manager.h"
 
 namespace an
 {
@@ -212,20 +213,76 @@ namespace rpc {
 
 	bool anStore::kv_get(const boost::json::Value& root, boost::json::Value& response)
 	{
+	  	RPC_Request req(root);
+		rpc::RPC_Request::Parameters rules;
+		rules["key"] = boost::json::str_type;
+		if(!req.valid(rules)) {
+		  LOG(INFO) << "invalid request";
+		 response = req.createErrorResponse().json();
+		  return false;
+		}
+	  std::string value;
+		if(!ModuleManager::instance().kv_get(req.params()["key"].get_str(),value)) {
+			LOG(INF) << "could not get";
 
-		return false;
+		 response = req.createErrorResponse().json()["err"] = "kv.get failed";
+		 return false;
+		}
+
+		RPC_Response res = req.createResponse();
+		LOG(INFO) << "got value for key: " << req.params()["key"].get_str()<< " " << value;
+		boost::json::Config::add(res.data(),"value",value);
+		response = res.json();
+		return true;
 	}
 
 	bool anStore::kv_put(const boost::json::Value& root, boost::json::Value& response)
 	{
+	  	RPC_Request req(root);
+		rpc::RPC_Request::Parameters rules;
+		rules["key"] = boost::json::str_type;
+		rules["value"] = boost::json::str_type;
+		if(!req.valid(rules)) {
+		  LOG(INFO) << "invalid request";
+		 response = req.createErrorResponse().json();
+		  return false;
+		}
 
-		return false;
+		if(!ModuleManager::instance().kv_put(req.params()["key"].get_str(),req.params()["value"].get_str())) {
+			LOG(INF) << "could not store";
+
+		 response = req.createErrorResponse().json()["err"] = "kv.put failed";
+		 return false;
+		}
+
+		RPC_Response res = req.createResponse();
+		LOG(INFO) << "stored key: " << req.params()["key"].get_str();
+		response = res.json();
+		return true;
 	}
 
 	bool anStore::kv_remove(const boost::json::Value& root, boost::json::Value& response)
 	{
+	  	RPC_Request req(root);
+		rpc::RPC_Request::Parameters rules;
+		rules["key"] = boost::json::str_type;
+		if(!req.valid(rules)) {
+		  LOG(INFO) << "invalid request";
+		 response = req.createErrorResponse().json();
+		  return false;
+		}
 
-		return false;
+		if(!ModuleManager::instance().kv_remove(req.params()["key"].get_str())) {
+			LOG(INF) << "could not remove";
+
+		 response = req.createErrorResponse().json()["err"] = "kv.remove failed";
+		 return false;
+		}
+
+		RPC_Response res = req.createResponse();
+		LOG(INFO) << "removed key: " << req.params()["key"].get_str();
+		response = res.json();
+		return true;
 	}
 
 	bool anStore::session_t_join(const boost::json::Value& root, boost::json::Value& response)
