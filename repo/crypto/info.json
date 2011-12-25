@@ -1,0 +1,14 @@
+{
+   "name": "crypto",
+   "version": "0.0.1",
+	"code": {
+		"aes": "aes.js",
+		"md5": "md5.js",
+		"rng": "rng.js",
+		"prng": "prng4.js",
+		"jsbn": "jsbn.js",
+		"jsbn2": "jsbn2.js"	
+	}
+}
+
+

@@ -2,3 +2,4 @@
 lib-cov
 filestore/*
 *~
+.DS_Store
