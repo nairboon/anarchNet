@@ -15,12 +15,12 @@ console.log(system_id);
 
 var an = require("./lib/an.js");
 
-db.store_ht("lamekey","mycontnet",function(err,data){
+/*db.store_ht("lamekey","mycontnet",function(err,data){
   console.log("calling get for:",data);
   db.get_ht("lamekey", function(err,data) {
     console.log("got:",data);
   });
-});
+});*/
 
 
 /*db.store("lamekey","mycontnet",function(err,data){
@@ -31,11 +31,6 @@ db.store_ht("lamekey","mycontnet",function(err,data){
 });*/
 
 
-setup.UserCreation(function(err,user){
-		if(err)
-			throw new Error(err);
-		console.log("user created");
-		userid = user._id;
 		setup.ScanLocalPackages(function(err,mlid){
 			console.log("packages scaned");
 			db.get(system_id+"masterlist", function(err,res) {
@@ -54,6 +49,6 @@ setup.UserCreation(function(err,user){
 				}
 			);
 		});
-	});
+
 
 
