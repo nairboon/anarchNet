@@ -369,7 +369,7 @@ namespace rpc {
 	}
 	
 	std::stringstream res;
-	LOG(INFO) << "decode_base64: " << _json["params"][id].get_str();
+	//LOG(INFO) << "decode_base64: " << _json["params"][id].get_str();
 	std::copy(
 	  base64_to_text(_json["params"][id].get_str().c_str()),
 		  base64_to_text(_json["params"][id].get_str().c_str() + _json["params"][id].get_str().size()),

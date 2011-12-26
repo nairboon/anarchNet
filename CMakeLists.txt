@@ -190,6 +190,35 @@ else ()
   message("-- Didn't find python executable: style checking disabled.")
 endif ()
 
+#
+# Modules
+#
+ MACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY _dir )
+    GET_FILENAME_COMPONENT(_fullPath ${_dir} ABSOLUTE)
+   IF(EXISTS "${_fullPath}/CMakeLists.txt")
+       IF(DISABLE_ALL_OPTIONAL_SUBDIRECTORIES)
+          SET(_DEFAULT_OPTION_VALUE FALSE)
+         ELSE()
+                    SET(_DEFAULT_OPTION_VALUE TRUE)
+       ENDIF()
+	OPTION(BUILD_${_dir} "Build directory ${_dir}" TRUE)
+       IF(BUILD_${_dir})
+          ADD_SUBDIRECTORY(${_dir})
+       ENDIF()
+   ENDIF()
+ ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
+
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/util")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/bootstrap")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/localstorage")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/remotestorage")
+MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/session")
+
+file(GLOB MODULES_C "${SOURCE_DIR}/modules/*/*/*.c*")
+file(GLOB MODULES_H "${SOURCE_DIR}/modules/*/*/*.h*")
+list(APPEND MODULES_SRC ${MODULES_C} ${MODULES_H})
+MESSAGE(${MODULES_SRC})
+
 ###################################################################################################
 # Tests
 ###################################################################################################
@@ -227,37 +256,13 @@ add_test(Modules ${BIN_DIR}/TModule)
 #add_test(RPC ${BIN_DIR}/TRPC)
 #add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
 
+set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line,-build/include,-readability/streams,-whitespace/braces,-whitespace/comments,-whitespace/labels,-runtime/rtti,-whitespace/line_length,-runtime/explicit")
 if (PYTHONINTERP_FOUND)
   if (UNIX)
-    add_test(STYLE_CHECK_DAEMON ${ROOT_DIR}/scripts/mylint.sh ${CPPLINTOPS} ${DAEMON_SRC})
+    add_test(STYLE_CHECK_DAEMON "${ROOT_DIR}/scripts/cpplint.py" ${CPPLINTOPS} ${DAEMON_SRC})
     set_property(TEST STYLE_CHECK_DAEMON PROPERTY LABELS Functional Daemon CodingStyle)
-   # ADD_TEST(STYLE_CHECK_LIBRARY ${MAIDSAFE_SOURCE_DIR}/scripts/mylint.sh ${M_BASE_DIR} ${T_BASE_DIR})
-   # SET_PROPERTY(TEST STYLE_CHECK_LIBRARY PROPERTY LABELS Functional Library CodingStyle)
+   ADD_TEST(STYLE_CHECK_MODULES ${ROOT_DIR}/scripts/cpplint.py ${CPPLINTOPS} ${MODULES_SRC})
+   SET_PROPERTY(TEST STYLE_CHECK_MODULES PROPERTY LABELS Functional Library CodingStyle)
   else ()
-    add_test(STYLE_CHECK finderrorsall.bat)
-    set_property(TEST STYLE_CHECK PROPERTY LABELS Functional CodingStyle)
   endif ()
 endif ()
-
-
- MACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY _dir )
-    GET_FILENAME_COMPONENT(_fullPath ${_dir} ABSOLUTE)
-   IF(EXISTS "${_fullPath}/CMakeLists.txt")
-       IF(DISABLE_ALL_OPTIONAL_SUBDIRECTORIES)
-          SET(_DEFAULT_OPTION_VALUE FALSE)
-         ELSE()
-                    SET(_DEFAULT_OPTION_VALUE TRUE)
-       ENDIF()
-	OPTION(BUILD_${_dir} "Build directory ${_dir}" TRUE)
-       IF(BUILD_${_dir})
-          ADD_SUBDIRECTORY(${_dir})
-       ENDIF()
-   ENDIF()
- ENDMACRO (MACRO_OPTIONAL_ADD_SUBDIRECTORY)
-
-MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/util")
-MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/bootstrap")
-MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/localstorage")
-MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/remotestorage")
-MACRO_OPTIONAL_ADD_SUBDIRECTORY( "${SOURCE_DIR}/modules/session")
-
