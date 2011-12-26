@@ -1,6 +1,9 @@
+
 #include "rpc_server.h"
 #include "logger.h"
 
+
+ 
 namespace an
 {
 
@@ -24,11 +27,24 @@ namespace an
 	{
 		if (!error)
 		{
-			LOG(INFO) << "got: " << data_;
+			std::istream request_stream(&request_buf_);
+			std::stringstream os;
+			std::copy(std::istream_iterator<char>(request_stream), std::istream_iterator<char>(), std::ostream_iterator<char>(os));
+		      
 
+		     
+			std::string data = os.str();
+			LOG(INFO) << "got: " << data.size() << ": " << data;
+
+			if(!data.size())
+			{
+			  delete this;
+			  return;
+			}
+    
 			//try {
 			boost::json::Value response;
-				_jsonHandler->Process(std::string(data_), response);
+				_jsonHandler->Process(std::string(data), response);
 			//}
 			//catch(boost::json::
 

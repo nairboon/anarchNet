@@ -26,10 +26,9 @@ namespace an
 			
 			void start()
 			{
-				socket_.async_read_some(boost::asio::buffer(data_, max_length),
-																boost::bind(&session::handle_read, this,
-																						boost::asio::placeholders::error,
-																						boost::asio::placeholders::bytes_transferred));
+			  async_read_until(socket_, request_buf_, "\r\n" ,boost::bind(&session::handle_read, this,
+													boost::asio::placeholders::error,
+													boost::asio::placeholders::bytes_transferred));
 			}
 			
 		private:
@@ -54,6 +53,7 @@ namespace an
 			tcp::socket socket_;
 			enum { max_length = 1024 };
 			char data_[max_length];
+			boost::asio::streambuf request_buf_;
 			Json::Rpc::Handler* _jsonHandler;
 		};
 	

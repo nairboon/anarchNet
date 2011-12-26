@@ -51,6 +51,7 @@ namespace an {
 	      RPC_Response(int id) { _init(); boost::json::Config::add(_json.get_obj(),"id",id); }
 	      boost::json::Value& json() { return _json; }
 	      boost::json::Object& data() { return _json["data"].get_obj(); }
+	      std::string encode_base64(std::string& inp);
 	  };
 
 	  class RPC_Request {
@@ -64,6 +65,7 @@ namespace an {
 	    bool valid( Parameters& param);
 	    boost::json::Value& json() { return _json; }
 	    boost::json::Value& params() { return _json["params"]; }
+	    std::string decode_base64(const std::string& id);
 	    RPC_Response createResponse() { return RPC_Response(_json["id"].get_int()); }
 	    RPC_Response createErrorResponse() { RPC_Response res(_json["id"].get_int()); res.json()["err"] = _error; return res; }
 	  };

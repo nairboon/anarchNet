@@ -21,6 +21,10 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/foreach.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
 #include "db_manager.h"
 #include "version.h"
 #include "rpc_server.h"
@@ -29,6 +33,8 @@
 #include "db.h"
 #include "logger.h"
 #include "module_manager.h"
+
+namespace ai = boost::archive::iterators;
 
 namespace an
 {
@@ -125,7 +131,7 @@ namespace rpc {
 		}
 
 		db::ObjPtr obj(new db::Object());
-		obj->create(req.params()["content"].get_str());
+		obj->create(req.decode_base64("content"));
 		if(!DBManager::instance().create_object(obj)) {
 			LOG(INF) << "could not store";
 
@@ -248,7 +254,8 @@ namespace rpc {
 		  return false;
 		}
 
-		if(!ModuleManager::instance().kv_put(req.params()["key"].get_str(),req.params()["value"].get_str())) {
+		std::string content = req.decode_base64("value");
+		if(!ModuleManager::instance().kv_put(req.params()["key"].get_str(),content)) {
 			LOG(INF) << "could not store";
 
 		 response = req.createErrorResponse().json()["err"] = "kv.put failed";
@@ -271,7 +278,7 @@ namespace rpc {
 		 response = req.createErrorResponse().json();
 		  return false;
 		}
-
+		
 		if(!ModuleManager::instance().kv_remove(req.params()["key"].get_str())) {
 			LOG(INF) << "could not remove";
 
@@ -327,6 +334,57 @@ namespace rpc {
 		}
 	      }
 	      return true;
+      }
+      
+      
+      typedef 
+      ai::base64_from_binary<
+      ai::transform_width<
+      const char *,
+      6,
+      8
+      >
+      > 
+      base64_to_text;
+		      
+      
+      typedef 
+      ai::binary_from_base64<
+      ai::transform_width<
+      const char *,
+      8,
+      6
+      >
+      > 
+      text_to_base64;
+      
+      
+      std::string RPC_Request::decode_base64(const std::string& id)
+      {
+	// field here?
+	if(_json["params"][id].is_null() || _json["params"][id].type() != boost::json::str_type) {
+	  _error = id + " not found";
+	  LOG(INFO) << "rpcrequest: " << _error;
+	  throw _error; //FIXME
+	}
+	
+	std::stringstream res;
+	LOG(INFO) << "decode_base64: " << _json["params"][id].get_str();
+	std::copy(
+	  base64_to_text(_json["params"][id].get_str().c_str()),
+		  base64_to_text(_json["params"][id].get_str().c_str() + _json["params"][id].get_str().size()),
+		  ai::ostream_iterator<char>(res));
+	return res.str();
+      }
+      
+      std::string RPC_Response::encode_base64(std::string& inp)
+      {
+	std::stringstream res;
+	std::copy(
+	  base64_to_text(inp.c_str()),
+		  base64_to_text(inp.c_str() + inp.size()),
+		  ai::ostream_iterator<char>(res));
+	return res.str();
       }
 }
 }
