@@ -41,7 +41,7 @@ namespace an
 			connection(boost::asio::io_service& io_service,Json::Rpc::Handler& jsh)
 			: socket_(io_service), strand_(io_service), _jsonHandler(jsh)
 			{
-			  LOG(INFO) << "new connection";
+
 			}
 			
 			tcp::socket& socket()
@@ -94,14 +94,6 @@ namespace an
 			Json::Rpc::Handler _jsonHandler;	
 			
 		private:
-			/*void start_accept()
-			{
-				connection* new_connection = new connection(io_service_,&_jsonHandler);
-				acceptor_.async_accept(new_connection->socket(),
-															 boost::bind(&RpcServer::handle_accept, this, new_connection,
-																					 boost::asio::placeholders::error));
-			}*/
-			
 			void handle_accept(const boost::system::error_code& error)
 			{
 				if (!error)

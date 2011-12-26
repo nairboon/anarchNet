@@ -19,12 +19,17 @@
  */
 
 #include <iostream>
+#include <istream>
 #include <boost/asio.hpp>
 #include <boost/foreach.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
+#define BUFFERSIZE 16777216
+#include <b64/encode.h>
+#include <b64/decode.h>
 #include "db_manager.h"
 #include "version.h"
 #include "rpc_server.h"
@@ -142,6 +147,8 @@ namespace rpc {
 		else
 		  obj->create(req.decode_base64("content"));
 		
+		LOG(INFO) << "stored: " << req.decode_base64("content");
+		LOG(INFO) << "o: " << req.params()["content"].get_str();
 		if(!DBManager::instance().create_object(obj)) {
 			LOG(INF) << "could not store";
 
@@ -152,7 +159,7 @@ namespace rpc {
 		}
 
 		RPC_Response res = req.createResponse();
-		LOG(INFO) << "stored under: " << obj->id;
+		LOG(INFO) << "stored under: " << obj->id << " : " << obj->snapshots[0]->content;
 		boost::json::Config::add(res.data(),"id",obj->id);
 		response = res.json();
 		return true;
@@ -172,10 +179,11 @@ namespace rpc {
 
 		db::ObjPtr obj(new db::Object());
 		db::ObjID id = req.params()["id"].get_str();
+		LOG(INFO) << "get obj: " << id;
 		if(!DBManager::instance().get_object(id,obj)) {
 			LOG(INF) << "could not get obj: "<< id;
 		 res = req.createErrorResponse();
-		 res.json()["err"] = "get object failed";
+		 res.json()["error"] = "get object failed";
 		 response = res.json();
 		 return false;
 		}
@@ -211,11 +219,14 @@ namespace rpc {
 		  {
 		    LOG(INFO) << "get_lastRevision failed: " << content;
 		    res = req.createErrorResponse();
-		    res.json()["err"] = "get last revision failed";
+		    res.json()["error"] = "get last revision failed";
 		    response = res.json();
 		    return false;
 		  }
-		  boost::json::Config::add(res.data(),"content",content);
+		  LOG(INFO) << "sending: " << content;
+		  std::string econtent = res.encode_base64(content);
+		  LOG(INFO) << econtent;
+		  boost::json::Config::add(res.data(),"content",econtent);
 		}
 		response = res.json();
 		return true;
@@ -246,7 +257,7 @@ namespace rpc {
 			LOG(INF) << "could not get";
 
 		 RPC_Response res = req.createErrorResponse();
-		 res.json()["err"] = "kv.get failed";
+		 res.json()["error"] = "kv.get failed";
 		 response = res.json();
 		 return false;
 		}
@@ -254,7 +265,7 @@ namespace rpc {
 		RPC_Response res = req.createResponse();
 		value = res.encode_base64(value);
 		LOG(INFO) << "got value for key: " << req.params()["key"].get_str()<< " " << value;
-		boost::json::Config::add(res.data(),"value",value);
+		boost::json::Config::add(res.data(),"content",value);
 		response = res.json();
 		return true;
 	}
@@ -276,7 +287,7 @@ namespace rpc {
 			LOG(INF) << "could not store";
 
 		 RPC_Response res = req.createErrorResponse();
-		 res.json()["err"] = "kv.put failed";
+		 res.json()["error"] = "kv.put failed";
 		 response = res.json();
 		 return false;
 		}
@@ -302,7 +313,7 @@ namespace rpc {
 			LOG(INF) << "could not remove";
 
 		 RPC_Response res = req.createErrorResponse();
-		 res.json()["err"] = "kv.remove failed";
+		 res.json()["error"] = "kv.remove failed";
 		 response = res.json();
 		 return false;
 		}
@@ -358,27 +369,6 @@ namespace rpc {
       }
       
       
-      typedef 
-      ai::base64_from_binary<
-      ai::transform_width<
-      const char *,
-      6,
-      8
-      >
-      > 
-      base64_to_text;
-		      
-      
-      typedef 
-      ai::binary_from_base64<
-      ai::transform_width<
-      const char *,
-      8,
-      6
-      >
-      > 
-      text_to_base64;
-      
       
       std::string RPC_Request::decode_base64(const std::string& id)
       {
@@ -389,22 +379,22 @@ namespace rpc {
 	  throw _error; //FIXME
 	}
 	
+	
 	std::stringstream res;
-	//LOG(INFO) << "decode_base64: " << _json["params"][id].get_str();
-	std::copy(
-	  base64_to_text(_json["params"][id].get_str().c_str()),
-		  base64_to_text(_json["params"][id].get_str().c_str() + _json["params"][id].get_str().size()),
-		  ai::ostream_iterator<char>(res));
+	std::istringstream i(_json["params"][id].get_str());
+	//LOG(INFO) << "decode_base64: " << i.str();
+	base64::decoder D;
+	D.decode(i,res);
+	//LOG(INFO) << res.str();
 	return res.str();
       }
       
       std::string RPC_Response::encode_base64(std::string& inp)
       {
 	std::stringstream res;
-	std::copy(
-	  base64_to_text(inp.c_str()),
-		  base64_to_text(inp.c_str() + inp.size()),
-		  ai::ostream_iterator<char>(res));
+	std::istringstream i(inp);
+	base64::encoder E;
+	E.encode(i,res);
 	return res.str();
       }
 }

@@ -39,8 +39,8 @@ namespace an {
 	     inline void _init() {
 	       boost::json::Object obj,err,data;
 	       obj.push_back(boost::json::Pair("jsonrpc","2.0"));
-	       obj.push_back(boost::json::Pair("data",data));
-	       obj.push_back(boost::json::Pair("err",""));
+	       obj.push_back(boost::json::Pair("result",data));
+	       obj.push_back(boost::json::Pair("error",""));
 
 	       _json = obj;
 	     }
@@ -50,7 +50,7 @@ namespace an {
 	      }
 	      RPC_Response(int id) { _init(); boost::json::Config::add(_json.get_obj(),"id",id); }
 	      boost::json::Value& json() { return _json; }
-	      boost::json::Object& data() { return _json["data"].get_obj(); }
+	      boost::json::Object& data() { return _json["result"].get_obj(); }
 	      std::string encode_base64(std::string& inp);
 	  };
 

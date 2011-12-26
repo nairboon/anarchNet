@@ -148,7 +148,7 @@ namespace Json
 
     bool Handler::Process(const boost::json::Value& root, boost::json::Value& response)
     {
-			LOG(INFO) << "process json: " << root["id"].get_int();
+    //LOG(INFO) << "process json: " << root["id"].get_int();
       boost::json::Value error;
       std::string method;
 
@@ -158,7 +158,7 @@ namespace Json
 	LOG(INFO) << "check failed: " << error.get_str();
         return false;
       }
-			LOG(INFO) << "check passed";
+	//LOG(INFO) << "check passed";
 
       method = root["method"].get_str();
       if(method != "")
@@ -191,7 +191,7 @@ namespace Json
       boost::json::Value error;
       bool parsing = false;
 
-      LOG(INFO) << "parsing msg";
+      //LOG(INFO) << "parsing msg";
       /* parsing */
       parsing = boost::json::read(msg, root);
 

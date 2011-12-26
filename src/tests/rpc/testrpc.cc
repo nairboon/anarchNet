@@ -32,28 +32,38 @@ TEST(rpc,json)
 TEST(rpc,request)
 {
   boost::json::Value v;
-  boost::json::Object o;
-  o.push_back(json::Pair("testtype","abc"));
-  v = o;
-
+  std::string json = "{\"jsonrpc\": \"2.0\",  \"params\": { \"testtype\": \"abc\"}, \"id\": 1}";
+  boost::json::read_or_throw(json,v);
+  
+  //LOG(INFO) << boost::json::write(v);
   rpc::RPC_Request r(v);
-  rpc::RPC_Request::Parameters rules, rules2;
-  rules["test"] = boost::json::str_type;
-  // incomplete rule set
-  ASSERT_FALSE(r.valid(rules));
+  rpc::RPC_Request::Parameters rules;
 
-  rules2["testtype"] = boost::json::str_type;
+  rules["testtype"] = boost::json::str_type;
   // complete rule set but invalid rpc request
-  ASSERT_FALSE(r.valid(rules2));
-  //o.push_back(json::Pair("id","1"));
-  o.push_back(json::Pair("jsonrpc","2.0"));
-  v=o;
-  boost::json::Config::add(v.get_obj(),"id",1);
-  rpc::RPC_Request r2(v);
-  // valid rpc
-  ASSERT_TRUE(r2.valid(rules2));
-  rpc::RPC_Response res = r2.createResponse();
+  ASSERT_TRUE(r.valid(rules));
+ 
+  rpc::RPC_Response res = r.createResponse();
   ASSERT_EQ(res.json()["id"].get_int(),1);
-  boost::json::Config::add(res.json().get_obj(),"random","string");
-  ASSERT_EQ(res.json()["random"].get_str(),"string");
+ }
+
+
+TEST(util,base64)
+{
+  std::string con = "ABCDEF01234,.-¨?$!*#{}[";
+  
+  boost::json::Value v;
+  std::string json = "{\"jsonrpc\": \"2.0\",  \"params\": { \"content\": \""+ con +"\"}, \"id\": 1}";
+  boost::json::read_or_throw(json,v);
+  
+ rpc::RPC_Request req(v); 
+ rpc::RPC_Response res = req.createResponse();
+ std::string b64 = res.encode_base64(con);
+ LOG(INFO) << "b64: " << b64;
+   req.params()["content"] = b64;
+
+ std::string ress = req.decode_base64("content");
+ 
+ ASSERT_EQ(con,ress);
+  
 }

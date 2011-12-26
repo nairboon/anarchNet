@@ -80,7 +80,6 @@ LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::ge
 	void connection::handle_read(const boost::system::error_code& error,
 									 size_t bytes_transferred)
 	{
-	  LOG(INFO) << __FUNCTION__;
 		if (!error)
 		{
 			std::istream request_stream(&request_buf_);
@@ -90,7 +89,7 @@ LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::ge
 
 		     
 			std::string data = os.str();
-			LOG(INFO) << "got: " << bytes_transferred;// << ": " << data;
+			//LOG(INFO) << "got: " << bytes_transferred;// << ": " << data;
 
 			if(!data.size())
 			{
@@ -114,7 +113,7 @@ LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::ge
 																					 boost::asio::placeholders::error)));
 			}
 		}
-		else
-		  LOG(INFO) << "error: " << error.default_error_condition().value() << " " << error.category().name();
+		//else
+		//  LOG(INFO) << "error: " << error.default_error_condition().value() << " " << error.category().name();
 	}
 }

@@ -58,6 +58,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/jsonrpc/src"
 	"${CMAKE_SOURCE_DIR}/third-party/boost/log"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
+	"${CMAKE_SOURCE_DIR}/third-party/libb64/include"
 	"/usr/local/include"
 	"/sw/include"
  )
@@ -78,13 +79,14 @@ endif()
 message(STATUS "linked libraries: ${LIB} ${TEST_LIB}")
 
 ################################################################################
-# json
+# util
 ################################################################################
 
 file(GLOB JSON_C "${ROOT_DIR}/third-party/boost/json/src/*.c*")
+file(GLOB B64_C "${ROOT_DIR}/third-party/libb64/src/*.c*")
 file(GLOB JSON_H "${ROOT_DIR}/third-party/boost/json/*.h*")
-list(APPEND JSON_SRC ${JSON_C} ${JSON_H})
-add_library(json ${JSON_SRC})
+list(APPEND UTIL_SRC ${JSON_C} ${JSON_H} ${B64_C})
+add_library(util ${UTIL_SRC})
 
 ################################################################################
 # jsonrpc
@@ -107,8 +109,8 @@ file(GLOB RPC_H "${SOURCE_DIR}/rpc/*.h*")
 list(APPEND RPC_SRC ${RPC_C} ${RPC_H} ${JSON_RPC_H} "${ROOT_DIR}/third-party/jsonrpc/src/jsonrpc_handler.cpp")
 
 add_library(rpc ${RPC_SRC})
-target_link_libraries(rpc json)
-add_dependencies(rpc json logger)
+target_link_libraries(rpc util)
+add_dependencies(rpc util logger)
 ################################################################################
 # logger
 ################################################################################
@@ -152,9 +154,9 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 
 add_library(anDaemonInternal STATIC ${DAEMON_SRC})
 add_executable(anDaemon "${SOURCE_DIR}/daemon/main.cc")
-add_dependencies(anDaemon anDaemonInternal json logger rpc)
+add_dependencies(anDaemon anDaemonInternal util logger rpc)
 target_link_libraries(anDaemonInternal ${LIB} ${PLATFORM_LIB})
-target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} an json logger rpc)
+target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} an util logger rpc)
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)
@@ -175,7 +177,7 @@ set(LIBRARY_SRC
 
 add_library(an SHARED ${LIBRARY_SRC})
 add_dependencies(an rpc logger)
-target_link_libraries(an ${LIB} json logger rpc)
+target_link_libraries(an ${LIB} util logger rpc)
 
 ################################################################################
 # Python library search (style check)                                          #
@@ -245,9 +247,9 @@ add_dependencies(TBase anDaemon logger)
 add_dependencies(TRPC anDaemon logger rpc)
 add_dependencies(TModule anDaemon logger rpc)
 
-target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} json an logger)
-target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} json an logger rpc)
-target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} json an logger rpc)
+target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger)
+target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
+target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
 
 enable_testing()
 add_test(Base ${BIN_DIR}/TBase)
