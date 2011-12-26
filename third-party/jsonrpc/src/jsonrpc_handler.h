@@ -34,6 +34,7 @@
 
 #include "jsonrpc_common.h"
 #include <boost/json/json.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace Json
 {
@@ -191,13 +192,13 @@ namespace Json
      * \note Always pass it in function with reference (i.e. void foo(Json::Rpc::Handler& handler)).
      * \see RpcMethod
      */
-    class Handler
+    class Handler : private boost::noncopyable
     {
       public:
         /**
          * \brief Constructor.
          */
-        Handler();
+        explicit Handler();
 
         /**
          * \brief Destructor.

@@ -34,6 +34,7 @@ class ConfigManager : public Singleton<ConfigManager> {
 		const 	boost::property_tree::ptree& config() { return _pt; }
 		const std::set<std::string>& modules() { return _modules; }
 		int port() { return _port; }
+		int threads() { return _threads; }
 		int rpc_port() { return _rpc_port; }
 		std::string datadir() { return _data_dir; }
 		std::string logdir() { return _log_dir; }
@@ -42,6 +43,7 @@ class ConfigManager : public Singleton<ConfigManager> {
 		std::set<std::string> _modules;
 		int _port;
 		int _rpc_port;
+		int _threads;
 		std::string _data_dir;
 		std::string _log_dir;
 		std::string _dir;

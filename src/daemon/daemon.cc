@@ -63,12 +63,12 @@ namespace an {
 	
 void anDaemon::run() 
 {
-	boost::thread network(boost::bind(&NetManager::run,boost::ref(NetManager::instance())));
+	//boost::thread network(boost::bind(&NetManager::run,boost::ref(NetManager::instance())));
 	boost::thread rpc(boost::bind(&RPCManager::run,boost::ref(RPCManager::instance())));
 
 	LOG(INFO)<<"waiting..";
-	network.join();
-	LOG(INFO) << "network joind";
+	/*network.join();
+	LOG(INFO) << "network joind";*/
 	rpc.join();
 	LOG(INFO) << "rpc joind";
 }

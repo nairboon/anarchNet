@@ -34,7 +34,7 @@ namespace an
 {
 	
 	bool	NetManager::init() {
-		_server = new RpcServer(_io_service, ConfigManager::instance().port());
+		_server = new RpcServer(_io_service, ConfigManager::instance().port(),ConfigManager::instance().threads());
 		
 		
 		p2p::Discovery hs;
@@ -46,7 +46,7 @@ namespace an
 	{
 		try {
 			LOG(INFO) << "Start p2p networking";
-			_io_service.run();
+			_server->run();
 			LOG(INFO) << "Finished NetManager";
 		}
 		catch(std::exception& e)

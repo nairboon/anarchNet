@@ -40,7 +40,7 @@ namespace an
 {
 
 bool	RPCManager::init() {
-	_server = new RpcServer(_io_service, ConfigManager::instance().rpc_port());
+	_server = new RpcServer(_io_service, ConfigManager::instance().rpc_port(),ConfigManager::instance().threads());
 
   _server->AddMethod(new Json::Rpc::RpcMethod<rpc::Util>(_bs,
 										&rpc::Util::RuntimeInfo, std::string("an.info")));
@@ -82,7 +82,7 @@ bool	RPCManager::init() {
 	{
 		try {
 			LOG(INFO) << "Start local rpc server";
-			_io_service.run();
+			_server->run();
 			LOG(INFO) << "Stop JSON-RPC TCP server";
 		}
 		catch(std::exception& e)
@@ -129,13 +129,25 @@ namespace rpc {
 		 response = req.createErrorResponse().json();
 		  return false;
 		}
-
+		
 		db::ObjPtr obj(new db::Object());
-		obj->create(req.decode_base64("content"));
+		
+		 if(!req.params()["id"].is_null() && req.params()["id"].type() == boost::json::str_type) {
+		  std::string custom_id = req.params()["id"].get_str();
+		    LOG(INFO) << "using custom id: " << custom_id;
+	      
+		  obj->create(req.decode_base64("content"),custom_id);
+		   
+		}
+		else
+		  obj->create(req.decode_base64("content"));
+		
 		if(!DBManager::instance().create_object(obj)) {
 			LOG(INF) << "could not store";
 
-		 response = req.createErrorResponse().json()["err"] = "create object failed";
+		 RPC_Response res = req.createErrorResponse();
+		 res.json()["err"] = "create object failed";
+		 response = res.json();
 		 return false;
 		}
 
@@ -162,7 +174,9 @@ namespace rpc {
 		db::ObjID id = req.params()["id"].get_str();
 		if(!DBManager::instance().get_object(id,obj)) {
 			LOG(INF) << "could not get obj: "<< id;
-		 response = req.createErrorResponse().json()["err"] = "get object failed";
+		 res = req.createErrorResponse();
+		 res.json()["err"] = "get object failed";
+		 response = res.json();
 		 return false;
 		}
 
@@ -231,11 +245,14 @@ namespace rpc {
 		if(!ModuleManager::instance().kv_get(req.params()["key"].get_str(),value)) {
 			LOG(INF) << "could not get";
 
-		 response = req.createErrorResponse().json()["err"] = "kv.get failed";
+		 RPC_Response res = req.createErrorResponse();
+		 res.json()["err"] = "kv.get failed";
+		 response = res.json();
 		 return false;
 		}
-
+		
 		RPC_Response res = req.createResponse();
+		value = res.encode_base64(value);
 		LOG(INFO) << "got value for key: " << req.params()["key"].get_str()<< " " << value;
 		boost::json::Config::add(res.data(),"value",value);
 		response = res.json();
@@ -258,7 +275,9 @@ namespace rpc {
 		if(!ModuleManager::instance().kv_put(req.params()["key"].get_str(),content)) {
 			LOG(INF) << "could not store";
 
-		 response = req.createErrorResponse().json()["err"] = "kv.put failed";
+		 RPC_Response res = req.createErrorResponse();
+		 res.json()["err"] = "kv.put failed";
+		 response = res.json();
 		 return false;
 		}
 
@@ -282,7 +301,9 @@ namespace rpc {
 		if(!ModuleManager::instance().kv_remove(req.params()["key"].get_str())) {
 			LOG(INF) << "could not remove";
 
-		 response = req.createErrorResponse().json()["err"] = "kv.remove failed";
+		 RPC_Response res = req.createErrorResponse();
+		 res.json()["err"] = "kv.remove failed";
+		 response = res.json();
 		 return false;
 		}
 

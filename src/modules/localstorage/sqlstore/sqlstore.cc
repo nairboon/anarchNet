@@ -45,7 +45,7 @@ try {
 		return true;
 	}
 	_db = new SQLDB("sqlite3","database="+_db_path);
-	_db->verbose = true;
+	//_db->verbose = true;
 	if(_db->needsUpgrade())
 	_db->upgrade();
 	return true;

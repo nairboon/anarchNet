@@ -55,6 +55,7 @@
 namespace an {
 #define ANARCHNET_RPC_PORT 23666
 #define ANARCHNET_PORT 23555
+#define ANARCHNET_THREADS 4
 
 
 #if defined( __WIN32__ ) || defined( _WIN32 )

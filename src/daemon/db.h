@@ -84,6 +84,7 @@ namespace an {
 			std::vector<DiffPtr> diffs;
 			bool save();
 			bool create(String inp);
+			bool create(String inp,const ObjID& custom_id);
 			bool load(const ObjID& id);
 			bool remove();
 			Object() : _db_id(0), _db_type("") {}

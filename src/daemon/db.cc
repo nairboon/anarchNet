@@ -51,7 +51,15 @@ namespace an
 			id = ObjID(crypto::toHex(crypto::Hash("OBJECT"+ss->id)));
 			return DBManager::instance().create_object(shared_from_this());
 		}
-
+		
+		bool Object::create(String inp,const ObjID& custom_id)
+		{
+			SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
+			snapshots.push_back(ss);
+			id = custom_id;
+			return DBManager::instance().create_object(shared_from_this());
+		}
+		
 		bool Object::save() {
 			return DBManager::instance().save_object(id,shared_from_this());
 		}

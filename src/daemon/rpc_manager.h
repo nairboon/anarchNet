@@ -60,7 +60,7 @@ namespace an {
 	    public:
 	      typedef std::map<std::string,boost::json::Value_type> Parameters;
 	    RPC_Request() {}
-	    RPC_Request(const boost::json::Value& inp) : _json(inp) { LOG(INFO) << boost::json::write(inp); }
+	    RPC_Request(const boost::json::Value& inp) : _json(inp) { /*LOG(INFO) << boost::json::write(inp);*/ }
 
 	    bool valid( Parameters& param);
 	    boost::json::Value& json() { return _json; }
@@ -115,6 +115,7 @@ class RPCManager : public Singleton<RPCManager>	{
 		RPCManager() : _running(true) {}
  private:
 		an::RpcServer *_server;
+		
 		boost::asio::io_service _io_service;
 		bool _running;
 		rpc::Util _bs;

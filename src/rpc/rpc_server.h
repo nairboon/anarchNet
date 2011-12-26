@@ -1,5 +1,27 @@
+/*
+ * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
+ * https://launchpad.net/anarchNet
+ *
+ * This file is part of anarchNet.
+ *
+ * anarchNet is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * anarchNet is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include "jsonrpc_handler.h"
 #include "logger.h"
 
@@ -11,12 +33,15 @@ namespace an
 
 	using boost::asio::ip::tcp;
 	
-	class session
+	class connection
+	 : public boost::enable_shared_from_this<connection>,
+    private boost::noncopyable
 		{
 		public:
-			session(boost::asio::io_service& io_service,Json::Rpc::Handler* jsh)
-			: socket_(io_service), _jsonHandler(jsh)
+			connection(boost::asio::io_service& io_service,Json::Rpc::Handler& jsh)
+			: socket_(io_service), strand_(io_service), _jsonHandler(jsh)
 			{
+			  LOG(INFO) << "new connection";
 			}
 			
 			tcp::socket& socket()
@@ -26,9 +51,9 @@ namespace an
 			
 			void start()
 			{
-			  async_read_until(socket_, request_buf_, "\r\n" ,boost::bind(&session::handle_read, this,
+			  async_read_until(socket_, request_buf_, "\r\n" ,strand_.wrap(bind(&connection::handle_read, shared_from_this(),
 													boost::asio::placeholders::error,
-													boost::asio::placeholders::bytes_transferred));
+													boost::asio::placeholders::bytes_transferred)));
 			}
 			
 		private:
@@ -39,63 +64,61 @@ namespace an
 			{
 				if (!error)
 				{
-					socket_.async_read_some(boost::asio::buffer(data_, max_length),
-																	boost::bind(&session::handle_read, this,
-																							boost::asio::placeholders::error,
-																							boost::asio::placeholders::bytes_transferred));
-				}
-				else
-				{
-					delete this;
+				  async_read_until(socket_, request_buf_, "\r\n" ,strand_.wrap(boost::bind(&connection::handle_read, shared_from_this(),
+													boost::asio::placeholders::error,
+													boost::asio::placeholders::bytes_transferred)));
+
+				  
 				}
 			}
 			
 			tcp::socket socket_;
-			enum { max_length = 1024 };
-			char data_[max_length];
 			boost::asio::streambuf request_buf_;
-			Json::Rpc::Handler* _jsonHandler;
+			Json::Rpc::Handler& _jsonHandler;
+			  /// Strand to ensure the connection's handlers are not called concurrently.
+			boost::asio::io_service::strand strand_;
 		};
+	typedef boost::shared_ptr<connection> connection_ptr;
 	
 	class RpcServer
 		{
 		public:
-			RpcServer(boost::asio::io_service& io_service, short port)
-			: io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
-			{
-				start_accept();
-			}
+			RpcServer(boost::asio::io_service& io_service, short port,std::size_t thread_pool_size);
 			~RpcServer();
 
 			void AddMethod(Json::Rpc::CallbackMethod* method);
 			void DeleteMethod(const std::string& method);
+			void run();
 			
 		protected:
 			Json::Rpc::Handler _jsonHandler;	
 			
 		private:
-			void start_accept()
+			/*void start_accept()
 			{
-				session* new_session = new session(io_service_,&_jsonHandler);
-				acceptor_.async_accept(new_session->socket(),
-															 boost::bind(&RpcServer::handle_accept, this, new_session,
+				connection* new_connection = new connection(io_service_,&_jsonHandler);
+				acceptor_.async_accept(new_connection->socket(),
+															 boost::bind(&RpcServer::handle_accept, this, new_connection,
 																					 boost::asio::placeholders::error));
-			}
+			}*/
 			
-			void handle_accept(session* new_session,
-												 const boost::system::error_code& error)
+			void handle_accept(const boost::system::error_code& error)
 			{
 				if (!error)
 				{
-					new_session->start();
+				  new_connection_->start();
+				  new_connection_.reset(new connection(io_service_, _jsonHandler));
+				  acceptor_.async_accept(new_connection_->socket(),
+							 boost::bind(&RpcServer::handle_accept, this,
+								     boost::asio::placeholders::error));
 				}
-				else
-					delete new_session;
-				
-				start_accept();
 			}
 			boost::asio::io_service& io_service_;
 			tcp::acceptor acceptor_;
+			 /// The number of threads that will call io_service::run().
+			std::size_t thread_pool_size_;
+			  /// The next connection to be accepted.
+			connection_ptr new_connection_;
 		};
 } 
 
