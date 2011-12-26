@@ -5,10 +5,8 @@
  */
 
 var express = require('express'),
-	mongoose = require('mongoose'),
 	crypto = require('crypto'),
 	fs = require("fs"),
-	MongoStore = require('connect-mongodb'),
 	resource = require('express-resource'),
 	namespace = require('express-namespace'),
 	db = require('./lib/db.js'),
@@ -18,8 +16,6 @@ var express = require('express'),
 	apploader = require('./lib/apploader.js'),
 	sharejs = require('share').server,
 	config = require('./config.js');
-
-var db_handle = mongoose.connect(config.dburl).db;
 
 
 if(config.use_ssl) {

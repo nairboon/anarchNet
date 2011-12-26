@@ -3,15 +3,14 @@
  *	creates admin user and imports pkgs
  */
 
-var common = require('./models/common.js'),
+var util = require('./lib/util.js'),
 	config = require('./config.js'),
 	db = require('./lib/db.js'),
-	os = require('os'),
 	setup = require("./lib/setup.js");
 
 
-var system_id = "SYSID" + os.type() + os.release() + os.totalmem() + os.hostname();
-console.log(system_id);
+
+console.log(util.system_id);
 
 var an = require("./lib/an.js");
 
@@ -20,35 +19,38 @@ var an = require("./lib/an.js");
   db.get_ht("lamekey", function(err,data) {
     console.log("got:",data);
   });
-});*/
+});
 
 
-/*db.store("lamekey","mycontnet",function(err,data){
+db.store("lamekey","mycontnet",function(err,data){
   console.log("calling get for:",data.id);
   db.get(data.id, function(err,data) {
     console.log("got:",data);
   });
-});*/
+});
+*/
 
+var filestore = require('./lib/filestore.js');
+filestore.storeFile("config.js","heheh",function(err){
+console.log(err);
+});
 
-		setup.ScanLocalPackages(function(err,mlid){
-			console.log("packages scaned");
-			db.get(system_id+"masterlist", function(err,res) {
-				
-					db.store(system_id+"masterlist",mlid, function(err){
-						if(err)
-							throw new Error("could not save settings");
+console.log("scan packages...");
+setup.ScanLocalPackages(function(err,mlid){
+	console.log("packages scaned");
+	db.get(util.system_id+"masterlist", function(err,res) {
+		console.log("storing master list...");
+		db.store(util.system_id+"masterlist",mlid, function(err){
+			if(err)
+				throw new Error("could not save settings");
 
-							setup.createDefaultRepo(mlid,function(err,res){
-								if(err)
-									throw new Error("could not create a repo");
+			setup.createDefaultRepo(mlid,function(err,res){
+				if(err)
+					throw new Error("could not create a repo");
 
-							});
-					});
-
-				}
-			);
+			});
 		});
 
-
+	});
+});
 
