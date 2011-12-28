@@ -20,27 +20,22 @@ var an = require("./lib/an.js");
     console.log("got:",data);
   });
 });
-
-
-db.store("lamekey","mycontnet",function(err,data){
+*/
+db.store_with_id("lamekey",{a:"mycontnet"},function(err,data){
   console.log("calling get for:",data.id);
   db.get(data.id, function(err,data) {
     console.log("got:",data);
   });
 });
-*/
 
-var filestore = require('./lib/filestore.js');
-filestore.storeFile("config.js","heheh",function(err){
-console.log(err);
-});
 
+/*
 console.log("scan packages...");
 setup.ScanLocalPackages(function(err,mlid){
 	console.log("packages scaned");
-	db.get(util.system_id+"masterlist", function(err,res) {
-		console.log("storing master list...");
-		db.store(util.system_id+"masterlist",mlid, function(err){
+	db.get_ht(util.system_id+"masterlist", function(err,res) {
+		console.log("storing master list...",mlid);
+		db.store_ht(util.system_id+"masterlist",mlid, function(err){
 			if(err)
 				throw new Error("could not save settings");
 
@@ -53,4 +48,4 @@ setup.ScanLocalPackages(function(err,mlid){
 
 	});
 });
-
+*/
