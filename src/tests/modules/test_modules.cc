@@ -89,7 +89,7 @@ TEST(LocalStore,FileStore)
 	ASSERT_TRUE(ModuleManager::instance().store_file("TESTFILE",res));
 	ASSERT_EQ(res,filehash);
 	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
-	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/filestore/"+filepath);
+	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);
 	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
 }
 

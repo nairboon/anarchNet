@@ -55,6 +55,7 @@ bool Blockstore::initialise() {
 			return false;	
 		}
 	}
+	_data_dir += "/";
 	
 	_blocksize = _config.get("blocksize",128) /* in kB */ * 1024;
 	
@@ -78,34 +79,34 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	BOOST_LOG_SEV(an::log::Logger::instance().get(),INFO) << "test";
 	
 	std::string hash = an::crypto::toHex(an::crypto::HashFile(path));
-	std::string hpath =hash_to_path(hash);
+	std::string hpath = hash_to_path(hash);
 	
     try {
       	uint filesize = fs::file_size(path);
 	uint blocks = ceil(filesize / _blocksize);
-	LOG(INFO) << "storing in " << blocks << " blocks";
+	LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
 	
-		if(fs::exists(_path + hpath)) {
+		if(fs::exists(_data_dir + hpath)) {
 			LOG(INFO) << "file already stored: " << hash;
 			res = hash;
 			return true;
 		}
 		
-		fs::path hf = fs::path(_path + hpath);
+		fs::path hf = fs::path(_data_dir + hpath);
 		fs::path ppath = hf.remove_filename();
-		LOG(INFO) << "from: " << path << " to: " << _path + hpath << std::endl;
+		LOG(INFO) << "from: " << path << " to: " << _data_dir + hpath << std::endl;
 		if(!fs::exists(ppath)) 
 		if(!fs::create_directories(ppath)) {
 			LOG(ERROR) << "could not create directories" << std::endl;
 			return false;
 		}
 		
-		fs::ofstream header_file(hf,std::ios::binary);
+		fs::ofstream header_file(_data_dir+hpath,std::ios::binary);
 		if(!header_file.good()) {
 		LOG(ERROR) << "could not open " << hf;
 		  return false;
 		}
-		header_file.write((char *)filesize,sizeof(long));
+		header_file.write(reinterpret_cast<char*>(&filesize),sizeof(uint));
 		
 		fs::ifstream input_file(path,std::ios::binary);
 		if(!input_file.good()) {
@@ -113,6 +114,11 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		  header_file.close();
 		  return false;
 		}
+		
+		if(filesize < _blocksize) { // we only need one file
+		  header_file << input_file.rdbuf();
+		}
+		else {
 		uint readbytes = 0;
 		boost::shared_array<char> buffer = boost::shared_array<char>(new char[_blocksize]);
 		std::string hash,block_path;
@@ -121,7 +127,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		  hash = an::crypto::Hash(buffer.get());
 		  block_path = hash_to_path(hash);
 		  {
-		    fs::ofstream block_file(_path + block_path,std::ios::binary);
+		    fs::ofstream block_file(_data_dir + block_path,std::ios::binary);
 		    if(!input_file.good()) {
 		      LOG(ERROR) << "could not open " << hf;
 		      header_file.close();
@@ -134,6 +140,8 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		  header_file.write(hash.c_str(),512);
 		  
 		} while(readbytes < filesize);
+		}
+		
 		input_file.close();
 		header_file.close();
 	}
@@ -153,7 +161,7 @@ bool Blockstore::get_file_path(const std::string& id,std::string& res)
 
 bool Blockstore::remove_file(const std::string& id) 
 { 
-	if(!fs::remove(_path + hash_to_path(id))) {
+	if(!fs::remove(_data_dir + hash_to_path(id))) {
 		LOG(ERROR) << "could not remove file";
 		return false; 
 	}
