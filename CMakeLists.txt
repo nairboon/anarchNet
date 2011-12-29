@@ -164,6 +164,10 @@ add_custom_command(TARGET anDaemon POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/anarchnet.conf" "${BIN_DIR}/anarchnet.conf")
 add_custom_command(TARGET anDaemon POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/contrib/an.log.conf" "${BIN_DIR}/an.log.conf")
+add_custom_command(TARGET anDaemon POST_BUILD
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/testing/TESTFILE" "${BIN_DIR}/TESTFILE")
+add_custom_command(TARGET anDaemon POST_BUILD
+		   COMMAND ${CMAKE_COMMAND} -E create_symlink "${ROOT_DIR}/testing/testfile.jpg" "${BIN_DIR}/testfile.jpg")
 ################################################################################
 # Library
 ################################################################################

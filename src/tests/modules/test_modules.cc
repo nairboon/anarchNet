@@ -81,12 +81,24 @@ TEST(DaemonTest,db_obj)
 	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }
 
-TEST(LocalStore,FileStore)
+TEST(LocalStore,FileStore_small)
 {
 	std::string filehash = "a02a9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
 	std::string filepath = "a0/2a/9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
 	std::string res;
 	ASSERT_TRUE(ModuleManager::instance().store_file("TESTFILE",res));
+	ASSERT_EQ(res,filehash);
+	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
+	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);
+	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
+}
+
+TEST(LocalStore,FileStore_big)
+{
+	std::string filehash = "81ec274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
+	std::string filepath = "81/ec/274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
+	std::string res;
+	ASSERT_TRUE(ModuleManager::instance().store_file("testfile.jpg",res));
 	ASSERT_EQ(res,filehash);
 	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
 	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);

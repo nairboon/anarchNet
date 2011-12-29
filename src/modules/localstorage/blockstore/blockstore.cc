@@ -83,7 +83,8 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	
     try {
       	uint filesize = fs::file_size(path);
-	uint blocks = ceil(filesize / _blocksize);
+	uint blocks = floor(filesize / _blocksize)+1;
+	uint blockc = 0;
 	LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
 	
 		if(fs::exists(_data_dir + hpath)) {
@@ -103,14 +104,14 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		
 		fs::ofstream header_file(_data_dir+hpath,std::ios::binary);
 		if(!header_file.good()) {
-		LOG(ERROR) << "could not open " << hf;
+		LOG(ERROR) << "could not open " << _data_dir+hpath;
 		  return false;
 		}
 		header_file.write(reinterpret_cast<char*>(&filesize),sizeof(uint));
 		
 		fs::ifstream input_file(path,std::ios::binary);
 		if(!input_file.good()) {
-		LOG(ERROR) << "could not open " << hf;
+		LOG(ERROR) << "could not open " << path;
 		  header_file.close();
 		  return false;
 		}
@@ -124,22 +125,35 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		std::string hash,block_path;
 		do {
 		  input_file.read(buffer.get(),_blocksize);
-		  hash = an::crypto::Hash(buffer.get());
-		  block_path = hash_to_path(hash);
+		  readbytes = _blocksize;
+		  if(input_file.eof()) {
+		    readbytes = abs((blockc * _blocksize) - filesize);
+		    hash = an::crypto::Hash(std::string(buffer.get(),readbytes));
+		  }
+		  else
+		    hash = an::crypto::Hash(buffer.get());
+		  block_path = hash_to_path(an::crypto::toHex(hash));
 		  {
+		    fs::path ppath = fs::path(_data_dir + block_path).remove_filename();
+		    if(!fs::exists(ppath)) 
+		      if(!fs::create_directories(ppath)) {
+			LOG(ERROR) << "could not create directories" << std::endl;
+			return false;
+		      }
 		    fs::ofstream block_file(_data_dir + block_path,std::ios::binary);
-		    if(!input_file.good()) {
-		      LOG(ERROR) << "could not open " << hf;
+		    if(!block_file.good()) {
+		      LOG(ERROR) << "block: " << blockc << " could not open " << _data_dir + block_path;
+		      LOG(ERROR) << an::crypto::toHex(hash);
 		      header_file.close();
 		      input_file.close();
 		      return false;
 		    }
-		    block_file.write(buffer.get(),_blocksize);
+		    block_file.write(buffer.get(),readbytes);
 		    block_file.close();
 		  }
 		  header_file.write(hash.c_str(),512);
 		  
-		} while(readbytes < filesize);
+		} while(blockc++ < blocks);
 		}
 		
 		input_file.close();
