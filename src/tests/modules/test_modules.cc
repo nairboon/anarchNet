@@ -4,6 +4,7 @@
 #include "module_manager.h"
 #include "config_manager.h"
 #include "crypto.h"
+#include "../modules/localstorage/blockstore/lru_cache.h"
 
 using namespace an;
 
@@ -102,4 +103,54 @@ TEST(LocalStore,HT)
 	ASSERT_EQ(res,value);
 	ASSERT_TRUE(ModuleManager::instance().kv_remove(key));
 	ASSERT_FALSE(ModuleManager::instance().kv_get(key,res));
+}
+
+ size_t count_evaluations=0;
+// Dummy function we want to cache 
+std::string fn(const std::string& s)
+{
+  ++count_evaluations;
+  std::string r;
+  std::copy(s.rbegin(),s.rend(),std::back_inserter(r));
+  return r;
+}
+
+
+typedef lru_cache_using_boost_set<std::string,std::string>::type  cache_type;
+
+TEST(Blockstore, lru_cache)
+{
+cache_type lru(fn,5); 
+ 
+  // Some initial accesses to prime state 
+  ASSERT_EQ(lru("first"),"tsrif"); 
+  ASSERT_EQ(lru("second"),"dnoces"); 
+  ASSERT_EQ(lru("third"),"driht"); 
+  ASSERT_EQ(lru("fourth"),"htruof"); 
+  ASSERT_EQ(lru("fifth"),"htfif"); 
+  ASSERT_EQ(count_evaluations,5); 
+  ASSERT_EQ(lru("sixth"),"htxis"); 
+  ASSERT_EQ(count_evaluations,6); 
+ 
+  // This should be retrieved from cache 
+  ASSERT_EQ(lru("second"),"dnoces"); 
+  ASSERT_EQ(count_evaluations,6); 
+ 
+  // This will have been evicted 
+  ASSERT_EQ(lru("first"),"tsrif"); 
+  ASSERT_EQ(count_evaluations,7); 
+ 
+  // So check fourth is retrieved 
+  ASSERT_EQ(lru("fourth"),"htruof"); 
+  ASSERT_EQ(count_evaluations,7); 
+ 
+  // That will have moved up "fourth" to the head 
+  // so this will evict fifth 
+  ASSERT_EQ(lru("seventh"),"htneves"); 
+  ASSERT_EQ(count_evaluations,8); 
+ 
+  // Check fifth was evicted as expected 
+  ASSERT_EQ(lru("fifth"),"htfif"); 
+  ASSERT_EQ(count_evaluations,9); 
+ 
 }

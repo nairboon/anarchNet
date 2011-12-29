@@ -1,8 +1,8 @@
+#include "config_manager.h"
 #include "logger.h"
 #include "puggKernel.h"
 #include "db.h"
 #include "sqlstore.h"
-#include "config_manager.h"
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>

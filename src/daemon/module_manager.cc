@@ -23,14 +23,14 @@
 #include "anarchNet.h"
 #include "logger.h"
 #include "module_manager.h"
-
+#include "config_manager.h"
 #include "plugins/bootstrap.h"
 #include "plugins/localstorage.h"
 #include "plugins/remotestorage.h"
 #include "plugins/session.h"
 #include "plugins/util.h"
 #include "plugin_manager.h"
-#include "config_manager.h"
+
 
 namespace an
 {
@@ -58,7 +58,8 @@ bool ModuleManager::init()
 	BOOST_FOREACH(plgdrv::Bootstrap* drv, bs_drivers) {
 		plg::Bootstrap* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
-		plg->initialise();
+		if(!plg->initialise())
+		  return false;
 		LOG(INFO)<< plg->getName() << " initialized";
 		_bootstrapers.push_back(plg);
 	}
@@ -68,7 +69,8 @@ bool ModuleManager::init()
 	BOOST_FOREACH(plgdrv::LocalStorage* drv, ls_drivers) {
 		plg::LocalStorage* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
-		plg->initialise();
+		if(!plg->initialise())
+		  return false;
 		LOG(INFO)<< plg->getName() << " initialized";
 		_localstorages.push_back(plg);
 	}
@@ -78,7 +80,8 @@ bool ModuleManager::init()
 	BOOST_FOREACH(plgdrv::RemoteStorage* drv, rs_drivers) {
 		plg::RemoteStorage* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
-		plg->initialise();
+		if(!plg->initialise())
+		  return false;
 		LOG(INFO)<< plg->getName() << " initialized";
 		_remotestorages.push_back(plg);
 	}
@@ -88,7 +91,8 @@ bool ModuleManager::init()
 	BOOST_FOREACH(plgdrv::Session* drv, s_drivers) {
 		plg::Session* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
-		plg->initialise();
+		if(!plg->initialise())
+		  return false;
 		LOG(INFO)<< plg->getName() << " initialized";
 		_sessions.push_back(plg);
 	}
@@ -98,7 +102,8 @@ bool ModuleManager::init()
 	BOOST_FOREACH(plgdrv::Util* drv, u_drivers) {
 		plg::Util* plg = drv->createPlugin();
 		LOG(INFO)<< plg->getName() << " created";
-		plg->initialise();
+		if(!plg->initialise())
+		  return false;
 		LOG(INFO)<< plg->getName() << " initialized";
 		_utils.push_back(plg);
 	}

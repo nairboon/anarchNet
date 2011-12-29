@@ -32,6 +32,7 @@ class ConfigManager : public Singleton<ConfigManager> {
  public:
 		bool init(const std::string&);
 		const 	boost::property_tree::ptree& config() { return _pt; }
+		const 	boost::property_tree::ptree& modules_config(std::string modulename) { return _pt.get_child("modules").get_child(modulename); }
 		const std::set<std::string>& modules() { return _modules; }
 		int port() { return _port; }
 		int threads() { return _threads; }

@@ -1,4 +1,5 @@
 #include <cstdio>
+#include "config_manager.h"
 #include "logger.h"
 #include "puggKernel.h"
 #include "db.h"
@@ -6,7 +7,6 @@
 #include <boost/date_time/time_duration.hpp>
 #include "pdb_updater.h"
 #include "crypto.h"
-#include "config_manager.h"
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>

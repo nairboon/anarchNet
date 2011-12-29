@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <boost/property_tree/ptree.hpp>
 
 #ifndef SRC_DAEMON_PLUGIN_H
 #define SRC_DAEMON_PLUGIN_H
@@ -29,6 +30,18 @@ namespace an {
 			virtual const unsigned int getVersion() = 0;
 			virtual bool initialise() = 0;
 			virtual void shutdown() = 0;
+		protected:
+		  bool get_config() {
+		    try {
+		      _config = an::ConfigManager::instance().modules_config(getName());
+		    }
+		    catch(boost::property_tree::ptree_error& e)
+		    {
+		      return false;
+		    }
+		    return true;
+		  }
+		  boost::property_tree::ptree _config;
 		};
 }
 #endif

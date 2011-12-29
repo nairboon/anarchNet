@@ -90,6 +90,9 @@ namespace an {
 			bool GetObject(const boost::json::Value& root, boost::json::Value& response);
 			bool DeleteObject(const boost::json::Value& root, boost::json::Value& response);
 			bool UpdateObject(const boost::json::Value& root, boost::json::Value& response);
+			
+			bool file_put(const boost::json::Value& root, boost::json::Value& response);
+			bool file_get(const boost::json::Value& root, boost::json::Value& response);
 		};
 
 	class anStore {

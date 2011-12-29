@@ -68,6 +68,11 @@ bool	RPCManager::init() {
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls,
 										&rpc::LocalStorage::DeleteObject, std::string("object.delete")));
 
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls,
+										&rpc::LocalStorage::file_put, std::string("file.put")));	
+	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::LocalStorage>(_ls,
+										&rpc::LocalStorage::file_get, std::string("file.get")));
+	
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans,
 										&rpc::anStore::kv_get, std::string("kv.get")));
 	_server->AddMethod(new Json::Rpc::RpcMethod<rpc::anStore>(_ans,
@@ -124,6 +129,64 @@ namespace rpc {
 	return true;
 	}
 
+	bool LocalStorage::file_put(const boost::json::Value& root, boost::json::Value& response)
+	{
+	  RPC_Request req(root);
+	  rpc::RPC_Request::Parameters rules;
+	  rules["path"] = boost::json::str_type;
+	  if(!req.valid(rules)) {
+	    LOG(INFO) << "invalid request";
+	    response = req.createErrorResponse().json();
+	    return false;
+	  }
+	  
+	  std::string path = req.params()["path"].get_str();
+	  std::string id;
+	  RPC_Response res = req.createResponse();
+	  LOG(INFO) << "put file: " << id;
+	  if(!ModuleManager::instance().store_file(path,id)) {
+	    LOG(INF) << "could not store file: "<< id;
+	    res = req.createErrorResponse();
+	    res.json()["error"] = "store file failed";
+	    response = res.json();
+	    return false;
+	  }
+	  boost::json::Config::add(res.data(),"id",id);
+	  
+	  response = res.json();
+	  
+	  return true;
+	}
+	
+	bool LocalStorage::file_get(const boost::json::Value& root, boost::json::Value& response)
+	{
+	  RPC_Request req(root);
+	  rpc::RPC_Request::Parameters rules;
+	  rules["id"] = boost::json::str_type;
+	  if(!req.valid(rules)) {
+	    LOG(INFO) << "invalid request";
+	    response = req.createErrorResponse().json();
+	    return false;
+	  }
+	  
+	  std::string id = req.params()["id"].get_str();
+	  std::string path;
+	  RPC_Response res = req.createResponse();
+	  LOG(INFO) << "get file: " << id;
+	  if(!ModuleManager::instance().get_file_path(id,path)) {
+	    LOG(INF) << "could not get file: "<< id;
+	    res = req.createErrorResponse();
+	    res.json()["error"] = "get file failed";
+	    response = res.json();
+	    return false;
+	  }
+
+	  boost::json::Config::add(res.data(),"path",path);
+	  
+	  response = res.json();
+	  return true;
+	}
+			
 	bool LocalStorage::CreateObject(const boost::json::Value& root, boost::json::Value& response)
 	{
 	  	RPC_Request req(root);
@@ -211,7 +274,6 @@ namespace rpc {
 				boost::json::Config::add(res.data(),"content",obj->id);
 
 		response = res.json();
-
 		}
 		else {
 		  std::string content;

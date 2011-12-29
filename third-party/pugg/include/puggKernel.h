@@ -64,8 +64,11 @@ namespace pugg
 		 */
 		~Kernel(void)
 		{
-			for (PluginMap::iterator it = loadedPlugins.begin();it != loadedPlugins.end();++it)
+			for (ServerMap::iterator it = loadedServers.begin();it != loadedServers.end();++it)
 				delete it->second;
+		  for (PluginMap::iterator it = loadedPlugins.begin();it != loadedPlugins.end();++it)
+				delete it->second;
+			
 		}
 		/**
 		 * Returns version of the pugg library                     

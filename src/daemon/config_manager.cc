@@ -63,7 +63,7 @@ namespace an {
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
 								_pt.get_child("daemon.modules"))
 	_modules.insert(v.first);
-	
+
 	_port = _pt.get("daemon.port", ANARCHNET_PORT);
 	_rpc_port = _pt.get("daemon.rpc_port", ANARCHNET_RPC_PORT);
 	_threads = _pt.get("daemon.threads", ANARCHNET_THREADS);
