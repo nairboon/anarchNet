@@ -173,7 +173,7 @@ namespace rpc {
 	  std::string path;
 	  RPC_Response res = req.createResponse();
 	  LOG(INFO) << "get file: " << id;
-	  if(!ModuleManager::instance().get_file_path(id,path)) {
+	  if(!ModuleManager::instance().get_file(id,path)) {
 	    LOG(INF) << "could not get file: "<< id;
 	    res = req.createErrorResponse();
 	    res.json()["error"] = "get file failed";

@@ -14,11 +14,18 @@
  * 
  * */
 #define PLG_BLOCKSTORE_VERSION 1
+#define HASH_SIZE 512
 
 typedef const std::string id;
 	
 class public_file
 {
+public:
+  public_file(std::string p,bool status=true) : path(p),good(status) { }
+  ~public_file();
+  std::string path;
+  bool good;
+
 };
 typedef boost::shared_ptr<public_file> smart_pf;
 
@@ -40,14 +47,16 @@ public:
 	void shutdown();
 	
 	bool store_file(const std::string& path, std::string& res);
-	bool get_file_path(const std::string& id,std::string& res);
+	bool get_file(const std::string& id,std::string& res);
 	bool remove_file(const std::string& id);
+	
+	bool get_stored_file_path(const std::string& id,std::string& res);
 private:
 	std::string hash_to_path(const std::string& inp);
 	
-
 	smart_block load_block(id& bid);
 	smart_pf load_file(id& fid);
+	
 	std::string _path;
 	std::string _pub_dir;
 	std::string _data_dir;

@@ -31,16 +31,7 @@ namespace an {
 			virtual bool initialise() = 0;
 			virtual void shutdown() = 0;
 		protected:
-		  bool get_config() {
-		    try {
-		      _config = an::ConfigManager::instance().modules_config(getName());
-		    }
-		    catch(boost::property_tree::ptree_error& e)
-		    {
-		      return false;
-		    }
-		    return true;
-		  }
+		  bool get_config(); // in plugin_manager.cc
 		  boost::property_tree::ptree _config;
 		};
 }

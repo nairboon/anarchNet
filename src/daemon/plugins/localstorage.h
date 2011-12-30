@@ -64,7 +64,7 @@ public:
 	 * Binary File Storage
 	 */
 	virtual bool store_file(const std::string& path, std::string& res) { return false; }
-	virtual bool get_file_path(const std::string& id,std::string& res) { return false; }
+	virtual bool get_file(const std::string& id,std::string& res) { return false; }
 	virtual bool remove_file(const std::string& id) { return false; }
 
 };

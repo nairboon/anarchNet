@@ -75,4 +75,15 @@ namespace an
 		//	dhtPlugins_.push_back(driver->createPlugin());
 		return true;
 	}
+	
+	 bool Plugin::get_config() {
+		    try {
+		      _config = an::ConfigManager::instance().modules_config(getName());
+		    }
+		    catch(boost::property_tree::ptree_error& e)
+		    {
+		      return false;
+		    }
+		    return true;
+		  }
 }

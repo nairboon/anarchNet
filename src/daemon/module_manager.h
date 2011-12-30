@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "plugins/plugin.h"
 #include "singleton.h"
 #include "db.h"
 
@@ -72,7 +73,7 @@ public:
 
 		// binary file storage
 		bool store_file(const std::string& path, std::string& res);
-		bool get_file_path(const std::string& id,std::string& res);
+		bool get_file(const std::string& id,std::string& res);
 		bool remove_file(const std::string& id);
 		
 		
@@ -81,6 +82,8 @@ public:
 		bool on_kv_put(const db::ObjID &key);
 		bool on_kv_remove(const db::ObjID &key);
 		bool on_db_update(const db::ObjID &key);
+		
+		plg::LocalStorage * get_ls_plugin(std::string name);		
 		
 protected:
 		ModuleManager() {}

@@ -6,6 +6,7 @@
 #include "crypto.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/log/common.hpp>
@@ -24,6 +25,12 @@ void registerPlugin(Kernel &K)
 	Server<an::plgdrv::LocalStorage>* server = CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
 	assert(server != NULL);
 	server->addDriver(new BlockstoreDriver(),PLG_LOCALSTORAGE_SERVER_VERSION);
+}
+
+
+public_file::~public_file() {
+  if(!fs::remove(path))
+    LOG(ERROR) << "could not remove: " << path;
 }
 
 bool Blockstore::initialise() {
@@ -47,6 +54,7 @@ bool Blockstore::initialise() {
 			return false;	
 		}
 	}
+	_pub_dir += "/";
 
 	_data_dir = _config.get("datadir",_path + "data");
 	if(!fs::exists(_data_dir)) {
@@ -67,10 +75,80 @@ bool Blockstore::initialise() {
 
 smart_block Blockstore::load_block(id& bid)
 {
+  
 }
 
 smart_pf Blockstore::load_file(id& fid)
 {
+  try {
+  	fs::ifstream ifile(_data_dir+hash_to_path(fid),std::ios::binary);
+	if(!ifile.good()) {
+	LOG(ERROR) << "could not open " << _data_dir+hash_to_path(fid);
+		 return smart_pf(new public_file("",false));
+	}
+	
+  	fs::ofstream ofile(_pub_dir+fid,std::ios::binary);
+	if(!ofile.good()) {
+	LOG(ERROR) << "could not open " << _pub_dir+fid;
+	  ifile.close();
+		 return smart_pf(new public_file("",false));
+	}		
+	
+	uint filesize;
+	ifile.read((char *)&filesize,sizeof(uint));
+	if(!boost::math::isfinite<uint>(filesize)) {
+	 LOG(ERROR) << "invalid filesize: " << filesize;
+	 ofile.close();
+	 ifile.close();
+	 return smart_pf(new public_file("",false));
+	}
+	LOG(INFO) << "loading file: " << filesize;
+	
+	boost::shared_array<char> buffer = boost::shared_array<char>(new char[_blocksize]);
+	if(filesize < (_blocksize - sizeof(uint))) { // just read one block
+	  ifile.read(buffer.get(),filesize);
+	  ofile.write(buffer.get(),filesize);
+	  
+	}
+	else {
+	  uint readbytes = 0;
+
+	  
+	  boost::shared_array<char> bid = boost::shared_array<char>(new char[HASH_SIZE]);
+	  do
+	  {
+	    ifile.read(bid.get(),HASH_SIZE); //hash
+	    if(ifile.eof())
+	     break;
+	    
+	    std::string newifile = hash_to_path(an::crypto::toHex(bid.get()));
+	    LOG(INFO) << "loading: " << newifile;
+	    fs::ifstream nif(_data_dir+newifile);
+	    if(!nif.good()) {
+	      LOG(ERROR) << "could not open " << _data_dir+newifile;
+		ifile.close();
+		ofile.close();
+		 return smart_pf(new public_file("",false));
+	    }
+	      
+	    ofile << nif.rdbuf();
+
+	    nif.close();
+	    readbytes+=_blocksize;
+	    LOG(INFO) << "rb: " << readbytes / 1024;
+	  }while(ifile.good());
+
+	}
+	
+	ifile.close();
+	ofile.close();
+}
+	catch (const fs::filesystem_error& ex) {
+				LOG(ERROR) << "fs error: "<< ex.what();
+		return smart_pf(new public_file("",false)); 
+	}
+
+	return smart_pf(new public_file(_pub_dir+fid));
 }
 void Blockstore::shutdown() {}
 
@@ -84,7 +162,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
     try {
       	uint filesize = fs::file_size(path);
 	uint blocks = floor(filesize / _blocksize)+1;
-	uint blockc = 0;
+	uint blockc = 1;
 	LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
 	
 		if(fs::exists(_data_dir + hpath)) {
@@ -127,12 +205,14 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		  input_file.read(buffer.get(),_blocksize);
 		  readbytes = _blocksize;
 		  if(input_file.eof()) {
-		    readbytes = abs((blockc * _blocksize) - filesize);
+		    readbytes = abs(filesize - ((blockc-1) * _blocksize));
+		    LOG(INFO) << "last bit: " << readbytes;
 		    hash = an::crypto::Hash(std::string(buffer.get(),readbytes));
 		  }
 		  else
 		    hash = an::crypto::Hash(buffer.get());
 		  block_path = hash_to_path(an::crypto::toHex(hash));
+		  LOG(DEBUG) << "write block: " << block_path;
 		  {
 		    fs::path ppath = fs::path(_data_dir + block_path).remove_filename();
 		    if(!fs::exists(ppath)) 
@@ -167,7 +247,15 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	return true;
 }
 
-bool Blockstore::get_file_path(const std::string& id,std::string& res) 
+bool Blockstore::get_file(const std::string& id,std::string& res)
+{
+	smart_pf file = (*_pubfile_cache)(id);
+	if(!file->good)
+	  return false;
+	res = file->path;
+	return true; 
+}
+bool Blockstore::get_stored_file_path(const std::string& id,std::string& res) 
 { 
 	res = _path + hash_to_path(id);
 	return true;
@@ -179,6 +267,7 @@ bool Blockstore::remove_file(const std::string& id)
 		LOG(ERROR) << "could not remove file";
 		return false; 
 	}
+	// FIXME delete all blocks
 	return true;
 }
 

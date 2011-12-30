@@ -253,7 +253,7 @@ add_dependencies(TModule anDaemon logger rpc)
 
 target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger)
 target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
-target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
+target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore)
 
 enable_testing()
 add_test(Base ${BIN_DIR}/TBase)

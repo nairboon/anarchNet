@@ -235,9 +235,9 @@ bool ModuleManager::init()
 		return false;
 	}
 
-	bool ModuleManager::get_file_path(const std::string& id,std::string& res) {
+	bool ModuleManager::get_file(const std::string& id,std::string& res) {
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->get_file_path(id,res))
+			if( (*it)->getType() == plg::LocalStorage::BINARY && (*it)->get_file(id,res))
 				return true;
 
 		return false;
@@ -290,4 +290,16 @@ bool ModuleManager::init()
 
 		return false;
 	}
+	
+	plg::LocalStorage * ModuleManager::get_ls_plugin(std::string name)
+	{
+
+	  BOOST_FOREACH(plg::LocalStorage *x,_localstorages)
+	  if( x->getName() == name) {
+	    return x;
+	  }
+
+	  return NULL;
+	}
+	
 }

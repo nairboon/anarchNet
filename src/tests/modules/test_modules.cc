@@ -5,6 +5,7 @@
 #include "config_manager.h"
 #include "crypto.h"
 #include "../modules/localstorage/blockstore/lru_cache.h"
+#include "../modules/localstorage/blockstore/blockstore.h"
 
 using namespace an;
 
@@ -81,28 +82,62 @@ TEST(DaemonTest,db_obj)
 	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }
 
-TEST(LocalStore,FileStore_small)
+TEST(LocalStore,BlockStore_small)
 {
 	std::string filehash = "a02a9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
 	std::string filepath = "a0/2a/9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
 	std::string res;
-	ASSERT_TRUE(ModuleManager::instance().store_file("TESTFILE",res));
+	
+	Blockstore* bs;
+	bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+	assert(bs);
+	ASSERT_TRUE(bs->store_file("TESTFILE",res));
 	ASSERT_EQ(res,filehash);
-	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
+	ASSERT_TRUE(bs->get_stored_file_path(filehash,res));
 	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);
-	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
+
 }
 
-TEST(LocalStore,FileStore_big)
+TEST(LocalStore,BlockStore_big)
 {
 	std::string filehash = "81ec274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
 	std::string filepath = "81/ec/274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
 	std::string res;
-	ASSERT_TRUE(ModuleManager::instance().store_file("testfile.jpg",res));
+	
+	Blockstore* bs;
+	bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+	ASSERT_TRUE(bs->store_file("testfile.jpg",res));
 	ASSERT_EQ(res,filehash);
-	ASSERT_TRUE(ModuleManager::instance().get_file_path(filehash,res));
+	ASSERT_TRUE(bs->get_stored_file_path(filehash,res));
 	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);
-	ASSERT_TRUE(ModuleManager::instance().remove_file(filehash));
+}
+
+TEST(LocalStore,BlockStore_get_small)
+{
+  Blockstore* bs;
+  bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+  
+  std::string hash = an::crypto::toHex(an::crypto::HashFile("TESTFILE"));
+  std::string rpath;
+  ASSERT_TRUE(bs->get_file(hash,rpath));
+  std::string hash2 = an::crypto::toHex(an::crypto::HashFile(rpath));
+  ASSERT_EQ(hash,hash2);
+  
+  ASSERT_TRUE(bs->remove_file(hash));
+}
+
+TEST(LocalStore,BlockStore_get_big)
+{
+  Blockstore* bs;
+  bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+  
+  std::string hash = an::crypto::toHex(an::crypto::HashFile("testfile.jpg"));
+  std::string rpath;
+  ASSERT_TRUE(bs->get_file(hash,rpath));
+  std::string hash2 = an::crypto::toHex(an::crypto::HashFile(rpath));
+  ASSERT_EQ(hash,hash2);
+  
+  //ASSERT_TRUE(bs->remove_file(hash));
 }
 
 TEST(LocalStore,HT)
