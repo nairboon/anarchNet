@@ -123,6 +123,7 @@ add_library(logger ${LOGGER_SRC})
 ################################################################################
 set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/config.h"
+		"${SOURCE_DIR}/daemon/exception.h"
 		"${SOURCE_DIR}/daemon/singleton.h"
 		"${SOURCE_DIR}/daemon/version.h"
 		"${SOURCE_DIR}/daemon/config_manager.h"

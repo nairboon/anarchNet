@@ -3,6 +3,7 @@
 #include "db.h"
 #include "config_manager.h"
 #include "blockstore.h"
+#include "exception.h"
 #include "crypto.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -20,7 +21,7 @@ using namespace pugg;
 extern "C" //__declspec(dllexport)
 void registerPlugin(Kernel &K) 
 {
-  LOG(INFO) << "regisster";
+  LOG(INFO) << "register";
   
 	Server<an::plgdrv::LocalStorage>* server = CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
 	assert(server != NULL);
@@ -32,6 +33,7 @@ public_file::~public_file() {
   if(!fs::remove(path))
     LOG(ERROR) << "could not remove: " << path;
 }
+
 
 bool Blockstore::initialise() {
     if(!get_config()) {
@@ -73,9 +75,34 @@ bool Blockstore::initialise() {
 	return true;
 }
 
+void Blockstore::shutdown() {}
+
 smart_block Blockstore::load_block(id& bid)
 {
-  
+    try {
+  	fs::ifstream ifile(_data_dir+hash_to_path(bid),std::ios::in|std::ios::binary|std::ios::ate);
+	if(!ifile.good()) {
+	LOG(ERROR) << "could not open " << _data_dir+hash_to_path(bid);
+		 throw an::file_not_found();
+	}
+
+	std::ifstream::pos_type size;
+	 size = ifile.tellg();
+	char *buffer = new char [size];
+	ifile.seekg (0, std::ios::beg);
+	ifile.read (buffer, size);
+	ifile.close();
+	
+	LOG(INFO) << "read: " << buffer;
+	
+	return smart_block(new block(buffer,size));
+  }
+	catch (const fs::filesystem_error& ex) {
+				LOG(ERROR) << "fs error: "<< ex.what();
+		 throw an::file_not_found();
+	}
+
+
 }
 
 smart_pf Blockstore::load_file(id& fid)
@@ -84,14 +111,14 @@ smart_pf Blockstore::load_file(id& fid)
   	fs::ifstream ifile(_data_dir+hash_to_path(fid),std::ios::binary);
 	if(!ifile.good()) {
 	LOG(ERROR) << "could not open " << _data_dir+hash_to_path(fid);
-		 return smart_pf(new public_file("",false));
+		 throw an::file_not_found();
 	}
 	
   	fs::ofstream ofile(_pub_dir+fid,std::ios::binary);
 	if(!ofile.good()) {
 	LOG(ERROR) << "could not open " << _pub_dir+fid;
 	  ifile.close();
-		 return smart_pf(new public_file("",false));
+		 throw an::file_not_found();
 	}		
 	
 	uint filesize;
@@ -150,7 +177,7 @@ smart_pf Blockstore::load_file(id& fid)
 
 	return smart_pf(new public_file(_pub_dir+fid));
 }
-void Blockstore::shutdown() {}
+
 
 bool Blockstore::store_file(const std::string& path, std::string& res) 
 { 
@@ -268,6 +295,53 @@ bool Blockstore::remove_file(const std::string& id)
 		return false; 
 	}
 	// FIXME delete all blocks
+	return true;
+}
+
+
+bool Blockstore::store_block(std::string& content)
+{
+  std::string hash = an::crypto::toHex(an::crypto::Hash(content));
+  
+  fs::path ppath = fs::path(_data_dir + hash_to_path(hash)).remove_filename();
+  if(!fs::exists(ppath)) 
+    if(!fs::create_directories(ppath)) {
+      LOG(ERROR) << "could not create directories" << std::endl;
+      return false;
+    }
+    
+    
+  fs::ofstream file(_data_dir+hash_to_path(hash));
+  if(!file.good()) {
+    LOG(ERROR) << "could not open " << _data_dir+hash_to_path(hash);
+    return false;
+  }
+  
+  file << content;
+  file.close();
+  return true;
+}
+
+bool Blockstore::get_block(const std::string& id,std::string& res)
+{
+  try {
+      smart_block block = (*_block_cache)(id);
+      res = std::string(block.get()->data,block.get()->size);
+      return true;
+  }
+  catch(an::file_not_found& e)
+  {
+    LOG(DEBUG) << e.what();
+    return false;
+  }
+}
+
+bool Blockstore::remove_block(const std::string& id)
+{
+  	if(!fs::remove(_data_dir + hash_to_path(id))) {
+		LOG(ERROR) << "could not remove file";
+		return false; 
+	}
 	return true;
 }
 

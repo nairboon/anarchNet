@@ -31,7 +31,11 @@ typedef boost::shared_ptr<public_file> smart_pf;
 
 class block
 {
-  
+public:
+  block(char *p,uint s) : data(p),size(s) { }
+  ~block() { delete[] data; }
+  char * data;
+  uint size;
 };
 
 typedef boost::shared_ptr<block> smart_block;
@@ -49,6 +53,10 @@ public:
 	bool store_file(const std::string& path, std::string& res);
 	bool get_file(const std::string& id,std::string& res);
 	bool remove_file(const std::string& id);
+	
+	bool store_block(std::string& content);
+	bool get_block(const std::string& id,std::string& res);	
+	bool remove_block(const std::string& id);	
 	
 	bool get_stored_file_path(const std::string& id,std::string& res);
 private:

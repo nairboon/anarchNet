@@ -82,7 +82,7 @@ TEST(DaemonTest,db_obj)
 	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }
 
-TEST(LocalStore,BlockStore_small)
+TEST(LocalStore,BlockStore_file_store_small)
 {
 	std::string filehash = "a02a9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
 	std::string filepath = "a0/2a/9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";
@@ -98,7 +98,7 @@ TEST(LocalStore,BlockStore_small)
 
 }
 
-TEST(LocalStore,BlockStore_big)
+TEST(LocalStore,BlockStore_file_store_big)
 {
 	std::string filehash = "81ec274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
 	std::string filepath = "81/ec/274c906247df385cf276b80dc618bf5d2a3175f4fdde92049b47da9a89a9e22d5e457d69d286fa4096fae74d44309987b9dc8c678be924044837c8e5e0db";
@@ -112,7 +112,7 @@ TEST(LocalStore,BlockStore_big)
 	ASSERT_EQ(res,an::ConfigManager::instance().datadir() + "/blockstore/"+filepath);
 }
 
-TEST(LocalStore,BlockStore_get_small)
+TEST(LocalStore,BlockStore_file_get_small)
 {
   Blockstore* bs;
   bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
@@ -126,7 +126,7 @@ TEST(LocalStore,BlockStore_get_small)
   ASSERT_TRUE(bs->remove_file(hash));
 }
 
-TEST(LocalStore,BlockStore_get_big)
+TEST(LocalStore,BlockStore_file_get_big)
 {
   Blockstore* bs;
   bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
@@ -137,7 +137,23 @@ TEST(LocalStore,BlockStore_get_big)
   std::string hash2 = an::crypto::toHex(an::crypto::HashFile(rpath));
   ASSERT_EQ(hash,hash2);
   
-  //ASSERT_TRUE(bs->remove_file(hash));
+  ASSERT_TRUE(bs->remove_file(hash));
+}
+
+TEST(LocalStore,BlockStore_blockstore)
+{
+  Blockstore* bs;
+  bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+  
+  std::string content = "ABCDEFG12346";
+  std::string hash = an::crypto::toHex(an::crypto::Hash(content));
+  std::string res;
+  
+  ASSERT_FALSE(bs->get_block(hash,res));
+  ASSERT_TRUE(bs->store_block(content));
+  ASSERT_TRUE(bs->get_block(hash,res));
+  ASSERT_EQ(content,res);
+  ASSERT_TRUE(bs->remove_block(hash));
 }
 
 TEST(LocalStore,HT)
