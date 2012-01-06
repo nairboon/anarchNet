@@ -55,8 +55,9 @@ public:
 	bool remove_file(const std::string& id);
 	
 	bool store_block(std::string& content);
-	bool get_block(const std::string& id,std::string& res);	
-	bool remove_block(const std::string& id);	
+	bool kv_put(const std::string& key, const std::string& value);
+	bool kv_get(const std::string& id,std::string& res);	
+	bool kv_remove(const std::string& id);	
 	
 	bool get_stored_file_path(const std::string& id,std::string& res);
 private:

@@ -299,11 +299,9 @@ bool Blockstore::remove_file(const std::string& id)
 }
 
 
-bool Blockstore::store_block(std::string& content)
+bool Blockstore::kv_put(const std::string& key, const std::string& value)
 {
-  std::string hash = an::crypto::toHex(an::crypto::Hash(content));
-  
-  fs::path ppath = fs::path(_data_dir + hash_to_path(hash)).remove_filename();
+    fs::path ppath = fs::path(_data_dir + hash_to_path(key)).remove_filename();
   if(!fs::exists(ppath)) 
     if(!fs::create_directories(ppath)) {
       LOG(ERROR) << "could not create directories" << std::endl;
@@ -311,18 +309,24 @@ bool Blockstore::store_block(std::string& content)
     }
     
     
-  fs::ofstream file(_data_dir+hash_to_path(hash));
+  fs::ofstream file(_data_dir+hash_to_path(key));
   if(!file.good()) {
-    LOG(ERROR) << "could not open " << _data_dir+hash_to_path(hash);
+    LOG(ERROR) << "could not open " << _data_dir+hash_to_path(key);
     return false;
   }
   
-  file << content;
+  file << value;
   file.close();
   return true;
 }
 
-bool Blockstore::get_block(const std::string& id,std::string& res)
+bool Blockstore::store_block(std::string& content)
+{
+  std::string hash = an::crypto::toHex(an::crypto::Hash(content));
+  return kv_put(hash,content);
+}
+
+bool Blockstore::kv_get(const std::string& id,std::string& res)
 {
   try {
       smart_block block = (*_block_cache)(id);
@@ -336,7 +340,7 @@ bool Blockstore::get_block(const std::string& id,std::string& res)
   }
 }
 
-bool Blockstore::remove_block(const std::string& id)
+bool Blockstore::kv_remove(const std::string& id)
 {
   	if(!fs::remove(_data_dir + hash_to_path(id))) {
 		LOG(ERROR) << "could not remove file";

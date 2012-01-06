@@ -149,11 +149,11 @@ TEST(LocalStore,BlockStore_blockstore)
   std::string hash = an::crypto::toHex(an::crypto::Hash(content));
   std::string res;
   
-  ASSERT_FALSE(bs->get_block(hash,res));
+  ASSERT_FALSE(bs->kv_get(hash,res));
   ASSERT_TRUE(bs->store_block(content));
-  ASSERT_TRUE(bs->get_block(hash,res));
+  ASSERT_TRUE(bs->kv_get(hash,res));
   ASSERT_EQ(content,res);
-  ASSERT_TRUE(bs->remove_block(hash));
+  ASSERT_TRUE(bs->kv_remove(hash));
 }
 
 TEST(LocalStore,HT)
