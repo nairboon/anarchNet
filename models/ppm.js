@@ -1,4 +1,5 @@
 var mongoose = require('mongoose'),
+util = require('../lib/util.js'),
 	hashlib = require('hashlib');
 
 var Schema = mongoose.Schema, ObjectId = mongoose.Types.ObjectId;
@@ -45,3 +46,8 @@ mongoose.model('map', Map);
 mongoose.model('package', Package);
 mongoose.model('repository', Repository);
 mongoose.model('appcache', Appcache);
+
+module.exports = {
+appcache: function(id) { return util.system_id+"appcache"+id; },
+package: function(id) { return util.system_id+"package"+id; }
+};

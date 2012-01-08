@@ -20,32 +20,30 @@ var an = require("./lib/an.js");
     console.log("got:",data);
   });
 });
-*/
+*
 db.store_with_id("lamekey",{a:"mycontnet"},function(err,data){
   console.log("calling get for:",data.id);
   db.get(data.id, function(err,data) {
     console.log("got:",data);
   });
 });
+*/
 
 
-/*
 console.log("scan packages...");
 setup.ScanLocalPackages(function(err,mlid){
 	console.log("packages scaned");
-	db.get_ht(util.system_id+"masterlist", function(err,res) {
 		console.log("storing master list...",mlid);
 		db.store_ht(util.system_id+"masterlist",mlid, function(err){
 			if(err)
-				throw new Error("could not save settings");
+				throw new Error("could not save masterlist");
 
 			setup.createDefaultRepo(mlid,function(err,res){
 				if(err)
 					throw new Error("could not create a repo");
-
+				console.log("repo created!");
+				db.close();
 			});
 		});
-
-	});
 });
-*/
+

@@ -12,6 +12,7 @@ var express = require('express'),
 	db = require('./lib/db.js'),
 	editor = require('./editor.js'),
 	auth = require('./auth.js'),
+	util = require('./lib/util.js'),
 	common = require('./models/common.js'),
 	apploader = require('./lib/apploader.js'),
 	sharejs = require('share').server,
@@ -111,8 +112,8 @@ app.namespace('/auth', function() {
 });
 
 if (!module.parent) {
-  	Settings  = mongoose.model('settings');
-	Settings.findOne({key:"masterlist"},function(err,res){
+
+	db.get_ht(util.system_id + 'masterlist',function(err,res){
 		if(err || !res)
 			throw new Error("No masterlist, run setup.js!");
 	});
@@ -120,6 +121,6 @@ if (!module.parent) {
   app.listen(config.port);
   console.log("Express server listening on port %d", app.address().port);
 
-	var options = {db: {type: 'memory'}};
+	var options = {db: {type: 'none'}};
 	sharejs.attach(app, options);
 }
