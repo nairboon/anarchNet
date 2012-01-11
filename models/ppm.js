@@ -46,8 +46,3 @@ mongoose.model('map', Map);
 mongoose.model('package', Package);
 mongoose.model('repository', Repository);
 mongoose.model('appcache', Appcache);
-
-module.exports = {
-appcache: function(id) { return util.system_id+"appcache"+id; },
-package: function(id) { return util.system_id+"package"+id; }
-};
