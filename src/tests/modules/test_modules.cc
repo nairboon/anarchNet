@@ -3,7 +3,9 @@
 #include "logger.h"
 #include "module_manager.h"
 #include "config_manager.h"
+#include "db_manager.h"
 #include "crypto.h"
+#include "diff_match_patch.h"
 #include "../modules/localstorage/blockstore/lru_cache.h"
 #include "../modules/localstorage/blockstore/blockstore.h"
 
@@ -21,6 +23,28 @@ TEST(DaemonTest,initDaemon)
 	}
 }
 
+TEST(Lib, diff_match_patch)
+{
+  std::string text1 = "ABCEDFGahahahah";
+  std::string text2 = "ABxEDFGahaxahyh";
+
+  diff_match_patch<std::string> dmp;
+  
+ /* dmp::Diff::Diffs d = dmp.diff_main(text1,text2);
+  std::string delta = dmp.diff_toDelta(dmp.diff_cleanupEfficiency(d));
+  
+  dmp.Patch::Patches p = dmp.patch_fromText(delta);
+  
+  std::string res = dmp.patch_apply(text1,p);*/
+
+   std::string strPatch = dmp.patch_toText(dmp.patch_make(text1, text2));
+   std::pair<std::string, std::vector<bool> > out
+       = dmp.patch_apply(dmp.patch_fromText(strPatch), text1);
+   std::string res = out.first;
+
+  EXPECT_EQ(text2,res);
+ 
+}
 
 TEST(DaemonTest,db_snapshot)
 {
@@ -68,7 +92,8 @@ TEST(DaemonTest,db_diff)
 
 TEST(DaemonTest,db_obj)
 {
-	std::string content = "ABCDEFGHobj";
+	std::string content = "ABCDEFGHobj\nabc";
+	std::string content2 = "ABCDXFGHobj\nabc";
 	db::ObjPtr obj(new db::Object());
 	obj->create(content);
 	db::ObjPtr nobj(new db::Object());
@@ -78,6 +103,13 @@ TEST(DaemonTest,db_obj)
 	ASSERT_EQ(obj->id,nobj->id);
 	ASSERT_EQ(obj->snapshots.size(),nobj->snapshots.size());
 	ASSERT_EQ(nobj->snapshots[0]->content,content);
+	ASSERT_EQ(nobj->get(),obj->get());
+	
+	ASSERT_TRUE(DBManager::instance().save_object(obj,content2));
+	ASSERT_EQ(obj->get(),content2);
+	ASSERT_TRUE(ModuleManager::instance().db_get_obj(obj->id,nobj));
+	ASSERT_EQ(nobj->get(),content2);
+
 	ASSERT_TRUE(ModuleManager::instance().db_remove(obj->id));
 	ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }

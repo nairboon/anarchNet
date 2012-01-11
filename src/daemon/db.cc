@@ -22,7 +22,10 @@
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "db.h"
+#include "diff_match_patch.h"
+#include <boost/foreach.hpp>
 #include "crypto.h"
+#include "logger.h"
 #include "db_manager.h"
 
 
@@ -61,7 +64,8 @@ namespace an
 		}
 		
 		bool Object::save() {
-			return DBManager::instance().save_object(id,shared_from_this());
+			//return DBManager::instance().save_object(id,shared_from_this());
+			return false;
 		}
 
 		bool Object::remove() {
@@ -71,6 +75,25 @@ namespace an
 		bool Object::load(const ObjID& id)
 		{
 			return DBManager::instance().get_object(id,shared_from_this());
+		}
+		
+		String Object::get() {
+		  db::SnapshotPtr ss = snapshots.back();
+		  String res = ss->content;
+		  diff_match_patch<String> dmp;
+LOG(INFO) << "loading obj with diffs: " << ss->diffs.size() << " : " << diffs.size();
+
+		  BOOST_FOREACH (an::db::DiffPtr diff, diffs) {
+		    LOG(INFO) << "diff: " << diff->content;
+		    std::pair<String, std::vector<bool> > out =
+		    dmp.patch_apply(dmp.patch_fromText(diff->content), res);
+		    res = out.first;
+		  }
+		  LOG(INFO) << "before: " << ss->content << " after: " << res;
+		  return res;
+		}
+		String Object::get(const ObjID& revision) {
+		  return "";
 		}
 	}
 }

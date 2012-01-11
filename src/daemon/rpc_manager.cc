@@ -203,8 +203,29 @@ namespace rpc {
 		 if(!req.params()["id"].is_null() && req.params()["id"].type() == boost::json::str_type) {
 		  std::string custom_id = req.params()["id"].get_str();
 		    LOG(INFO) << "using custom id: " << custom_id;
-	      
-		  obj->create(req.decode_base64("content"),custom_id);
+		  
+		   // is it a new object or update?
+		    if(DBManager::instance().get_object(custom_id,obj)) {
+		      LOG(INFO) << "updating object....";
+		      if(!DBManager::instance().save_object(obj,req.decode_base64("content"))) {
+			LOG(INFO) << "could not update object";
+			 RPC_Response res = req.createErrorResponse();
+			res.json()["err"] = "update object failed";
+			  response = res.json();
+			  return false;
+		      }
+		      else {
+			LOG(INFO) << "obj updated";
+			RPC_Response res = req.createResponse();
+			boost::json::Config::add(res.data(),"id",obj->id);
+			response = res.json();
+			return true;
+		      }
+		    }
+		    else {
+		      //its a new object
+		      obj->create(req.decode_base64("content"),custom_id);
+		    }
 		   
 		}
 		else
@@ -213,7 +234,7 @@ namespace rpc {
 		LOG(INFO) << "stored: " << req.decode_base64("content");
 		LOG(INFO) << "o: " << req.params()["content"].get_str();
 		if(!DBManager::instance().create_object(obj)) {
-			LOG(INF) << "could not store";
+			LOG(INFO) << "could not store";
 
 		 RPC_Response res = req.createErrorResponse();
 		 res.json()["err"] = "create object failed";

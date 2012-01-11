@@ -214,15 +214,19 @@ bool Sqlstore::db_get_obj(const an::db::ObjID& id, an::db::ObjPtr res)
 		res->_db_type = obj.type;
 
 		std::vector<Snapshot> snapshots = obj.snapshots().get().all();
-
+		std::vector<Diff> diffs = obj.diffs().get().all();
+		
 		BOOST_FOREACH (db::Snapshot prevss, snapshots) {
 			an::db::SnapshotPtr s(new an::db::Snapshot());
 			_db_get_snapshot(prevss.anID.value(), prevss,s);
 			res->snapshots.push_back(s);
-			BOOST_FOREACH (an::db::DiffPtr ssdiff, s->diffs) {
-				res->diffs.push_back(ssdiff);
-			}
 		}
+		BOOST_FOREACH (db::Diff prevdiff, diffs) {
+		    an::db::DiffPtr d(new an::db::Diff());
+		    _db_get_diff(prevdiff.anID.value(),prevdiff,d);
+		  res->diffs.push_back(d);
+		}
+
 	}
 	catch(Except e) {
 		LOG(ERROR) << e;

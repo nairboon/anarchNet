@@ -67,10 +67,12 @@ namespace an {
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
 			{
+			      //ar & boost::serialization::base_object<needs_ObjID()>(*this);
 				ar & id;
 				ar & based;
 				ar & content;
 				ar & time;
+				ar & diffs;
 			}
 		};
 		typedef boost::shared_ptr<Snapshot> SnapshotPtr;
@@ -87,6 +89,8 @@ namespace an {
 			bool create(String inp,const ObjID& custom_id);
 			bool load(const ObjID& id);
 			bool remove();
+			String get();
+			String get(const ObjID& revision);
 			Object() : _db_id(0), _db_type("") {}
 		 private:
 		};

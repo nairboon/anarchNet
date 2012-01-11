@@ -48,17 +48,26 @@ namespace an
 
 		return false;
 	}
-	bool DBManager::save_object(const db::ObjID& id,db::ObjPtr obj)
-	{
-	  return false;
-	}
 	bool DBManager::save_object(const db::ObjID& id,const String& diff)
 	{
-		db::ObjPtr obj;
+	  db::ObjPtr obj;
 		if(!ModuleManager::instance().db_get_obj(id,obj))
 			return false;
-
-		db::DiffPtr ddiff(new db::Diff(obj->snapshots[0]->id,diff));
+		
+		if(!save_object(obj,diff))
+			return false;
+		
+	  return true;
+	}
+	bool DBManager::save_object(db::ObjPtr obj,const String& diff)
+	{
+		// create diff
+		diff_match_patch<String> dmp;
+		  std::string patch = dmp.patch_toText(dmp.patch_make(obj->get(), diff));
+   
+		LOG(INFO) << "patch: " << patch;
+	  
+		db::DiffPtr ddiff(new db::Diff(obj->snapshots[0]->id,patch));
 
 		if(!ModuleManager::instance().db_store_diff(ddiff))
 			return false;
@@ -86,16 +95,7 @@ namespace an
 	}
 	bool DBManager::get_lastRevision(const db::ObjPtr obj,String& lastRev)
 	{
-	  db::SnapshotPtr ss = obj->snapshots.back();
-	  String res = ss->content;
-	  diff_match_patch<String> dmp;
-
-	  BOOST_FOREACH (an::db::DiffPtr diff, ss->diffs) {
-	      std::pair<String, std::vector<bool> > out =
-	      dmp.patch_apply(dmp.patch_fromText(diff->content), res);
-	      res = out.first;
-	  }
-	  lastRev = res;
+	   lastRev = obj->get();
 	  return true;
 	}
 

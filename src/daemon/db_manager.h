@@ -31,7 +31,7 @@ public:
 		bool init(const std::string&);
 
 		bool create_object(db::ObjPtr obj);
-		bool save_object(const db::ObjID& id,db::ObjPtr obj);
+		bool save_object(db::ObjPtr obj,const String& diff);
 		bool save_object(const db::ObjID& id,const String& diff);
 		bool delete_entry(const db::ObjID& id);
 		bool get_object(const db::ObjID& id,db::ObjPtr obj);
