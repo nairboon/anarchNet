@@ -105,7 +105,7 @@ TEST(DaemonTest,db_obj)
 	ASSERT_EQ(nobj->snapshots[0]->content,content);
 	ASSERT_EQ(nobj->get(),obj->get());
 	
-	ASSERT_TRUE(DBManager::instance().save_object(obj,content2));
+	ASSERT_TRUE(DBManager::instance().update_object(obj,content2));
 	ASSERT_EQ(obj->get(),content2);
 	ASSERT_TRUE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 	ASSERT_EQ(nobj->get(),content2);
@@ -180,10 +180,10 @@ TEST(LocalStore,BlockStore_blockstore)
   std::string content = "ABCDEFG12346";
   std::string hash = an::crypto::toHex(an::crypto::Hash(content));
   std::string res;
-  
-  ASSERT_FALSE(bs->kv_get(hash,res));
+  an::KV_ResPtr kvres;
+  ASSERT_FALSE(bs->kv_get(hash,kvres));
   ASSERT_TRUE(bs->store_block(content));
-  ASSERT_TRUE(bs->kv_get(hash,res));
+  ASSERT_TRUE(bs->kv_get_unique(hash,res));
   ASSERT_EQ(content,res);
   ASSERT_TRUE(bs->kv_remove(hash));
 }
@@ -193,11 +193,12 @@ TEST(LocalStore,HT)
 	std::string key = "mykey";
 	std::string value = "myvalue";
 	std::string res;
+	an::KV_ResPtr kres;
 	ASSERT_TRUE(ModuleManager::instance().kv_put(key,value));
-	ASSERT_TRUE(ModuleManager::instance().kv_get(key,res));
-	ASSERT_EQ(res,value);
+	ASSERT_TRUE(ModuleManager::instance().kv_get(key,kres));
+	ASSERT_EQ((*kres)[key],value);
 	ASSERT_TRUE(ModuleManager::instance().kv_remove(key));
-	ASSERT_FALSE(ModuleManager::instance().kv_get(key,res));
+	ASSERT_FALSE(ModuleManager::instance().kv_get(key,kres));
 }
 
  size_t count_evaluations=0;

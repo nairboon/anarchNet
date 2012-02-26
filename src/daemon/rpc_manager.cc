@@ -205,9 +205,9 @@ namespace rpc {
 		    LOG(INFO) << "using custom id: " << custom_id;
 		  
 		   // is it a new object or update?
-		    if(DBManager::instance().get_object(custom_id,obj)) {
+		    if(DBManager::instance().get_object_head(custom_id,obj)) {
 		      LOG(INFO) << "updating object....";
-		      if(!DBManager::instance().save_object(obj,req.decode_base64("content"))) {
+		      if(!DBManager::instance().update_object(obj,req.decode_base64("content"))) {
 			LOG(INFO) << "could not update object";
 			 RPC_Response res = req.createErrorResponse();
 			res.json()["err"] = "update object failed";
@@ -264,7 +264,7 @@ namespace rpc {
 		db::ObjPtr obj(new db::Object());
 		db::ObjID id = req.params()["id"].get_str();
 		LOG(INFO) << "get obj: " << id;
-		if(!DBManager::instance().get_object(id,obj)) {
+		if(!DBManager::instance().get_object_head(id,obj)) {
 			LOG(INF) << "could not get obj: "<< id;
 		 res = req.createErrorResponse();
 		 res.json()["error"] = "get object failed";
@@ -297,15 +297,16 @@ namespace rpc {
 		response = res.json();
 		}
 		else {
-		  std::string content;
-		  if(!DBManager::instance().get_lastRevision(obj,content))
+		  std::string content = obj->head;
+		 /* db::ObjPtr ob;
+		  if(!DBManager::instance().get_object_head(obj,content))
 		  {
 		    LOG(INFO) << "get_lastRevision failed: " << content;
 		    res = req.createErrorResponse();
 		    res.json()["error"] = "get last revision failed";
 		    response = res.json();
 		    return false;
-		  }
+		  }*/
 		  LOG(INFO) << "sending: " << content;
 		  std::string econtent = res.encode_base64(content);
 		  LOG(INFO) << econtent;
@@ -336,7 +337,8 @@ namespace rpc {
 		  return false;
 		}
 	  std::string value;
-		if(!ModuleManager::instance().kv_get(req.params()["key"].get_str(),value)) {
+	  an::KV_ResPtr kv_res;
+		if(!ModuleManager::instance().kv_get(req.params()["key"].get_str(),kv_res)) {
 			LOG(INF) << "could not get";
 
 		 RPC_Response res = req.createErrorResponse();
@@ -346,6 +348,8 @@ namespace rpc {
 		}
 		
 		RPC_Response res = req.createResponse();
+		LOG(INFO) << "got " << kv_res->size() << " keys";
+		value = (*kv_res)[req.params()["key"].get_str()];
 		value = res.encode_base64(value);
 		LOG(INFO) << "got value for key: " << req.params()["key"].get_str()<< " " << value;
 		boost::json::Config::add(res.data(),"content",value);

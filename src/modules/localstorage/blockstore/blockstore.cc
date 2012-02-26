@@ -5,6 +5,7 @@
 #include "blockstore.h"
 #include "exception.h"
 #include "crypto.h"
+#include "module_manager.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -66,6 +67,22 @@ bool Blockstore::initialise() {
 		}
 	}
 	_data_dir += "/";
+	_mid_dir = _data_dir+"mid";
+	_unique_dir = _data_dir+"unique";
+	if(!fs::exists(_unique_dir)) {
+		if(!fs::create_directory(_unique_dir)) {
+			LOG(ERROR) << "could not create filestore directory: " << _unique_dir;
+			return false;	
+		}
+	}
+	if(!fs::exists(_mid_dir)) {
+		if(!fs::create_directory(_mid_dir)) {
+			LOG(ERROR) << "could not create filestore directory: " << _mid_dir;
+			return false;	
+		}
+	}
+	_unique_dir += "/";
+	_mid_dir += "/";
 	
 	_blocksize = _config.get("blocksize",128) /* in kB */ * 1024;
 	
@@ -80,14 +97,15 @@ void Blockstore::shutdown() {}
 smart_block Blockstore::load_block(id& bid)
 {
     try {
-  	fs::ifstream ifile(_data_dir+hash_to_path(bid),std::ios::in|std::ios::binary|std::ios::ate);
+  	fs::ifstream ifile(_unique_dir+hash_to_path(bid),std::ios::in|std::ios::binary|std::ios::ate);
 	if(!ifile.good()) {
-	LOG(ERROR) << "could not open " << _data_dir+hash_to_path(bid);
+	LOG(ERROR) << "could not open " << _unique_dir+hash_to_path(bid);
 		 throw an::file_not_found();
 	}
 
 	std::ifstream::pos_type size;
 	 size = ifile.tellg();
+	 LOG(INFO) << "reading " << size << "bytes";
 	char *buffer = new char [size];
 	ifile.seekg (0, std::ios::beg);
 	ifile.read (buffer, size);
@@ -108,9 +126,9 @@ smart_block Blockstore::load_block(id& bid)
 smart_pf Blockstore::load_file(id& fid)
 {
   try {
-  	fs::ifstream ifile(_data_dir+hash_to_path(fid),std::ios::binary);
+  	fs::ifstream ifile(_unique_dir+hash_to_path(fid),std::ios::binary);
 	if(!ifile.good()) {
-	LOG(ERROR) << "could not open " << _data_dir+hash_to_path(fid);
+	LOG(ERROR) << "could not open " << _unique_dir+hash_to_path(fid);
 		 throw an::file_not_found();
 	}
 	
@@ -150,9 +168,9 @@ smart_pf Blockstore::load_file(id& fid)
 	    
 	    std::string newifile = hash_to_path(an::crypto::toHex(bid.get()));
 	    LOG(INFO) << "loading: " << newifile;
-	    fs::ifstream nif(_data_dir+newifile);
+	    fs::ifstream nif(_unique_dir+newifile);
 	    if(!nif.good()) {
-	      LOG(ERROR) << "could not open " << _data_dir+newifile;
+	      LOG(ERROR) << "could not open " << _unique_dir+newifile;
 		ifile.close();
 		ofile.close();
 		 return smart_pf(new public_file("",false));
@@ -192,24 +210,24 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	uint blockc = 1;
 	LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
 	
-		if(fs::exists(_data_dir + hpath)) {
+		if(fs::exists(_unique_dir + hpath)) {
 			LOG(INFO) << "file already stored: " << hash;
 			res = hash;
 			return true;
 		}
 		
-		fs::path hf = fs::path(_data_dir + hpath);
+		fs::path hf = fs::path(_unique_dir + hpath);
 		fs::path ppath = hf.remove_filename();
-		LOG(INFO) << "from: " << path << " to: " << _data_dir + hpath << std::endl;
+		LOG(INFO) << "from: " << path << " to: " << _unique_dir + hpath << std::endl;
 		if(!fs::exists(ppath)) 
 		if(!fs::create_directories(ppath)) {
 			LOG(ERROR) << "could not create directories" << std::endl;
 			return false;
 		}
 		
-		fs::ofstream header_file(_data_dir+hpath,std::ios::binary);
+		fs::ofstream header_file(_unique_dir+hpath,std::ios::binary);
 		if(!header_file.good()) {
-		LOG(ERROR) << "could not open " << _data_dir+hpath;
+		LOG(ERROR) << "could not open " << _unique_dir+hpath;
 		  return false;
 		}
 		header_file.write(reinterpret_cast<char*>(&filesize),sizeof(uint));
@@ -241,15 +259,15 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 		  block_path = hash_to_path(an::crypto::toHex(hash));
 		  LOG(DEBUG) << "write block: " << block_path;
 		  {
-		    fs::path ppath = fs::path(_data_dir + block_path).remove_filename();
+		    fs::path ppath = fs::path(_unique_dir + block_path).remove_filename();
 		    if(!fs::exists(ppath)) 
 		      if(!fs::create_directories(ppath)) {
 			LOG(ERROR) << "could not create directories" << std::endl;
 			return false;
 		      }
-		    fs::ofstream block_file(_data_dir + block_path,std::ios::binary);
+		    fs::ofstream block_file(_unique_dir + block_path,std::ios::binary);
 		    if(!block_file.good()) {
-		      LOG(ERROR) << "block: " << blockc << " could not open " << _data_dir + block_path;
+		      LOG(ERROR) << "block: " << blockc << " could not open " << _unique_dir + block_path;
 		      LOG(ERROR) << an::crypto::toHex(hash);
 		      header_file.close();
 		      input_file.close();
@@ -290,7 +308,7 @@ bool Blockstore::get_stored_file_path(const std::string& id,std::string& res)
 
 bool Blockstore::remove_file(const std::string& id) 
 { 
-	if(!fs::remove(_data_dir + hash_to_path(id))) {
+	if(!fs::remove(_unique_dir + hash_to_path(id))) {
 		LOG(ERROR) << "could not remove file";
 		return false; 
 	}
@@ -323,28 +341,83 @@ bool Blockstore::kv_put(const std::string& key, const std::string& value)
 bool Blockstore::store_block(std::string& content)
 {
   std::string hash = an::crypto::toHex(an::crypto::Hash(content));
-  return kv_put(hash,content);
+   fs::path ppath = fs::path(_unique_dir + hash_to_path(hash)).remove_filename();
+  if(!fs::exists(ppath)) 
+    if(!fs::create_directories(ppath)) {
+      LOG(ERROR) << "could not create directories" << std::endl;
+      return false;
+    }
+  fs::ofstream file(_unique_dir+hash_to_path(hash));
+  if(!file.good()) {
+    LOG(ERROR) << "could not open " << _data_dir+hash_to_path(hash);
+    return false;
+  }
+  
+  file << content;
+  file.close();
+  return true;
 }
 
-bool Blockstore::kv_get(const std::string& id,std::string& res)
+
+bool Blockstore::kv_get(const std::string& id,an::KV_ResPtr& res)
 {
+  res = an::KV_ResPtr(new an::KV_ResMap);
+  
   try {
       smart_block block = (*_block_cache)(id);
-      res = std::string(block.get()->data,block.get()->size);
+      std::string cont = std::string(block.get()->data,block.get()->size);
+      res->insert(std::make_pair<std::string,std::string>(an::crypto::toHex(an::crypto::Hash(cont)),cont));
       return true;
   }
   catch(an::file_not_found& e)
   {
-    LOG(DEBUG) << e.what();
-    return false;
+    LOG(DEBUG) << "not a unique block";
   }
+  
+     try {
+       std::string mid_d = _mid_dir+hash_to_path(id);
+       if(!fs::is_directory(mid_d)) {
+	LOG(ERROR) << "not a directory " << _mid_dir+hash_to_path(id);
+		return false;
+	}
+
+	fs::directory_iterator dir(mid_d),end;
+       BOOST_FOREACH(const fs::path& p, std::make_pair(dir, end)) {
+	fs::ifstream file(p,std::ios::binary);
+	if(!file.good()) {
+	 LOG(ERROR) << "could not open: " << p.native();
+	 return false;
+	}
+	std::ifstream::pos_type size;
+	 size = file.tellg();
+	char *buffer = new char [size];
+	file.seekg (0, std::ios::beg);
+	file.read (buffer, size);
+	file.close();
+		 std::string cont(buffer,size);
+		 delete[] buffer;
+	res->insert(std::make_pair<std::string,std::string>(an::crypto::toHex(an::crypto::Hash(cont)),cont));
+
+	return true;
+      }
+      
+  }
+	catch (const fs::filesystem_error& ex) {
+				LOG(ERROR) << "fs error: "<< ex.what();
+	return false;
+	}
+
 }
 
 bool Blockstore::kv_remove(const std::string& id)
 {
-  	if(!fs::remove(_data_dir + hash_to_path(id))) {
-		LOG(ERROR) << "could not remove file";
-		return false; 
+  	if(!fs::remove(_unique_dir + hash_to_path(id))) {
+		LOG(ERROR) << "could not remove unqiue file";
+		if(!fs::remove(_mid_dir + hash_to_path(id))) {
+			    LOG(ERROR) << "could not mid remove file";
+		      return false; 
+		}
+
 	}
 	return true;
 }

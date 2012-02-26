@@ -51,9 +51,21 @@ namespace an {
 		class Diff : public needs_ObjID {
 		 public:
 			ObjID snapshot;
-			std::vector<ObjID> prev;
+			//std::vector<ObjID> prev;
+			ObjID prev;
 			Diff() {}
 			Diff(const ObjID& s, const String& c) : needs_ObjID(c), snapshot(s) {}
+			
+			template<class Archive>
+			void serialize(Archive & ar, const unsigned int version)
+			{
+			      //ar & boost::serialization::base_object<needs_ObjID()>(*this);
+				ar & id;
+				ar & snapshot;
+				ar & content;
+				ar & time;
+				ar & prev;
+			}
 		};
 		typedef boost::shared_ptr<Diff> DiffPtr;
 
@@ -84,14 +96,24 @@ namespace an {
 			std::string _db_type;
 			std::vector<SnapshotPtr> snapshots;
 			std::vector<DiffPtr> diffs;
+			std::string head;
 			bool save();
 			bool create(String inp);
 			bool create(String inp,const ObjID& custom_id);
 			bool load(const ObjID& id);
+			bool create_from_diffs();
 			bool remove();
 			String get();
 			String get(const ObjID& revision);
 			Object() : _db_id(0), _db_type("") {}
+			template<class Archive>
+			void serialize(Archive & ar, const unsigned int version)
+			{
+			      //ar & boost::serialization::base_object<needs_ObjID()>(*this);
+				ar & id;
+				ar & snapshots;
+				ar & diffs;
+			}
 		 private:
 		};
 		typedef boost::shared_ptr<Object> ObjPtr;

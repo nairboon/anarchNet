@@ -44,6 +44,10 @@ namespace an {
 	  };
 	  typedef boost::shared_ptr<std::vector<KV_Stat> > KV_StatsPtr;
 	
+	  typedef std::map<std::string,std::string> KV_ResMap;
+	  typedef boost::shared_ptr<KV_ResMap> KV_ResPtr;
+	  #define newKVRes new KV_ResMap
+	  
 class ModuleManager : public Singleton<ModuleManager> {
 		friend class Singleton<ModuleManager>;
 public:
@@ -65,7 +69,8 @@ public:
 
 		// key value store
 		bool kv_put(const std::string& key, const std::string& value);
-		bool kv_get(const std::string& key,std::string& res);
+		bool kv_get(const std::string& key,KV_ResPtr& res);
+		bool kv_get_unique(const std::string& key, std::string& res);
 		bool kv_remove(const std::string& key);
 		bool kv_get_stats(const std::string& key, KV_Stat& res);
 		bool kv_get_unsuccessful(int n, KV_StatsPtr& res);

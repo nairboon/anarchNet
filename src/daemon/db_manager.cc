@@ -23,6 +23,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/foreach.hpp>
 #include "config.h"
+#include "crypto.h"
 #include "logger.h"
 #include "anarchNet.h"
 #include "db_manager.h"
@@ -48,18 +49,18 @@ namespace an
 
 		return false;
 	}
-	bool DBManager::save_object(const db::ObjID& id,const String& diff)
+	bool DBManager::update_object(const db::ObjID& id,const String& diff)
 	{
 	  db::ObjPtr obj;
 		if(!ModuleManager::instance().db_get_obj(id,obj))
 			return false;
 		
-		if(!save_object(obj,diff))
+		if(!update_object(obj,diff))
 			return false;
 		
 	  return true;
 	}
-	bool DBManager::save_object(db::ObjPtr obj,const String& diff)
+	bool DBManager::update_object(db::ObjPtr obj,const String& diff)
 	{
 		// create diff
 		diff_match_patch<String> dmp;
@@ -79,24 +80,52 @@ namespace an
 
 		return true;
 	}
-	bool DBManager::delete_entry(const db::ObjID& id)
+	bool DBManager::delete_object(const db::ObjID& id)
 	{
 		if(ModuleManager::instance().db_remove(id))
 			return true;
 
 		return false;
 	}
-	bool DBManager::get_object(const db::ObjID& id,db::ObjPtr obj)
+	bool DBManager::get_object_head(const db::ObjID& id,db::ObjPtr obj)
 	{
-		if(ModuleManager::instance().db_get_obj(id,obj))
+		db::ObjID headid = db::ObjID(crypto::toHex(crypto::Hash( "HEAD" + id )));
+		if(ModuleManager::instance().kv_get_unique(headid,obj->head))
+		{	// head snapshot exists
 			return true;
+		}
+		// no haed yet
+		KV_ResPtr diffs;
+		obj->id = id;
+		
+		if(ModuleManager::instance().kv_get(id,diffs)) {
+		  BOOST_FOREACH(const KV_ResMap::value_type& entry, *diffs) {
+		    try {
+		    db::DiffPtr diff;
 
+		    std::istringstream inputStream(entry.second);
+		  boost::archive::text_iarchive inputArchive(inputStream);
+		  inputArchive >> *diff;
+
+		    obj->diffs.push_back(diff);
+		    }
+		    catch(boost::archive::archive_exception& e)
+		    {
+		      LOG(ERROR) << "not a diff: " << entry.second;
+		    }
+		  }
+		  
+		  if(obj->create_from_diffs()) {
+		    return true;
+		  }
+		}
 		return false;
 	}
-	bool DBManager::get_lastRevision(const db::ObjPtr obj,String& lastRev)
+	bool DBManager::get_object_rev(const db::ObjPtr obj,db::ObjPtr rev)
 	{
-	   lastRev = obj->get();
-	  return true;
+	  // lastRev = obj->get();
+	  LOG(ERROR) << "unimplemented";
+	  return false;
 	}
 
 

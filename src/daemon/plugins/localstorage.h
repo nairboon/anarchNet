@@ -35,7 +35,6 @@ namespace plg {
 class LocalStorage : public Plugin {
 public:
 	enum StorageType { PLAIN, BINARY };
-
 	virtual const std::string getName() {return "generic LocalStorage plugin";}
 	virtual const StorageType getType() { return LocalStorage::PLAIN; }
 	
@@ -54,7 +53,15 @@ public:
 	 * \return true if successfuly stored
 	 */
 	virtual bool kv_put(const std::string& key, const std::string& value) { return false; }
-	virtual bool kv_get(const std::string& key, std::string& res) { return false; }
+	virtual bool kv_get(const std::string& key, KV_ResPtr& res) { return false; }
+	virtual bool kv_get_unique(const std::string& key, std::string& res) { 
+	  KV_ResPtr _res;
+	  if(!kv_get(key,_res))
+	    return false;
+
+	  res = (*_res)[key];
+	  return true;
+	}
 	virtual bool kv_get_stats(const std::string& key, KV_Stat& res) { return false; }
 	virtual bool kv_get_unsuccessful(int n, KV_StatsPtr res) { return false; }
 	virtual bool kv_get_unchecked_since(boost::posix_time::time_duration & t , KV_StatsPtr res) { return false; }

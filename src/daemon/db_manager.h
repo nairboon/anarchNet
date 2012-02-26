@@ -31,11 +31,11 @@ public:
 		bool init(const std::string&);
 
 		bool create_object(db::ObjPtr obj);
-		bool save_object(db::ObjPtr obj,const String& diff);
-		bool save_object(const db::ObjID& id,const String& diff);
-		bool delete_entry(const db::ObjID& id);
-		bool get_object(const db::ObjID& id,db::ObjPtr obj);
-		bool get_lastRevision(const db::ObjPtr obj,String& lastRev);
+		bool update_object(db::ObjPtr obj,const String& diff);
+		bool update_object(const db::ObjID& id,const String& diff);
+		bool delete_object(const db::ObjID& id);
+		bool get_object_head(const db::ObjID& id,db::ObjPtr res);
+		bool get_object_rev(const db::ObjPtr obj,db::ObjPtr rev);
 
 		std::vector<std::string> get_unchecked_keys_since(int);
 private:

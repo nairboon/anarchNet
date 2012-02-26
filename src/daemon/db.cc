@@ -62,6 +62,10 @@ namespace an
 			id = custom_id;
 			return DBManager::instance().create_object(shared_from_this());
 		}
+		bool Object::create_from_diffs()
+		{
+		    return false;
+		}
 		
 		bool Object::save() {
 			//return DBManager::instance().save_object(id,shared_from_this());
@@ -69,12 +73,12 @@ namespace an
 		}
 
 		bool Object::remove() {
-			return DBManager::instance().delete_entry(id);
+			return DBManager::instance().delete_object(id);
 		}
 
 		bool Object::load(const ObjID& id)
 		{
-			return DBManager::instance().get_object(id,shared_from_this());
+			return DBManager::instance().get_object_head(id,shared_from_this());
 		}
 		
 		String Object::get() {

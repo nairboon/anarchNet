@@ -139,7 +139,7 @@ bool ModuleManager::init()
 		return false;
 	}
 
-	bool ModuleManager::kv_get(const std::string& key,std::string& res)
+	bool ModuleManager::kv_get(const std::string& key,KV_ResPtr& res)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get(key,res))
@@ -148,6 +148,14 @@ bool ModuleManager::init()
 		return false;
 	}
 
+	bool ModuleManager::kv_get_unique(const std::string& key,std::string& res)
+	{
+		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
+			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get_unique(key,res))
+				return true;
+
+		return false;
+	}
 	bool ModuleManager::kv_remove(const std::string& key)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)

@@ -56,7 +56,7 @@ public:
 	
 	bool store_block(std::string& content);
 	bool kv_put(const std::string& key, const std::string& value);
-	bool kv_get(const std::string& id,std::string& res);	
+	bool kv_get(const std::string& id, an::KV_ResPtr& res);	
 	bool kv_remove(const std::string& id);	
 	
 	bool get_stored_file_path(const std::string& id,std::string& res);
@@ -68,6 +68,8 @@ private:
 	
 	std::string _path;
 	std::string _pub_dir;
+	std::string _mid_dir;
+	std::string _unique_dir;
 	std::string _data_dir;
 	uint _blocksize;
 	
