@@ -25,7 +25,7 @@ namespace an {
 	class Plugin {
 		public:
 			Plugin() {}
-			virtual ~Plugin() {}
+			~Plugin() {}
 			virtual const std::string getName() = 0;
 			virtual const unsigned int getVersion() = 0;
 			virtual bool initialise() = 0;

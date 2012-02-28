@@ -64,6 +64,7 @@ typedef boost::shared_ptr<block> smart_block;
 class Blockstore : public an::plg::LocalStorage
 {
 public:
+	~Blockstore() {}
 	const std::string getName() {return "blockstore";}
 	const unsigned int getVersion() { return PLG_BLOCKSTORE_VERSION; }
 	const StorageType getType() { return LocalStorage::BINARY; }

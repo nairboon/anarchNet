@@ -102,7 +102,7 @@ bool	RPCManager::init() {
 	}
 
 	RPCManager::~RPCManager() {
-		//delete _server;
+		delete _server;
 	}
 namespace rpc {
 	bool Util::BootstrapFromPeer(const boost::json::Value& root, boost::json::Value& response)
