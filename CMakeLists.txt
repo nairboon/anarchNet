@@ -7,7 +7,8 @@ cmake_minimum_required(VERSION 2.6)
 
 GET_FILENAME_COMPONENT(CMAKE_BUILD_TYPE_DIR ${CMAKE_BINARY_DIR} NAME)
 SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_DIR})
-
+set(CMAKE_CXX_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 set(ROOT_DIR  ${CMAKE_SOURCE_DIR})
 set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
@@ -256,7 +257,7 @@ target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger)
 target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
 target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore)
 
-enable_testing()
+include(CTest)
 add_test(Base ${BIN_DIR}/TBase)
 add_test(Modules ${BIN_DIR}/TModule)
 #add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)

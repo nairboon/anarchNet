@@ -133,7 +133,7 @@ bool ModuleManager::init()
 	bool ModuleManager::kv_put(const std::string& key, const std::string& value)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_put(key,value))
+			if( (*it)->kv_put(key,value))
 				return true;
 
 		return false;
@@ -142,7 +142,7 @@ bool ModuleManager::init()
 	bool ModuleManager::kv_get(const std::string& key,KV_ResPtr& res)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get(key,res))
+			if(  (*it)->kv_get(key,res))
 				return true;
 
 		return false;
@@ -151,7 +151,7 @@ bool ModuleManager::init()
 	bool ModuleManager::kv_get_unique(const std::string& key,std::string& res)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_get_unique(key,res))
+			if( (*it)->kv_get_unique(key,res))
 				return true;
 
 		return false;
@@ -159,7 +159,7 @@ bool ModuleManager::init()
 	bool ModuleManager::kv_remove(const std::string& key)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
-			if( (*it)->getType() == plg::LocalStorage::PLAIN && (*it)->kv_remove(key))
+			if(  (*it)->kv_remove(key))
 				return true;
 
 		return false;

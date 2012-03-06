@@ -44,7 +44,12 @@ namespace an
   
   bool DBManager::create_object(db::ObjPtr obj)
   {
-    if(ModuleManager::instance().db_store_obj(obj))
+    	std::ostringstream os;
+	boost::archive::text_oarchive oa(os);
+	oa << *obj;
+	LOG(INFO) << os.str();
+	
+    if(ModuleManager::instance().kv_put(obj->id, os.str()))
       return true;
     
     return false;
@@ -82,23 +87,24 @@ namespace an
   }
   bool DBManager::delete_object(const db::ObjID& id)
   {
-    if(ModuleManager::instance().db_remove(id))
+    if(ModuleManager::instance().kv_remove(id))
       return true;
     
     return false;
   }
   bool DBManager::get_object_head(const db::ObjID& id,db::ObjPtr obj)
   {
-    db::ObjID headid = db::ObjID(crypto::toHex(crypto::Hash( "HEAD" + id )));
+    obj->id = id;
+  /*  db::ObjID headid = db::ObjID(crypto::toHex(crypto::Hash( id + "HEAD" )));
     if(ModuleManager::instance().kv_get_unique(headid,obj->head))
     {	// head snapshot exists
     return true;
   }
-  // no haed yet
-  KV_ResPtr diffs;
-  obj->id = id;
+  // no haed yet*/
+ /* KV_ResPtr diffs;
+
   
-  if(ModuleManager::instance().kv_get(id,diffs)) {
+  if(ModuleManager::instance().kv_get( db::ObjID(crypto::toHex(crypto::Hash(id + "DIFFS"))),diffs)) {
     BOOST_FOREACH(const KV_ResMap::value_type& entry, *diffs) {
       try {
 	db::DiffPtr diff;
@@ -117,6 +123,25 @@ namespace an
     
     if(obj->create_from_diffs()) {
       return true;
+    }
+  }*/
+ 
+  KV_ResPtr objres;
+  if(ModuleManager::instance().kv_get( id,objres)) {
+    BOOST_FOREACH(const KV_ResMap::value_type& entry, *objres) {
+      try {
+	db::ObjPtr tobj(new db::Object());
+	
+	std::istringstream inputStream(entry.second);
+	boost::archive::text_iarchive inputArchive(inputStream);
+	inputArchive >> *obj;
+	return true;
+      }
+      catch(boost::archive::archive_exception& e)
+      {
+	LOG(ERROR) << "not a obj: " << entry.second;
+      }
+      
     }
   }
   return false;

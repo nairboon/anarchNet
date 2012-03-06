@@ -339,6 +339,7 @@ bool Blockstore::remove_file(const std::string& id)
 
 bool Blockstore::kv_put(const std::string& _key, const std::string& value)
 {
+  LOG(INFO) << "kv_put: " << _key;
   std::string key =  validate_key(_key);
   std::string hash = an::crypto::toHex(an::crypto::Hash(value));
   

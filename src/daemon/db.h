@@ -22,6 +22,8 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
 #include <boost/serialization/string.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "config.h"
 
@@ -113,6 +115,7 @@ namespace an {
 				ar & id;
 				ar & snapshots;
 				ar & diffs;
+				ar & head;
 			}
 		 private:
 		};

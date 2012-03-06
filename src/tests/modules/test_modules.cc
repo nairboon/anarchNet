@@ -114,6 +114,25 @@ TEST(DaemonTest,db_obj)
   ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
 }
 
+TEST(Object, add_del) {
+  std::string content = "abcdefg";
+  std::string id = "XXXXX";
+   db::ObjPtr obj(new db::Object());
+   db::ObjPtr obj2(new db::Object());
+
+  ASSERT_TRUE(obj->create(content,id));
+  ASSERT_TRUE(DBManager::instance().get_object_head (id,obj2));
+  ASSERT_EQ(obj2->id,id);
+  ASSERT_EQ(obj2->head,content);
+  ASSERT_TRUE(DBManager::instance().delete_object(id));
+}
+
+TEST(Object, update) {
+  
+}
+
+
+
 TEST(LocalStore,BlockStore_file_store_small)
 {
   std::string filehash = "a02a9f00615b9a9b2564ddff8bcad1f0ef9e0b9efc40e300f62b013f63e6dc6327428cf38b9b6f9769eb4da8075b7bfc39e940fc8aad35daba746121d977ee6c";

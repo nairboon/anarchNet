@@ -60,6 +60,7 @@ namespace an
       SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
       snapshots.push_back(ss);
       id = custom_id;
+      head = inp;
       return DBManager::instance().create_object(shared_from_this());
     }
     bool Object::create_from_diffs()
