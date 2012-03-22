@@ -75,15 +75,17 @@ namespace an
     
     db::DiffPtr ddiff(new db::Diff(obj->snapshots[0]->id,patch));
     
-    if(!ModuleManager::instance().db_store_diff(ddiff))
-      return false;
+  //  if(!ModuleManager::instance().db_store_diff(ddiff))
+ //     return false;
     
     obj->diffs.push_back(ddiff);
     
-    if(!ModuleManager::instance().db_store_obj(obj))
-      return false;
+  //  if(!ModuleManager::instance().db_store_obj(obj))
+  //    return false;
+    if(obj->save())
+      return true;
     
-    return true;
+    return false;
   }
   bool DBManager::delete_object(const db::ObjID& id)
   {

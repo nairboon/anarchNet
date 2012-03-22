@@ -127,9 +127,20 @@ TEST(Object, add_del) {
   ASSERT_TRUE(DBManager::instance().delete_object(id));
 }
 
-TEST(Object, update) {
-  
-}
+  TEST(Object, update) {
+    std::string content = "abcdefg";
+    std::string content2 = "ab34324cdefg";
+    std::string id = "XXXXXy";
+    
+    db::ObjPtr obj(new db::Object());
+    db::ObjPtr obj2(new db::Object());
+
+    ASSERT_TRUE(obj->create(content,id));
+    ASSERT_TRUE(DBManager::instance().update_object(obj,content2));
+    ASSERT_TRUE(DBManager::instance().get_object_head (id,obj2));
+    ASSERT_EQ(obj2->head,content2);
+    ASSERT_TRUE(DBManager::instance().delete_object(id));
+  }
 
 
 

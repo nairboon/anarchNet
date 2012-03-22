@@ -70,7 +70,13 @@ namespace an
     
     bool Object::save() {
       //return DBManager::instance().save_object(id,shared_from_this());
-      return false;
+      if(!DBManager::instance().delete_object(id))
+	return false;
+      
+     if(!DBManager::instance().create_object(shared_from_this()))
+	return false;
+      
+      return true;
     }
     
     bool Object::remove() {
