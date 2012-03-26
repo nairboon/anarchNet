@@ -73,12 +73,14 @@ namespace an
     
     LOG(INFO) << "patch: " << patch;
     
-    db::DiffPtr ddiff(new db::Diff(obj->snapshots[0]->id,patch));
+    db::DiffPtr ddiff(new db::Diff(patch,obj->master));
     
   //  if(!ModuleManager::instance().db_store_diff(ddiff))
  //     return false;
     
     obj->diffs.push_back(ddiff);
+    obj->master = ddiff->id;
+    obj->head = diff;
     
   //  if(!ModuleManager::instance().db_store_obj(obj))
   //    return false;

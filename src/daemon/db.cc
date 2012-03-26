@@ -49,16 +49,20 @@ namespace an
     
     bool Object::create(String inp)
     {
-      SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
-      snapshots.push_back(ss);
-      id = ObjID(crypto::toHex(crypto::Hash("OBJECT"+ss->id)));
-      return DBManager::instance().create_object(shared_from_this());
+      id = ObjID(crypto::toHex(crypto::Hash("OBJECT"+crypto::Hash(inp))));
+      return create(inp,id);
     }
     
     bool Object::create(String inp,const ObjID& custom_id)
     {
-      SnapshotPtr ss = SnapshotPtr(new Snapshot("",inp));
-      snapshots.push_back(ss);
+        diff_match_patch<String> dmp;
+    std::string initialDiff = dmp.patch_toText(dmp.patch_make("", inp));
+    
+    LOG(INFO) << "oc.patch: " << initialDiff;
+     db::DiffPtr diff(new db::Diff(initialDiff,""));
+      diffs.push_back(diff);
+
+      master = diff->id;
       id = custom_id;
       head = inp;
       return DBManager::instance().create_object(shared_from_this());
@@ -89,7 +93,7 @@ namespace an
     }
     
     String Object::get() {
-      db::SnapshotPtr ss = snapshots.back();
+     /* db::SnapshotPtr ss = snapshots.back();
       String res = ss->content;
       diff_match_patch<String> dmp;
       LOG(INFO) << "loading obj with diffs: " << ss->diffs.size() << " : " << diffs.size();
@@ -101,7 +105,8 @@ namespace an
 	res = out.first;
       }
       LOG(INFO) << "before: " << ss->content << " after: " << res;
-      return res;
+      return res;*/
+     return head;
     }
     String Object::get(const ObjID& revision) {
       return "";

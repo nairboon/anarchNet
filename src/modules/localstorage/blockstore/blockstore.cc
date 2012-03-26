@@ -403,7 +403,7 @@ bool Blockstore::kv_get(const std::string& _key,an::KV_ResPtr& res)
   try {
     smart_block block = (*_block_cache)(key);
     std::string cont = std::string(block.get()->data,block.get()->size);
-    res->insert(std::make_pair<std::string,std::string>(an::crypto::toHex(an::crypto::Hash(cont)),cont));
+    res->insert(std::make_pair(an::crypto::toHex(an::crypto::Hash(cont)),cont));
     return true;
   }
   catch(an::file_not_found& e)
@@ -434,7 +434,7 @@ bool Blockstore::kv_get(const std::string& _key,an::KV_ResPtr& res)
       std::string cont(buffer,size);
       delete[] buffer;
       LOG(INFO) << "added: " << cont <<" << " << an::crypto::toHex(an::crypto::Hash(cont));
-      res->insert(std::make_pair<std::string,std::string>(an::crypto::toHex(an::crypto::Hash(cont)),cont));
+      res->insert(std::make_pair(an::crypto::toHex(an::crypto::Hash(cont)),cont));
       
       return true;
     }

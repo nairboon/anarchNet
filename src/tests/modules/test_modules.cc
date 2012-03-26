@@ -45,7 +45,7 @@ TEST(Lib, diff_match_patch)
   EXPECT_EQ(text2,res);
   
 }
-
+/*
 TEST(DaemonTest,db_snapshot)
 {
   std::string content = "ABCDEFGHsnapshot";
@@ -112,7 +112,7 @@ TEST(DaemonTest,db_obj)
   
   ASSERT_TRUE(ModuleManager::instance().db_remove(obj->id));
   ASSERT_FALSE(ModuleManager::instance().db_get_obj(obj->id,nobj));
-}
+}*/
 
 TEST(Object, add_del) {
   std::string content = "abcdefg";

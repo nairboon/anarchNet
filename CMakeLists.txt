@@ -230,6 +230,7 @@ MESSAGE(${MODULES_SRC})
 ###################################################################################################
 # Tests
 ###################################################################################################
+ADD_SUBDIRECTORY("${ROOT_DIR}/third-party/gtest-1.6.0")
 file(GLOB T_MAIN  "${SOURCE_DIR}/tests/main.cc")
 
 file(GLOB T_BASE_C "${SOURCE_DIR}/tests/base/*.c*")
@@ -249,13 +250,13 @@ add_executable(TBase ${T_MAIN} ${T_BASE_DIR})
 add_executable(TRPC ${T_MAIN} ${T_RPC_DIR})
 add_executable(TModule ${T_MAIN} ${T_MD_DIR})
 
-add_dependencies(TBase anDaemon logger)
-add_dependencies(TRPC anDaemon logger rpc)
-add_dependencies(TModule anDaemon logger rpc)
+add_dependencies(TBase anDaemon logger gtest)
+add_dependencies(TRPC anDaemon logger rpc gtest)
+add_dependencies(TModule anDaemon logger rpc gtest)
 
-target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger)
-target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc)
-target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore)
+target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger gtest)
+target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc gtest)
+target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore gtest)
 
 include(CTest)
 add_test(Base ${BIN_DIR}/TBase)

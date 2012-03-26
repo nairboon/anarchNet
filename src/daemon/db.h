@@ -56,8 +56,9 @@ namespace an {
 			//std::vector<ObjID> prev;
 			ObjID prev;
 			Diff() {}
-			Diff(const ObjID& s, const String& c) : needs_ObjID(c), snapshot(s) {}
-			
+			//Diff(const ObjID& s, const String& c) : needs_ObjID(c), snapshot(s) {}
+			Diff(const String& c,const ObjID& p) : needs_ObjID(c), prev(p) {}
+
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version)
 			{
@@ -94,6 +95,7 @@ namespace an {
 		class Object : public boost::enable_shared_from_this<Object> {
 		 public:
 			ObjID id;
+			ObjID master;
 			int _db_id;
 			std::string _db_type;
 			std::vector<SnapshotPtr> snapshots;
@@ -113,7 +115,7 @@ namespace an {
 			{
 			      //ar & boost::serialization::base_object<needs_ObjID()>(*this);
 				ar & id;
-				ar & snapshots;
+				ar & master;
 				ar & diffs;
 				ar & head;
 			}
