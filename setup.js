@@ -34,16 +34,16 @@ console.log("scan packages...");
 setup.ScanLocalPackages(function(err,mlid){
 	console.log("packages scaned");
 		console.log("storing master list...",mlid);
-		db.store_ht(util.system_id+"masterlist",mlid, function(err){
+		/*db.store_ht(util.system_id+"masterlist",mlid, function(err){
 			if(err)
 				throw new Error("could not save masterlist");
-
+*/
 			setup.createDefaultRepo(mlid,function(err,res){
 				if(err)
-					throw new Error("could not create a repo");
+					throw err;
 				console.log("repo created!");
 				db.close();
 			});
-		});
+		//});
 });
 
