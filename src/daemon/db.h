@@ -107,6 +107,7 @@ namespace an {
 			bool load(const ObjID& id);
 			bool create_from_diffs();
 			bool remove();
+			bool has_diff(const ObjID& id);
 			String get();
 			String get(const ObjID& revision);
 			Object() : _db_id(0), _db_type("") {}

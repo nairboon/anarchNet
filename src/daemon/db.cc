@@ -109,7 +109,29 @@ namespace an
      return head;
     }
     String Object::get(const ObjID& revision) {
-      return "";
+      String res = "";
+      diff_match_patch<String> dmp;
+      LOG(INFO) << "jumping to rev: " << revision<< " Tdiffs: " << diffs.size();
+      
+      BOOST_FOREACH (an::db::DiffPtr diff, diffs) {
+	LOG(INFO) << "diff: " << diff->content;
+	std::pair<String, std::vector<bool> > out =
+	dmp.patch_apply(dmp.patch_fromText(diff->content), res);
+	res = out.first;
+	if(diff->id == revision)
+	  break;
+      }
+      LOG(INFO) << " after: " << res;
+      return res;
     }
+    bool Object::has_diff(const ObjID& id) {
+      BOOST_FOREACH(DiffPtr diff, diffs) {
+	if(diff->id == id)
+	  return true;
+      }
+      LOG(ERROR) << "diff not found: " << id;
+      return false;
+    }
+
   }
 }

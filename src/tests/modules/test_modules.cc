@@ -142,7 +142,27 @@ TEST(Object, add_del) {
     ASSERT_TRUE(DBManager::instance().delete_object(id));
   }
 
+  TEST(Object, revsion) {
+    std::string content = "abcdefg";
+    std::string content2 = "ab34324cdefg";
+    std::string content3 = "EEab24Xcdefg";
+    std::string id = "XXXXXz";
+    
+    db::ObjPtr obj(new db::Object());
+    db::ObjPtr obj2(new db::Object());
 
+    ASSERT_TRUE(obj->create(content,id));
+    ASSERT_TRUE(DBManager::instance().update_object(obj,content2));
+    db::ObjID revid = obj->master;
+    ASSERT_TRUE(DBManager::instance().update_object(obj,content3));
+    ASSERT_TRUE(DBManager::instance().get_object_head (id,obj2));
+    ASSERT_EQ(obj2->head,content3);
+    ASSERT_TRUE(DBManager::instance().rollback_object(obj,revid));
+    ASSERT_EQ(obj->head,content2);
+    ASSERT_TRUE(DBManager::instance().get_object_head (id,obj2));
+    ASSERT_EQ(obj2->head,content2);
+    ASSERT_TRUE(DBManager::instance().delete_object(id));
+  }
 
 TEST(LocalStore,BlockStore_file_store_small)
 {

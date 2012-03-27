@@ -47,7 +47,7 @@ namespace an
     	std::ostringstream os;
 	boost::archive::text_oarchive oa(os);
 	oa << *obj;
-	LOG(INFO) << os.str();
+	//LOG(INFO) << os.str();
 	
     if(ModuleManager::instance().kv_put(obj->id, os.str()))
       return true;
@@ -150,12 +150,26 @@ namespace an
   }
   return false;
 }
-bool DBManager::get_object_rev(const db::ObjPtr obj,db::ObjPtr rev)
+bool DBManager::rollback_object(const db::ObjPtr obj,const db::ObjID& rev)
 {
-  // lastRev = obj->get();
-  LOG(ERROR) << "unimplemented";
-  return false;
+  String res;
+  if(!get_object_rev(obj,rev,res))
+    return false;
+  
+  obj->head = res;
+  obj->master = rev;
+    if(obj->save())
+      return true;
+    
+    return false;
 }
-
+bool DBManager::get_object_rev(const db::ObjPtr obj,const db::ObjID& rev,String& res)
+{
+    if(!obj->has_diff(rev))
+      return false;
+    
+    res = obj->get(rev);
+    return true;
+}
 
 }

@@ -125,13 +125,13 @@ smart_block Blockstore::load_block(id& bid)
     
     std::ifstream::pos_type size;
     size = ifile.tellg();
-    LOG(INFO) << "reading " << size << "bytes";
+   // LOG(INFO) << "reading " << size << "bytes";
     char *buffer = new char [size];
     ifile.seekg (0, std::ios::beg);
     ifile.read (buffer, size);
     ifile.close();
     
-    LOG(INFO) << "read: " << buffer;
+   // LOG(INFO) << "read: " << buffer;
     
     return smart_block(new block(buffer,size));
   }
@@ -167,7 +167,7 @@ smart_pf Blockstore::load_file(id& fid)
       ifile.close();
       return smart_pf(new public_file("",false));
     }
-    LOG(INFO) << "loading file: " << filesize;
+    //LOG(INFO) << "loading file: " << filesize;
     
     boost::shared_array<char> buffer = boost::shared_array<char>(new char[_blocksize]);
     if(filesize < (_blocksize - sizeof(uint))) { // just read one block
@@ -187,7 +187,7 @@ smart_pf Blockstore::load_file(id& fid)
 	break;
       
       std::string newifile = hash_to_path(an::crypto::toHex(bid.get()));
-      LOG(INFO) << "loading: " << newifile;
+     // LOG(INFO) << "loading: " << newifile;
       fs::ifstream nif(_unique_dir+newifile);
       if(!nif.good()) {
 	LOG(ERROR) << "could not open " << _unique_dir+newifile;
@@ -200,7 +200,7 @@ smart_pf Blockstore::load_file(id& fid)
       
       nif.close();
       readbytes+=_blocksize;
-      LOG(INFO) << "rb: " << readbytes / 1024;
+     // LOG(INFO) << "rb: " << readbytes / 1024;
     }while(ifile.good());
     
   }
@@ -228,7 +228,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
     uint filesize = fs::file_size(path);
     uint blocks = floor(filesize / _blocksize)+1;
     uint blockc = 1;
-    LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
+    //LOG(INFO) << "storing in " << blocks << " blocks ( " << filesize << " : " << _blocksize;
     
     if(fs::exists(_unique_dir + hpath)) {
       LOG(INFO) << "file already stored: " << hash;
@@ -271,13 +271,13 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
       readbytes = _blocksize;
       if(input_file.eof()) {
 	readbytes = abs(filesize - ((blockc-1) * _blocksize));
-	LOG(INFO) << "last bit: " << readbytes;
+	//LOG(INFO) << "last bit: " << readbytes;
 	hash = an::crypto::Hash(std::string(buffer.get(),readbytes));
       }
       else
 	hash = an::crypto::Hash(buffer.get());
       block_path = hash_to_path(an::crypto::toHex(hash));
-      LOG(DEBUG) << "write block: " << block_path;
+     // LOG(DEBUG) << "write block: " << block_path;
       {
 	fs::path ppath = fs::path(_unique_dir + block_path).remove_filename();
 	if(!fs::exists(ppath))
@@ -367,7 +367,7 @@ bool Blockstore::kv_put(const std::string& _key, const std::string& value)
 
 std::string Blockstore::validate_key(std::string key)
 {
-  LOG(INFO) << "validate: " << key;
+ // LOG(INFO) << "validate: " << key;
   if(key.size() < 128) // hash it
     return an::crypto::toHex(an::crypto::Hash(key));
   else
@@ -408,7 +408,7 @@ bool Blockstore::kv_get(const std::string& _key,an::KV_ResPtr& res)
   }
   catch(an::file_not_found& e)
   {
-    LOG(DEBUG) << "not a unique block";
+   // LOG(DEBUG) << "not a unique block";
   }
   
   try {
@@ -433,7 +433,7 @@ bool Blockstore::kv_get(const std::string& _key,an::KV_ResPtr& res)
       file.close();
       std::string cont(buffer,size);
       delete[] buffer;
-      LOG(INFO) << "added: " << cont <<" << " << an::crypto::toHex(an::crypto::Hash(cont));
+      //LOG(INFO) << "added: " << cont <<" << " << an::crypto::toHex(an::crypto::Hash(cont));
       res->insert(std::make_pair(an::crypto::toHex(an::crypto::Hash(cont)),cont));
       
       return true;
@@ -452,7 +452,7 @@ bool Blockstore::kv_remove(const std::string& _key)
   std::string key =  validate_key(_key);
   
   if(!fs::remove(_unique_dir + hash_to_path(key))) {
-    LOG(INFO) << "could not remove unique file, mid key?";
+   // LOG(INFO) << "could not remove unique file, mid key?";
     
     fs::directory_iterator dir(_mid_dir + hash_to_path(key)),end;
     BOOST_FOREACH(const fs::path& p, std::make_pair(dir, end)) {

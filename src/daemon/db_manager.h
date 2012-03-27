@@ -35,7 +35,8 @@ public:
 		bool update_object(const db::ObjID& id,const String& diff);
 		bool delete_object(const db::ObjID& id);
 		bool get_object_head(const db::ObjID& id,db::ObjPtr res);
-		bool get_object_rev(const db::ObjPtr obj,db::ObjPtr rev);
+		bool rollback_object(const db::ObjPtr obj,const db::ObjID& rev);
+		bool get_object_rev(const db::ObjPtr obj,const db::ObjID& rev,String& res);
 
 		std::vector<std::string> get_unchecked_keys_since(int);
 private:
