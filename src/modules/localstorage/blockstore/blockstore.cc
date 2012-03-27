@@ -222,6 +222,11 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
   BOOST_LOG_SEV(an::log::Logger::instance().get(),INFO) << "test";
   
   std::string hash = an::crypto::toHex(an::crypto::HashFile(path));
+  if(hash=="")
+  {
+    LOG(ERROR) << "file not found: " << path;
+    return false;
+  }
   std::string hpath = hash_to_path(hash);
   
   try {

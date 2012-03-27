@@ -143,7 +143,7 @@ namespace an
       }
       catch(boost::archive::archive_exception& e)
       {
-	LOG(ERROR) << "not a obj: " << entry.second;
+	LOG(ERROR) << "not a obj: " << entry.second << " : " << id;
       }
       
     }

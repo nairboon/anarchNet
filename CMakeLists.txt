@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.6)
 
 GET_FILENAME_COMPONENT(CMAKE_BUILD_TYPE_DIR ${CMAKE_BINARY_DIR} NAME)
 SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_DIR})
-set(CMAKE_CXX_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
+#set(CMAKE_CXX_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 set(ROOT_DIR  ${CMAKE_SOURCE_DIR})

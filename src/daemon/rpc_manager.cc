@@ -243,7 +243,7 @@ namespace rpc {
 		}
 
 		RPC_Response res = req.createResponse();
-		LOG(INFO) << "stored under: " << obj->id << " : " << obj->snapshots[0]->content;
+		LOG(INFO) << "stored under: " << obj->id << " : " << obj->head;
 		boost::json::Config::add(res.data(),"id",obj->id);
 		response = res.json();
 		return true;
