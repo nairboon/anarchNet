@@ -167,27 +167,39 @@ smart_pf Blockstore::load_file(id& fid)
       ifile.close();
       return smart_pf(new public_file("",false));
     }
-    //LOG(INFO) << "loading file: " << filesize;
+    LOG(INFO) << "loading file: " << filesize;
     
     boost::shared_array<char> buffer = boost::shared_array<char>(new char[_blocksize]);
-    if(filesize < (_blocksize - sizeof(uint))) { // just read one block
+    if(filesize <= (_blocksize - sizeof(uint))) { // just read one block
       ifile.read(buffer.get(),filesize);
       ofile.write(buffer.get(),filesize);
       
   }
   else {
     uint readbytes = 0;
+    uint readblock = 0;;
     
-    
-    boost::shared_array<char> bid = boost::shared_array<char>(new char[HASH_SIZE]);
+    //boost::shared_array<char> bid = boost::shared_array<char>(new char[HASH_SIZE]);
+    char bid[HASH_SIZE*sizeof(char)];
     do
     {
-      ifile.read(bid.get(),HASH_SIZE); //hash
+      ifile.read(bid,HASH_SIZE); //hash
       if(ifile.eof())
 	break;
+      readblock = ifile.gcount();
+      readbytes+=readblock;
       
-      std::string newifile = hash_to_path(an::crypto::toHex(bid.get()));
-     // LOG(INFO) << "loading: " << newifile;
+      std::string newifile = hash_to_path(std::string(bid,HASH_SIZE));
+      LOG(INFO) << readblock << " ->loading: " << newifile;
+      if(readblock < HASH_SIZE) {
+	LOG(ERROR) << "size of rb <512: " << strlen(bid) << " : " << readblock;		
+	throw an::file_not_found();
+      }	
+      if(strlen(bid) < HASH_SIZE) {
+	LOG(ERROR) << "size of id < 64: " << strlen(bid) << " : " << readblock << " : " << bid;		
+	throw an::file_not_found();
+      }	
+      
       fs::ifstream nif(_unique_dir+newifile);
       if(!nif.good()) {
 	LOG(ERROR) << "could not open " << _unique_dir+newifile;
@@ -199,10 +211,10 @@ smart_pf Blockstore::load_file(id& fid)
       ofile << nif.rdbuf();
       
       nif.close();
-      readbytes+=_blocksize;
+      
      // LOG(INFO) << "rb: " << readbytes / 1024;
     }while(ifile.good());
-    
+      
   }
   
   ifile.close();
@@ -252,7 +264,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
       
       fs::ofstream header_file(_unique_dir+hpath,std::ios::binary);
     if(!header_file.good()) {
-      LOG(ERROR) << "could not open " << _unique_dir+hpath;
+      LOG(ERROR) << "could not open header file " << _unique_dir+hpath;
       return false;
     }
     header_file.write(reinterpret_cast<char*>(&filesize),sizeof(uint));
@@ -264,7 +276,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
       return false;
     }
     
-    if(filesize < _blocksize) { // we only need one file
+    if(filesize <= _blocksize) { // we only need one file
       header_file << input_file.rdbuf();
   }
   else {
@@ -301,8 +313,8 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	block_file.write(buffer.get(),readbytes);
 	block_file.close();
       }
-      header_file.write(hash.c_str(),512);
-      
+      header_file.write(an::crypto::toHex(hash).c_str(),HASH_SIZE);
+      LOG(INF) << "added to info: " << hash.size() << " : " << an::crypto::toHex(hash);
     } while(blockc++ < blocks);
   }
   

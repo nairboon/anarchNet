@@ -34,7 +34,8 @@
  *
  * */
 #define PLG_BLOCKSTORE_VERSION 1
-#define HASH_SIZE 512
+#define HASH_SIZE_BITS 512
+#define HASH_SIZE 128
 
 typedef const std::string id;
 

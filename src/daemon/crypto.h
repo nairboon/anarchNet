@@ -32,7 +32,7 @@ namespace crypto
 	 *  @param inp string that is converted
 	 *  @return the hex string */
 	std::string toHex(const std::string& inp);
-	
+	std::string toHex(const char *inp,size_t length);
 	/** Hash a string
 	 *  @param inp string that is to be hashed.
 	 *  @return the hash */
