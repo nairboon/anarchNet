@@ -39,7 +39,7 @@ namespace an
 		{
 		public:
 			connection(boost::asio::io_service& io_service,Json::Rpc::Handler& jsh)
-			: socket_(io_service), strand_(io_service), _jsonHandler(jsh)
+			: socket_(io_service), strand_(io_service), jsonHandler_(jsh)
 			{
 
 			}
@@ -74,9 +74,10 @@ namespace an
 			
 			tcp::socket socket_;
 			boost::asio::streambuf request_buf_;
-			Json::Rpc::Handler& _jsonHandler;
+			Json::Rpc::Handler& jsonHandler_;
 			  /// Strand to ensure the connection's handlers are not called concurrently.
 			boost::asio::io_service::strand strand_;
+			boost::asio::streambuf response_;
 		};
 	typedef boost::shared_ptr<connection> connection_ptr;
 	
@@ -91,7 +92,7 @@ namespace an
 			void run();
 			
 		protected:
-			Json::Rpc::Handler _jsonHandler;	
+			Json::Rpc::Handler jsonHandler_;	
 			
 		private:
 			void handle_accept(const boost::system::error_code& error)
@@ -99,7 +100,7 @@ namespace an
 				if (!error)
 				{
 				  new_connection_->start();
-				  new_connection_.reset(new connection(io_service_, _jsonHandler));
+				  new_connection_.reset(new connection(io_service_, jsonHandler_));
 				  acceptor_.async_accept(new_connection_->socket(),
 							 boost::bind(&RpcServer::handle_accept, this,
 								     boost::asio::placeholders::error));

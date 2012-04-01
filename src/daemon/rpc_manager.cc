@@ -298,18 +298,9 @@ namespace rpc {
 		}
 		else {
 		  std::string content = obj->head;
-		 /* db::ObjPtr ob;
-		  if(!DBManager::instance().get_object_head(obj,content))
-		  {
-		    LOG(INFO) << "get_lastRevision failed: " << content;
-		    res = req.createErrorResponse();
-		    res.json()["error"] = "get last revision failed";
-		    response = res.json();
-		    return false;
-		  }*/
-		  LOG(INFO) << "sending: " << content;
+		  
 		  std::string econtent = res.encode_base64(content);
-		  LOG(INFO) << econtent;
+		  LOG(INFO) << content.size() << " (byes) -> "<<econtent.size() << " (bytes,hex) sending: " << content;
 		  boost::json::Config::add(res.data(),"content",econtent);
 		}
 		response = res.json();

@@ -28,7 +28,7 @@ namespace an
 {
 
 RpcServer::RpcServer(boost::asio::io_service& io_service, short int port, std::size_t thread_pool_size)
-: io_service_(io_service), acceptor_(io_service),new_connection_(new connection(io_service_, _jsonHandler)), thread_pool_size_(thread_pool_size)
+: io_service_(io_service), acceptor_(io_service),new_connection_(new connection(io_service_, jsonHandler_)), thread_pool_size_(thread_pool_size)
 {
 	  std::stringstream ports;
 	  ports << port;
@@ -48,12 +48,12 @@ RpcServer::RpcServer(boost::asio::io_service& io_service, short int port, std::s
 
  void RpcServer::AddMethod(Json::Rpc::CallbackMethod* method)
  {
-      _jsonHandler.AddMethod(method);
+      jsonHandler_.AddMethod(method);
  }
 
     void RpcServer::DeleteMethod(const std::string& method)
     {
-      _jsonHandler.DeleteMethod(method);
+      jsonHandler_.DeleteMethod(method);
     }
 	RpcServer::~RpcServer()
 	{
@@ -96,24 +96,23 @@ LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::ge
 			  LOG(INFO) << "data is null";	 
 			  return;
 			}
-    
-			//try {
-			boost::json::Value response;
-				_jsonHandler.Process(std::string(data), response);
-			//}
-			//catch(boost::json::
+    			boost::json::Value response;
+				jsonHandler_.Process(std::string(data), response);
+
 
 			if(!response.is_null())
 			{
-				std::string rep = _jsonHandler.GetString(response);
-				LOG(INFO) << "send: " << rep;
+				std::string rep = jsonHandler_.GetString(response);
+
+				std::ostream responce_stream(&response_);
+				    responce_stream << rep;
+				    LOG(INFO) << "sent: " << rep.size();
 			boost::asio::async_write(socket_,
-															 boost::asio::buffer(rep, rep.size()),
+															response_/* boost::asio::buffer(rep, rep.size())*/,
 															 strand_.wrap(boost::bind(&connection::handle_write, shared_from_this(),
 																					 boost::asio::placeholders::error)));
+
 			}
 		}
-		//else
-		//  LOG(INFO) << "error: " << error.default_error_condition().value() << " " << error.category().name();
 	}
 }
