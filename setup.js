@@ -20,10 +20,7 @@ setup.ScanLocalPackages(function(err,mlid){
 					throw err;
 				console.log("repo created!",res);
 				
-				/*ppm.updateRepo(res,function(err,repores){
-				if(err)
-					return next(new Error('Could not update repo: ' + err));
-				*/ppm.cacheApp("user",res,function(err,appres){
+				ppm.cacheApp("user",res,function(err,appres){
 					if(err || !appres)
 						return	next( new Error('Could not cache that app: '+err.message));
 					db.close();
