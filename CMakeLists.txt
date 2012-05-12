@@ -13,6 +13,8 @@ set(CMAKE_CXX_FLAGS "-std=c++0x")
 set(ROOT_DIR  ${CMAKE_SOURCE_DIR})
 set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
 
+option(build_tests "Build all tests" OFF)
+
 if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/..")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
@@ -33,13 +35,13 @@ endif()
 
 find_package(GTest)
 find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
-find_library(SQLITE NAMES sqlite3 REQUIRED PATH)
+#find_library(SQLITE NAMES sqlite3 REQUIRED PATH)
 find_library(LSQL NAMES litesql REQUIRED PATH)
 find_library(LSQLUTIL NAMES litesql-util REQUIRED PATH)
 set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
-find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost/log/")
+#find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost/log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
@@ -230,6 +232,8 @@ MESSAGE(${MODULES_SRC})
 ###################################################################################################
 # Tests
 ###################################################################################################
+include(CTest)
+if(build_tests)
 ADD_SUBDIRECTORY("${ROOT_DIR}/third-party/gtest-1.6.0")
 file(GLOB T_MAIN  "${SOURCE_DIR}/tests/main.cc")
 
@@ -258,13 +262,13 @@ target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger g
 target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc gtest)
 target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore gtest)
 
-include(CTest)
+
 add_test(Base ${BIN_DIR}/TBase)
 add_test(Modules ${BIN_DIR}/TModule)
 #add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
 #add_test(RPC ${BIN_DIR}/TRPC)
 #add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
-
+endif()
 set(CPPLINTOPS "--verbose=4" "--filter=-whitespace/tab,-whitespace/end_of_line,-build/include,-readability/streams,-whitespace/braces,-whitespace/comments,-whitespace/labels,-runtime/rtti,-whitespace/line_length,-runtime/explicit")
 if (PYTHONINTERP_FOUND)
   if (UNIX)
