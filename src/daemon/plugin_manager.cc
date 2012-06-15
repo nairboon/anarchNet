@@ -74,6 +74,7 @@ namespace an
     }
     catch(boost::property_tree::ptree_error& e)
     {
+      LOG(ERROR) << "get_config: " << e.what();
       return false;
     }
     return true;

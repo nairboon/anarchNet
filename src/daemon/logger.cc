@@ -40,7 +40,7 @@ namespace keywords = boost::log::keywords;
 
 using boost::shared_ptr;
 
-
+/*
 namespace an
 {
 	namespace log {
@@ -91,3 +91,4 @@ namespace an
 	}
 	}
 }
+*/

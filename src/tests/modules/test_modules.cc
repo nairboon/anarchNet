@@ -8,6 +8,7 @@
 #include "diff_match_patch.h"
 #include "../modules/localstorage/blockstore/lru_cache.h"
 #include "../modules/localstorage/blockstore/blockstore.h"
+#include "../modules/localstorage/flatfilestorage/ffstore.h"
 
 using namespace an;
 
@@ -238,10 +239,26 @@ TEST(LocalStore,BlockStore_blockstore)
   ASSERT_TRUE(bs->kv_remove(hash));
 }
 
-TEST(LocalStore,HT)
+TEST(LocalStore,blockstore_HT)
 {
   Blockstore* bs;
   bs = static_cast<Blockstore*>(ModuleManager::instance().get_ls_plugin("blockstore"));
+  
+  std::string key = "mykey";
+  std::string value = "myvalue";
+  std::string res;
+  an::KV_ResPtr kres;
+  ASSERT_TRUE(bs->kv_put(key,value));
+  ASSERT_TRUE(bs->kv_get(key,kres));
+  ASSERT_EQ((*kres)[an::crypto::toHex(an::crypto::Hash(value))],value);
+  ASSERT_TRUE(bs->kv_remove(key));
+  ASSERT_FALSE(bs->kv_get(key,kres));
+}
+
+TEST(LocalStore,ffstore_HT)
+{
+  FFStore* bs;
+  bs = static_cast<FFStore*>(ModuleManager::instance().get_ls_plugin("ffstore"));
   
   std::string key = "mykey";
   std::string value = "myvalue";

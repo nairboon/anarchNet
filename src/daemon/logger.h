@@ -41,7 +41,7 @@ namespace an
 	};
 
 	
-	class Logger : public Singleton<Logger> {
+	/*class Logger : public Singleton<Logger> {
 		friend class Singleton<Logger>;
 	 public:
 
@@ -50,7 +50,7 @@ namespace an
 		void log(const std::string& msg, severity_level lvl);
 	 private:
 		boost::log::sources::severity_logger_mt< severity_level > _logger;
-	};
+	};*/
 }
 //#define LOG(lvl)
 //BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),
