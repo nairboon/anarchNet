@@ -76,6 +76,8 @@ void anDaemon::run()
 	void anDaemon::stop() {
 		NetManager::instance().stop();
 		RPCManager::instance().stop();
+		DBManager::instance().kill();
+		ModuleManager::instance().kill();
 	}
 	
 	anDaemon::~anDaemon() {

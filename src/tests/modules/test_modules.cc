@@ -13,17 +13,6 @@
 using namespace an;
 
 
-TEST(DaemonTest,initDaemon)
-{
-  an::anDaemon *_daemon = new an::anDaemon();
-  LOG(INFO) << "initializing daemon";
-  
-  if (!_daemon->init(".")) {
-    LOG(FATAL) << "init failed";
-    exit(EXIT_FAILURE);
-  }
-}
-
 TEST(Lib, diff_match_patch)
 {
   std::string text1 = "ABCEDFGahahahah";

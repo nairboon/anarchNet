@@ -130,14 +130,14 @@ bool ModuleManager::init()
 	}
 
 
-	bool ModuleManager::kv_put(const std::string& key, const std::string& value)
+	/*bool ModuleManager::kv_put(const std::string& key, const std::string& value)
 	{
 		for(std::vector<plg::LocalStorage*>::iterator it = _localstorages.begin(); it != _localstorages.end(); it++)
 			if( (*it)->kv_put(key,value))
 				return true;
 
 		return false;
-	}
+	}*/
 
 	bool ModuleManager::kv_get(const std::string& key,KV_ResPtr& res)
 	{

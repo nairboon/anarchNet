@@ -16,7 +16,7 @@ using namespace pugg;
 
 extern "C" //__declspec(dllexport)
 void registerPlugin(Kernel &K) 
-{
+{ 
 	Server<an::plgdrv::LocalStorage>* server = CastToServerType<an::plgdrv::LocalStorage>(K.getServer(PLG_LOCALSTORAGE_SERVER_NAME));
 	assert(server != NULL);
 	server->addDriver(new FFStoreDriver(),PLG_LOCALSTORAGE_SERVER_VERSION);
@@ -24,6 +24,9 @@ void registerPlugin(Kernel &K)
 
 
 bool FFStore::initialise() {
+  
+  an::ModuleManager::instance().kv_put.connect(boost::bind(&FFStore::kv_put,this,_1,_2));
+  
  if(!get_config()) {
     LOG(ERROR) << "could not load config";
    // return false;

@@ -45,7 +45,11 @@ namespace an
     {
 			t.reset(new T());
     }
-		
+    
+    static void kill()
+    {
+      t.reset();
+    }
   protected:
     ~Singleton() {}
 		Singleton() {}

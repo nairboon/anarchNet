@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2/signal.hpp>
 #include "plugins/plugin.h"
 #include "singleton.h"
 #include "db.h"
@@ -47,13 +48,42 @@ namespace an {
 	  typedef std::map<std::string,std::string> KV_ResMap;
 	  typedef boost::shared_ptr<KV_ResMap> KV_ResPtr;
 	  #define newKVRes new KV_ResMap
-	  
+
+// combiner which returns if one is true
+template<typename T>
+struct res_check
+{
+  typedef T result_type;
+
+  template<typename InputIterator>
+  T operator()(InputIterator first, InputIterator last) const
+  {
+    if(first == last ) return false;
+    T state = false;
+    while (first != last) {
+      if (*first)
+        state = true;
+      ++first;
+    }
+    return state;
+  }
+};
+
 class ModuleManager : public Singleton<ModuleManager> {
 		friend class Singleton<ModuleManager>;
 public:
 		bool init();
 		
-			~ModuleManager() {}
+			~ModuleManager() {
+			kv_put.disconnect_all_slots();
+			}
+		
+		
+		
+		//signals
+		boost::signals2::signal<bool (const std::string& key, const std::string& value),
+              res_check<bool> > kv_put;
+
 		
 		bool bootstrapFromPeer(const std::string&ip,int port);
 		bool bootstrapFromHostlist(const std::string&url);
@@ -68,7 +98,7 @@ public:
 		bool db_remove(const db::ObjID& id);
 
 		// key value store
-		bool kv_put(const std::string& key, const std::string& value);
+		//bool kv_put(const std::string& key, const std::string& value);
 		bool kv_get(const std::string& key,KV_ResPtr& res);
 		bool kv_get_unique(const std::string& key, std::string& res);
 		bool kv_remove(const std::string& key);
