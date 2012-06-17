@@ -69,7 +69,6 @@ void RpcServer::run()
           boost::bind(&boost::asio::io_service::run, &io_service_)));
     threads.push_back(thread);
   }
-LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::get_id();
 
   // Wait for all threads in the pool to exit.
   for (std::size_t i = 0; i < threads.size(); ++i)
@@ -102,7 +101,7 @@ LOG(INFO) << thread_pool_size_ << " threads launchd: " << boost::this_thread::ge
 
 			if(!response.is_null())
 			{
-				std::string rep = jsonHandler_.GetString(response);
+				std::string rep = jsonHandler_.GetString(response) + "{$}";
 
 				std::ostream responce_stream(&response_);
 				    responce_stream << rep;

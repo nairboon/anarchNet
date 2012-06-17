@@ -87,7 +87,9 @@ if(!store_block(value))
       return false;
     }
   //if(!
-  fs::create_symlink(_data_dir+hash_to_path(hash), _link_dir+hash_to_path(key)+"/"+hash);/*) {
+  fs::path symlink = _link_dir+hash_to_path(key)+"/"+hash;
+  if(!fs::exists(symlink))
+    fs::create_symlink(_data_dir+hash_to_path(hash), symlink );/*) {
     LOG(ERROR) << "could not create symlink " << _link_dir+hash_to_path(key)+"/"+hash;
     return false;
   }*/
