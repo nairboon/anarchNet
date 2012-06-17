@@ -15,7 +15,7 @@ var express = require('express'),
 	util = require('./lib/util.js'),
 	common = require('./models/common.js'),
 	apploader = require('./lib/apploader.js'),
-	sharejs = require('share').server,
+//	sharejs = require('share').server,
 	config = require('./config.js');
 
 
@@ -112,8 +112,7 @@ app.namespace('/auth', function() {
 });
 
 if (!module.parent) {
-
-	db.get_ht(util.system_id + 'masterlist',function(err,res){
+	db.get(util.system_id + 'masterlist',function(err,res){
 		if(err || !res)
 			throw new Error("No masterlist, run setup.js!");
 	});
@@ -122,5 +121,5 @@ if (!module.parent) {
   console.log("Express server listening on port %d", app.address().port);
 
 	var options = {db: {type: 'none'}};
-	sharejs.attach(app, options);
+	//sharejs.attach(app, options);
 }
