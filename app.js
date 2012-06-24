@@ -1,7 +1,7 @@
 /**
  * Parannus
  * http://rbose.org/wiki/Parannus
- * Copyright 2011 nairboon - Licensed under: GNU Public License 3 or later
+ * Copyright 2011, 2012 Remo Hertig - Licensed under: GNU Public License 3 or later
  */
 
 var express = require('express'),
@@ -11,9 +11,9 @@ var express = require('express'),
 	namespace = require('express-namespace'),
 	db = require('./lib/db.js'),
 	editor = require('./editor.js'),
+	api = require('./lib/api.js'),
 	auth = require('./auth.js'),
 	util = require('./lib/util.js'),
-	common = require('./models/common.js'),
 	apploader = require('./lib/apploader.js'),
 //	sharejs = require('share').server,
 	config = require('./config.js');
@@ -109,6 +109,11 @@ app.namespace('/auth', function() {
 	app.post('register',auth.register_form,auth.register_post);
 	app.post('login',auth.login_form,auth.login_post);
 	app.get('logout',auth.logout);
+});
+
+app.namespace('/api', function() {
+	app.get('emergency_shutdown',api.emergency_shutdown);
+	app.post('register',api.create_identity_form,api.create_identity);
 });
 
 if (!module.parent) {
