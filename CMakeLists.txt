@@ -22,10 +22,10 @@ if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
 	set(BIN_DIR "${CMAKE_BINARY_DIR}")
 	set(PLG_BIN_DIR ${BIN_DIR})
 else()
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/bin")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-	set(BIN_DIR "${CMAKE_BINARY_DIR}/bin")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+	set(BIN_DIR "${CMAKE_BINARY_DIR}")
 	set(PLG_BIN_DIR ${BIN_DIR})
 endif()
 
@@ -73,7 +73,6 @@ set( LIB
 	)
 set( TEST_LIB
 	${GCOV}
-	${GTEST_LIBRARIES}
 	)
 if(UNIX)
 set(PLATFORM_LIB pthread dl)
@@ -153,7 +152,6 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/plugins/plugin.h"
 		"${SOURCE_DIR}/daemon/plugins/session.h"
 		"${ROOT_DIR}/third-party/diff_match_patch-stl/diff_match_patch.h"
-
 )
 
 add_library(anDaemonInternal STATIC ${DAEMON_SRC})
@@ -262,9 +260,8 @@ target_link_libraries(TBase anDaemonInternal ${LIB} ${TEST_LIB} util an logger g
 target_link_libraries(TRPC anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc gtest)
 target_link_libraries(TModule anDaemonInternal ${LIB} ${TEST_LIB} util an logger rpc ls_blockstore gtest)
 
-
-add_test(Base ${BIN_DIR}/TBase)
-add_test(Modules ${BIN_DIR}/TModule)
+add_test(Base TBase)
+add_test(Modules TModule)
 #add_test(StartDaemon sh ${BIN_DIR}/startDaemon.sh)
 #add_test(RPC ${BIN_DIR}/TRPC)
 #add_test(StopDaemon sh ${BIN_DIR}/stopDaemon.sh)
