@@ -44,8 +44,8 @@ namespace an
     new pugg::Server<plgdrv::RemoteStorage>(PLG_REMOTESTORAGE_SERVER_NAME,PLG_REMOTESTORAGE_SERVER_VERSION);
     pugg::Server<an::plgdrv::Session>* session_server = 
     new pugg::Server<plgdrv::Session>(PLG_SESSION_SERVER_NAME,PLG_SESSION_SERVER_VERSION);
-    pugg::Server<an::plgdrv::Util>* util_server = 
-    new pugg::Server<plgdrv::Util>(PLG_UTIL_SERVER_NAME,PLG_UTIL_SERVER_VERSION);
+    pugg::Server<an::plgdrv::Generic>* util_server = 
+    new pugg::Server<plgdrv::Generic>(PLG_UTIL_SERVER_NAME,PLG_UTIL_SERVER_VERSION);
     
     _plugin_kernel.addServer(bootstrap_server);
     _plugin_kernel.addServer(localstorage_server);

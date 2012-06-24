@@ -57,6 +57,16 @@ public_file::~public_file() {
 
 
 bool Blockstore::initialise() {
+  
+    an::ModuleManager::instance().kv_get.connect(boost::bind(&Blockstore::kv_get,this,_1,_2));
+  an::ModuleManager::instance().kv_put.connect(boost::bind(&Blockstore::kv_put,this,_1,_2));
+  an::ModuleManager::instance().kv_remove.connect(boost::bind(&Blockstore::kv_remove,this,_1));
+
+  an::ModuleManager::instance().store_file.connect(boost::bind(&Blockstore::store_file,this,_1,_2));
+  an::ModuleManager::instance().get_file.connect(boost::bind(&Blockstore::get_file,this,_1,_2));
+  an::ModuleManager::instance().remove_file.connect(boost::bind(&Blockstore::remove_file,this,_1));
+
+
   if(!get_config()) {
     LOG(ERROR) << "could not load config";
     return false;

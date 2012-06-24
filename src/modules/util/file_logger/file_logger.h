@@ -8,7 +8,7 @@
 #define PLG_LOGGER_VERSION 1
 
 		
-class Logger : public an::plg::Util
+class Logger : public an::plg::Generic
 {
 public:
 	const std::string getName() {return "simple_file_store";}
@@ -24,7 +24,7 @@ private:
 	std::string _path;
 };
 
-class LoggerDriver : public an::plgdrv::Util
+class LoggerDriver : public an::plgdrv::Generic
 {
 public: 
 	const std::string getName() { return "simple_file_store_driver"; }

@@ -25,25 +25,20 @@
 #define SRC_DAEMON_PLUGIN_UTIL_H
 namespace an {
 	namespace plg {
-#define PLG_UTIL_SERVER_NAME "UtilServer"
+#define PLG_UTIL_SERVER_NAME "GenericServer"
 #define PLG_UTIL_SERVER_VERSION 1
 
 
-class Util : public Plugin {
+class Generic : public Plugin {
 public:
 
-	virtual const std::string getName() {return "generic util plugin";}
-	
-	virtual bool log(log::severity_level level, const std::string message) { return false; }
-	virtual bool on_kv_put(const db::ObjID &key) { return false; }
-	virtual bool on_kv_remove(const db::ObjID &key) { return false; }
-	virtual bool on_db_update(const db::ObjID &key) { return false; }
+	virtual const std::string getName() {return "generic plugin";}
 };
 	}
 		namespace plgdrv {
-class Util : public pugg::Driver {
+class Generic : public pugg::Driver {
 public:
-	virtual plg::Util* createPlugin() = 0;
+	virtual plg::Generic* createPlugin() = 0;
 };
 		}
 

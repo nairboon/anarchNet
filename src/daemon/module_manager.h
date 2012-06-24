@@ -33,7 +33,7 @@ namespace an {
 		class LocalStorage;
 		class RemoteStorage; 
 		class Session; 
-		class Util;
+		class Generic;
 
 	}
 	
@@ -77,13 +77,24 @@ public:
 			~ModuleManager() {
 			kv_put.disconnect_all_slots();
 			}
-		
-		
-		
+
 		//signals
 		boost::signals2::signal<bool (const std::string& key, const std::string& value),
               res_check<bool> > kv_put;
-
+	      	boost::signals2::signal<bool (const std::string& key, KV_ResPtr& value),
+              res_check<bool> > kv_get;
+	      		boost::signals2::signal<bool (const std::string& key),
+              res_check<bool> > kv_remove;
+	      		// binary file storage
+		boost::signals2::signal<bool (const std::string& path, std::string& res),
+              res_check<bool> > store_file;
+		boost::signals2::signal<bool (const std::string& id,std::string& res),
+              res_check<bool> > get_file;
+		boost::signals2::signal<bool (const std::string& id),
+              res_check<bool> > remove_file;
+	      
+		boost::signals2::signal<bool (const log::severity_level&, const std::string&),
+              res_check<bool> > log;
 		
 		bool bootstrapFromPeer(const std::string&ip,int port);
 		bool bootstrapFromHostlist(const std::string&url);
@@ -99,24 +110,15 @@ public:
 
 		// key value store
 		//bool kv_put(const std::string& key, const std::string& value);
-		bool kv_get(const std::string& key,KV_ResPtr& res);
+		//bool kv_get(const std::string& key,KV_ResPtr& res);
 		bool kv_get_unique(const std::string& key, std::string& res);
-		bool kv_remove(const std::string& key);
+		//bool kv_remove(const std::string& key);
 		bool kv_get_stats(const std::string& key, KV_Stat& res);
 		bool kv_get_unsuccessful(int n, KV_StatsPtr& res);
 		bool kv_get_unchecked_since(boost::posix_time::time_duration t , KV_StatsPtr& res);
 
-		// binary file storage
-		bool store_file(const std::string& path, std::string& res);
-		bool get_file(const std::string& id,std::string& res);
-		bool remove_file(const std::string& id);
+
 		
-		
-		// util
-		bool log(log::severity_level level, const std::string message);
-		bool on_kv_put(const db::ObjID &key);
-		bool on_kv_remove(const db::ObjID &key);
-		bool on_db_update(const db::ObjID &key);
 		
 		plg::LocalStorage * get_ls_plugin(std::string name);		
 		
@@ -127,7 +129,7 @@ private:
 		std::vector<plg::LocalStorage*> _localstorages;
 		std::vector<plg::RemoteStorage*> _remotestorages;
 		std::vector<plg::Session*> _sessions;
-		std::vector<plg::Util*> _utils;
+		std::vector<plg::Generic*> _utils;
 	};
 }
 #endif  // SRC_DAEMON_MODULE_MANAGER_H_

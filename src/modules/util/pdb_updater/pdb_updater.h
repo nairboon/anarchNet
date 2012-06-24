@@ -5,7 +5,7 @@
 
 #define PLG_PDB_VERSION 1
 
-class PDB : public an::plg::Util
+class PDB : public an::plg::Generic
 {
 	bool _run;
 	boost::mutex _mutex;
@@ -23,7 +23,7 @@ public:
 	void check();
 };
 
-class PDBDriver : public an::plgdrv::Util
+class PDBDriver : public an::plgdrv::Generic
 {
 public: 
 	const std::string getName() { return "pdb updater"; }

@@ -18,7 +18,7 @@ using namespace pugg;
 extern "C" //__declspec(dllexport)
 void registerPlugin(Kernel &K) 
 {
-	Server<an::plgdrv::Util>* server = CastToServerType<an::plgdrv::Util>(K.getServer(PLG_UTIL_SERVER_NAME));
+	Server<an::plgdrv::Generic>* server = CastToServerType<an::plgdrv::Generic>(K.getServer(PLG_UTIL_SERVER_NAME));
 	assert(server != NULL);
 	server->addDriver(new LoggerDriver(),PLG_UTIL_SERVER_VERSION);
 }

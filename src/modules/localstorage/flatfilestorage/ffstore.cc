@@ -26,7 +26,9 @@ void registerPlugin(Kernel &K)
 bool FFStore::initialise() {
   
   an::ModuleManager::instance().kv_put.connect(boost::bind(&FFStore::kv_put,this,_1,_2));
-  
+    an::ModuleManager::instance().kv_get.connect(boost::bind(&FFStore::kv_get,this,_1,_2));
+  an::ModuleManager::instance().kv_remove.connect(boost::bind(&FFStore::kv_remove,this,_1));
+
  if(!get_config()) {
     LOG(ERROR) << "could not load config";
    // return false;
