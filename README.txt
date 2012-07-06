@@ -6,13 +6,11 @@ cmake ../../..
 
 Dependencies:
  * boost >= 1.47
- * litesql: https://sourceforge.net/apps/trac/litesql/
-	* http://sourceforge.net/projects/litesql/files/litesql/0.3.13/litesql-src-0.3.13b2.tar.gz/download
  * cryptopp >= 5.6
- * boost.log
+ * cmake
 
-on Ubuntu:
- sudo apt-get install libcrypto++-dev
+for Debian/Ubuntu:
+ sudo apt-get install libcrypto++-dev cmake libboost1.48-dev libboost-system1.48-dev libboost-program-options1.48-dev libboost-thread1.48-dev libboost-serialization1.48-dev libboost-filesystem1.48-dev
 
 on Mac:
  sudo fink install libcryptopp

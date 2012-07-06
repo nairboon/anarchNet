@@ -18,7 +18,6 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cstdio>
-#include <glog/logging.h>
 
 #include "client.h"
 #include "anarchNet.h"
