@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -21,8 +21,8 @@
 #define BOOST_LOG_DETAIL_PROCESS_ID_HPP_INCLUDED_
 
 #include <iosfwd>
-#include <boost/cstdint.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/id.hpp>
 
 namespace boost {
 
@@ -30,11 +30,11 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-    //! The process class (currently used as a namespace)
-    class process
+    //! The process id descriptor
+    struct process
     {
-    public:
-        class id;
+        typedef unsigned long native_type;
+        typedef boost::log::aux::id< process > id;
     };
 
     namespace this_process {
@@ -47,52 +47,6 @@ namespace aux {
     template< typename CharT, typename TraitsT >
     BOOST_LOG_EXPORT std::basic_ostream< CharT, TraitsT >&
     operator<< (std::basic_ostream< CharT, TraitsT >& strm, process::id const& pid);
-
-    //! Process identifier class
-    class process::id
-    {
-        friend class process;
-
-        friend id this_process::get_id();
-
-        template< typename CharT, typename TraitsT >
-        friend BOOST_LOG_EXPORT std::basic_ostream< CharT, TraitsT >&
-        operator<< (std::basic_ostream< CharT, TraitsT >& strm, process::id const& pid);
-
-    private:
-        uintmax_t m_NativeID;
-
-    public:
-        id() : m_NativeID(0) {}
-
-        bool operator== (id const& that) const
-        {
-            return (m_NativeID == that.m_NativeID);
-        }
-        bool operator!= (id const& that) const
-        {
-            return (m_NativeID != that.m_NativeID);
-        }
-        bool operator< (id const& that) const
-        {
-            return (m_NativeID < that.m_NativeID);
-        }
-        bool operator> (id const& that) const
-        {
-            return (m_NativeID > that.m_NativeID);
-        }
-        bool operator<= (id const& that) const
-        {
-            return (m_NativeID <= that.m_NativeID);
-        }
-        bool operator>= (id const& that) const
-        {
-            return (m_NativeID >= that.m_NativeID);
-        }
-
-    private:
-        explicit id(uintmax_t native) : m_NativeID(native) {}
-    };
 
 } // namespace aux
 

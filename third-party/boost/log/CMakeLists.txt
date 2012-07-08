@@ -24,7 +24,7 @@ SET( SOURCES
     libs/log/src/process_id.cpp
     libs/log/src/timer.cpp
     libs/log/src/exceptions.cpp
-    libs/log/src/sink_frontends.cpp
+
     libs/log/src/text_ostream_backend.cpp
     libs/log/src/text_file_backend.cpp
     libs/log/src/syslog_backend.cpp
@@ -38,6 +38,12 @@ SET( SOURCES
     libs/log/src/filter_parser.cpp
     libs/log/src/formatter_parser.cpp
     libs/log/src/default_filter_factory.cpp
+libs/log/src/default_sink.cpp
+
+libs/log/src/event.cpp
+libs/log/src/thread_id.cpp
+libs/log/src/timestamp.cpp
+
 )
 
 if( WIN32 )

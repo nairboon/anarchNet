@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -54,9 +54,20 @@ enum severity_level
     fatal
 };
 
+//! Returns stringified enumeration value or \c NULL, if the value is not valid
+BOOST_LOG_EXPORT const char* to_string(severity_level lvl);
+
 template< typename CharT, typename TraitsT >
-BOOST_LOG_EXPORT std::basic_ostream< CharT, TraitsT >& operator<< (
-    std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl);
+inline std::basic_ostream< CharT, TraitsT >& operator<< (
+    std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl)
+{
+    const char* str = boost::log::trivial::to_string(lvl);
+    if (str)
+        strm << str;
+    else
+        strm << static_cast< int >(lvl);
+    return strm;
+}
 
 //! Trivial logger type
 #if !defined(BOOST_LOG_NO_THREADS)

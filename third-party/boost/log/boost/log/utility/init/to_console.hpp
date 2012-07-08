@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -65,14 +65,14 @@ shared_ptr<
     pBackend->add_stream(pStream);
     pBackend->auto_flush(args[keywords::auto_flush | false]);
 
-    aux::setup_formatter(*pBackend, args,
-        typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
-
     typedef BOOST_LOG_CONSOLE_SINK_FRONTEND_INTERNAL< backend_t > sink_t;
     shared_ptr< sink_t > pSink = boost::make_shared< sink_t >(pBackend);
 
     aux::setup_filter(*pSink, args,
         typename is_void< typename parameter::binding< ArgsT, keywords::tag::filter, void >::type >::type());
+
+    aux::setup_formatter(*pSink, args,
+        typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
 
     basic_core< CharT >::get()->add_sink(pSink);
 

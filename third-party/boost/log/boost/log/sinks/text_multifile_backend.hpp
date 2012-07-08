@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -210,11 +210,13 @@ public:
         set_file_name_composer_internal(composer, typename formatters::is_formatter< ComposerT >::type());
     }
 
+    /*!
+     * The method writes the message to the sink
+     */
+    BOOST_LOG_EXPORT void consume(record_type const& record, target_string_type const& formatted_message);
+
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
-    //! The method writes the message to the sink
-    BOOST_LOG_EXPORT void do_consume(record_type const& record, target_string_type const& formatted_message);
-
     //! The method sets the file name composer
     template< typename ComposerT >
     void set_file_name_composer_internal(ComposerT const& composer, mpl::true_ const&)

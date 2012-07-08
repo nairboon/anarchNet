@@ -324,7 +324,7 @@ bool Blockstore::store_file(const std::string& path, std::string& res)
 	block_file.close();
       }
       header_file.write(an::crypto::toHex(hash).c_str(),HASH_SIZE);
-      LOG(INF) << "added to info: " << hash.size() << " : " << an::crypto::toHex(hash);
+      LOG(INFO) << "added to info: " << hash.size() << " : " << an::crypto::toHex(hash);
     } while(blockc++ < blocks);
   }
   

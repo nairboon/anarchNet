@@ -41,7 +41,7 @@ find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
 #set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
-#find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost/log/")
+find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost/log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
 set(Boost_USE_MULTITHREADED ON)
@@ -74,7 +74,7 @@ set( TEST_LIB
 	${GCOV}
 	)
 if(UNIX)
-set(PLATFORM_LIB pthread dl)
+set(PLATFORM_LIB pthread dl rt)
 endif()
 
 message(STATUS "linked libraries: ${LIB} ${TEST_LIB}")

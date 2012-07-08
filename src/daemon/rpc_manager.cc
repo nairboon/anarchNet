@@ -145,7 +145,7 @@ namespace rpc {
 	  RPC_Response res = req.createResponse();
 	  LOG(INFO) << "put file: " << id;
 	  if(!ModuleManager::instance().store_file(path,id)) {
-	    LOG(INF) << "could not store file: "<< id;
+	    LOG(INFO) << "could not store file: "<< id;
 	    res = req.createErrorResponse();
 	    res.json()["error"] = "store file failed";
 	    response = res.json();
@@ -174,7 +174,7 @@ namespace rpc {
 	  RPC_Response res = req.createResponse();
 	  LOG(INFO) << "get file: " << id;
 	  if(!ModuleManager::instance().get_file(id,path)) {
-	    LOG(INF) << "could not get file: "<< id;
+	    LOG(INFO) << "could not get file: "<< id;
 	    res = req.createErrorResponse();
 	    res.json()["error"] = "get file failed";
 	    response = res.json();
@@ -265,7 +265,7 @@ namespace rpc {
 		db::ObjID id = req.params()["id"].get_str();
 		LOG(INFO) << "get obj: " << id;
 		if(!DBManager::instance().get_object_head(id,obj)) {
-			LOG(INF) << "could not get obj: "<< id;
+			LOG(INFO) << "could not get obj: "<< id;
 		 res = req.createErrorResponse();
 		 res.json()["error"] = "get object failed";
 		 response = res.json();
@@ -330,7 +330,7 @@ namespace rpc {
 	  std::string value;
 	  an::KV_ResPtr kv_res;
 		if(!ModuleManager::instance().kv_get(req.params()["key"].get_str(),kv_res)) {
-			LOG(INF) << "could not get";
+			LOG(INFO) << "could not get";
 
 		 RPC_Response res = req.createErrorResponse();
 		 res.json()["error"] = "kv.get failed";
@@ -362,7 +362,7 @@ namespace rpc {
 
 		std::string content = req.decode_base64("value");
 		if(!ModuleManager::instance().kv_put(req.params()["key"].get_str(),content)) {
-			LOG(INF) << "could not store";
+			LOG(INFO) << "could not store";
 
 		 RPC_Response res = req.createErrorResponse();
 		 res.json()["error"] = "kv.put failed";
@@ -388,7 +388,7 @@ namespace rpc {
 		}
 		
 		if(!ModuleManager::instance().kv_remove(req.params()["key"].get_str())) {
-			LOG(INF) << "could not remove";
+			LOG(INFO) << "could not remove";
 
 		 RPC_Response res = req.createErrorResponse();
 		 res.json()["error"] = "kv.remove failed";

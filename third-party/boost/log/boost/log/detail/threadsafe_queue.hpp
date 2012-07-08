@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -26,9 +26,9 @@
 
 #include <new>
 #include <memory>
-#include <boost/compatibility/cpp_c_headers/cstddef>
+#include <cstddef>
 #include <boost/aligned_storage.hpp>
-#include <boost/utility/swap.hpp>
+#include <boost/move/move.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/type_with_alignment.hpp>
 
@@ -61,6 +61,10 @@ struct threadsafe_queue_impl
     };
 
     static BOOST_LOG_EXPORT threadsafe_queue_impl* create(node_base* first_node);
+
+    static BOOST_LOG_EXPORT void* operator new (std::size_t size);
+    static BOOST_LOG_EXPORT void operator delete (void* p, std::size_t);
+
     virtual ~threadsafe_queue_impl() {}
     virtual node_base* reset_last_node() = 0;
     virtual bool unsafe_empty() = 0;
@@ -243,7 +247,7 @@ public:
         {
             register node* p = static_cast< node* >(destr);
             auto_deallocate guard(static_cast< base_type* >(this), static_cast< node* >(dealloc), p);
-            boost::swap(value, p->value()); // move would be more appropriate, but it's not available ATM
+            value = boost::move(p->value());
             return true;
         }
         else

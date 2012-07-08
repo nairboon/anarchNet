@@ -22,7 +22,7 @@
 #include <iostream>
 //#include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
-
+#include <boost/log/trivial.hpp>
 
 #ifndef SRC_DAEMON_LOGGER_H_
 #define SRC_DAEMON_LOGGER_H_
@@ -41,24 +41,23 @@ namespace an
 	};
 
 	
-	/*class Logger : public Singleton<Logger> {
+	class Logger : public Singleton<Logger> {
 		friend class Singleton<Logger>;
 	 public:
 
-		bool init(const std::string& logfile);
+		bool init(const std::string& logfile,severity_level file_lvl = severity_level::INFO, severity_level console_lvl= severity_level::WARNING);
 		boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
 		void log(const std::string& msg, severity_level lvl);
 	 private:
 		boost::log::sources::severity_logger_mt< severity_level > _logger;
-	};*/
+	};
 }
-//#define LOG(lvl)
-//BOOST_LOG_STREAM_WITH_PARAMS(an::Logger::instance().get(),
-//(::boost::log::keywords::severity = ::an::lvl))
-#define INFO an::log::INFO
-#define ERROR an::log::ERROR
-#define LOG(lvl) std::cerr << std::endl; std::cerr
+/*#define LOG(lvl)\
+    BOOST_LOG_STREAM_WITH_PARAMS(::boost::log::trivial::logger::get(),\
+        (::boost::log::keywords::severity = ::boost::log::trivial::lvl))
+*/
+//#define LOG(lvl) std::cerr << std::endl; std::cerr
 #define UNIMPLEMENTED << "unimplemented function: " << __func__ << ": " << :__file__
-//#define LOG(lvl) an::ModuleManager::instance().log(
+#define LOG(lvl) BOOST_LOG_STREAM_WITH_PARAMS((an::log::Logger::instance().get()), (::boost::log::keywords::severity = an::log::lvl)) 
 }
 #endif  // SRC_DAEMON_LOGGER_H_

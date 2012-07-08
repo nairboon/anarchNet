@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -54,7 +54,7 @@
 #include <boost/log/utility/type_dispatch/standard_types.hpp>
 #include <boost/log/utility/type_dispatch/date_time_types.hpp>
 #if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/thread/thread.hpp> // thread::id
+#include <boost/log/detail/thread_id.hpp>
 #include <boost/log/detail/locks.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
 #endif
@@ -191,7 +191,7 @@ public:
                         typename mpl::vector<
                             attributes::basic_named_scope_list< char_type >,
 #if !defined(BOOST_LOG_NO_THREADS)
-                            thread::id,
+                            log::aux::thread::id,
 #endif
                             log::aux::process::id
                         >::type

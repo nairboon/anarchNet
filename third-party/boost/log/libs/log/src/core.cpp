@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/compatibility/cpp_c_headers/cstddef>
 #include <boost/log/core/core.hpp>
 #include <boost/log/sinks/sink.hpp>
@@ -30,6 +31,7 @@
 #include <boost/log/detail/locks.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
 #endif
+#include "default_sink.hpp"
 
 namespace boost {
 
@@ -88,6 +90,9 @@ public:
         attribute_set_type ThreadAttributes;
     };
 
+    //! Log record implementation type
+    typedef typename record_type::private_data record_private_data;
+
 public:
 #if !defined(BOOST_LOG_NO_THREADS)
     //! Synchronization mutex
@@ -96,6 +101,8 @@ public:
 
     //! List of sinks involved into output
     sink_list Sinks;
+    //! Default sink
+    const shared_ptr< sink_type > DefaultSink;
 
     //! Global attribute set
     attribute_set_type GlobalAttributes;
@@ -123,7 +130,50 @@ public:
 
 public:
     //! Constructor
-    implementation() : Enabled(true) {}
+    implementation() :
+        DefaultSink(boost::make_shared< sinks::aux::basic_default_sink< char_type > >()),
+        Enabled(true)
+    {
+    }
+
+    //! Invokes sink-specific filter and adds the sink to the record if the filter passes the log record
+    void apply_sink_filter(shared_ptr< sink_type > const& sink, record_type& rec, record_private_data*& rec_impl, values_view_type*& attr_values)
+    {
+        try
+        {
+            if (sink->will_consume(*attr_values))
+            {
+                // If at least one sink accepts the record, it's time to create it
+                if (!rec_impl)
+                {
+                    attr_values->freeze();
+                    rec.m_pData = rec_impl = new record_private_data(move(*attr_values));
+                    attr_values = &rec.m_pData->m_AttributeValues;
+                }
+                rec_impl->m_AcceptingSinks.push_back(sink);
+            }
+        }
+#if !defined(BOOST_LOG_NO_THREADS)
+        catch (thread_interrupted&)
+        {
+            throw;
+        }
+#endif // !defined(BOOST_LOG_NO_THREADS)
+        catch (...)
+        {
+            if (this->ExceptionHandler.empty())
+                throw;
+
+            // Assume that the sink is incapable to receive messages now
+            this->ExceptionHandler();
+
+            if (rec_impl && rec_impl->m_AcceptingSinks.empty())
+            {
+                rec_impl = NULL;
+                rec.m_pData = NULL; // destroy record implementation
+            }
+        }
+    }
 
     //! The method returns the current thread-specific data
     thread_data* get_thread_data()
@@ -336,6 +386,34 @@ void basic_core< CharT >::set_exception_handler(exception_handler_type const& ha
     pImpl->ExceptionHandler = handler;
 }
 
+//! The method performs flush on all registered sinks.
+template< typename CharT >
+void basic_core< CharT >::flush()
+{
+    // Acquire exclusive lock to prevent any logging attempts while flushing
+    BOOST_LOG_EXPR_IF_MT(typename implementation::scoped_write_lock lock(pImpl->Mutex);)
+    typename implementation::sink_list::iterator it = pImpl->Sinks.begin(), end = pImpl->Sinks.end();
+    for (; it != end; ++it)
+    {
+        try
+        {
+            it->get()->flush();
+        }
+#if !defined(BOOST_LOG_NO_THREADS)
+        catch (thread_interrupted&)
+        {
+            throw;
+        }
+#endif // !defined(BOOST_LOG_NO_THREADS)
+        catch (...)
+        {
+            if (pImpl->ExceptionHandler.empty())
+                throw;
+            pImpl->ExceptionHandler();
+        }
+    }
+}
+
 //! The method opens a new record to be written and returns true if the record was opened
 template< typename CharT >
 typename basic_core< CharT >::record_type basic_core< CharT >::open_record(attribute_set_type const& source_attributes)
@@ -350,7 +428,7 @@ typename basic_core< CharT >::record_type basic_core< CharT >::open_record(attri
         // Lock the core to be safe against any attribute or sink set modifications
         BOOST_LOG_EXPR_IF_MT(typename implementation::scoped_read_lock lock(pImpl->Mutex);)
 
-        if (pImpl->Enabled && !pImpl->Sinks.empty())
+        if (pImpl->Enabled)
         {
             // Compose a view of attribute values (unfrozen, yet)
             values_view_type temp_attr_values(source_attributes, tsd->ThreadAttributes, pImpl->GlobalAttributes);
@@ -359,45 +437,19 @@ typename basic_core< CharT >::record_type basic_core< CharT >::open_record(attri
             if (pImpl->Filter.empty() || pImpl->Filter(*attr_values))
             {
                 // The global filter passed, trying the sinks
-                typedef typename record_type::private_data record_private_data;
-                record_private_data* pData = NULL;
-                typename implementation::sink_list::iterator it = pImpl->Sinks.begin(), end = pImpl->Sinks.end();
-                for (; it != end; ++it)
+                typename implementation::record_private_data* rec_impl = NULL;
+                if (!pImpl->Sinks.empty())
                 {
-                    try
+                    typename implementation::sink_list::iterator it = pImpl->Sinks.begin(), end = pImpl->Sinks.end();
+                    for (; it != end; ++it)
                     {
-                        if (it->get()->will_consume(*attr_values))
-                        {
-                            // If at least one sink accepts the record, it's time to create it
-                            if (!pData)
-                            {
-                                temp_attr_values.freeze();
-                                rec.m_pData = pData = new record_private_data(move(temp_attr_values));
-                                attr_values = &pData->m_AttributeValues;
-                            }
-                            pData->m_AcceptingSinks.push_back(*it);
-                        }
+                        pImpl->apply_sink_filter(*it, rec, rec_impl, attr_values);
                     }
-#if !defined(BOOST_LOG_NO_THREADS)
-                    catch (thread_interrupted&)
-                    {
-                        throw;
-                    }
-#endif // !defined(BOOST_LOG_NO_THREADS)
-                    catch (...)
-                    {
-                        if (pImpl->ExceptionHandler.empty())
-                            throw;
-
-                        // Assume that the sink is incapable to receive messages now
-                        pImpl->ExceptionHandler();
-
-                        if (pData && pData->m_AcceptingSinks.empty())
-                        {
-                            pData = NULL;
-                            rec.m_pData = NULL; // destroy record implementation
-                        }
-                    }
+                }
+                else
+                {
+                    // Use the default sink
+                    pImpl->apply_sink_filter(pImpl->DefaultSink, rec, rec_impl, attr_values);
                 }
             }
         }

@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +21,6 @@
 #define BOOST_LOG_SINKS_SINK_HPP_INCLUDED_
 
 #include <string>
-#include <boost/noncopyable.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/light_function.hpp>
 #include <boost/log/core/record.hpp>
@@ -43,7 +42,7 @@ namespace sinks {
 
 //! A base class for a logging sink frontend
 template< typename CharT >
-class BOOST_LOG_NO_VTABLE sink : noncopyable
+class BOOST_LOG_NO_VTABLE sink
 {
 public:
     //! Character type
@@ -61,6 +60,11 @@ public:
 
 public:
     /*!
+     * Default constructor
+     */
+    BOOST_LOG_DEFAULTED_FUNCTION(sink(), {})
+
+    /*!
      * Virtual destructor
      */
     virtual ~sink() {}
@@ -73,14 +77,14 @@ public:
     virtual bool will_consume(values_view_type const& attributes) = 0;
 
     /*!
-     * The method puts logging message to the sink
+     * The method puts logging record to the sink
      *
      * \param record Logging record to consume
      */
     virtual void consume(record_type const& record) = 0;
 
     /*!
-     * The method attempts to put logging message to the sink. The method may be used by the
+     * The method attempts to put logging record to the sink. The method may be used by the
      * core in order to determine the most efficient order of sinks to feed records to in
      * case of heavy contention. Sink implementations may implement try/backoff logic in
      * order to improve overall logging throughput.
@@ -93,6 +97,16 @@ public:
         consume(record);
         return true;
     }
+
+    /*!
+     * The method performs flushing of any internal buffers that may hold log records. The method
+     * may take considerable time to complete and may block both the calling thread and threads
+     * attempting to put new records into the sink while this call is in progress.
+     */
+    virtual void flush() = 0;
+
+    BOOST_LOG_DELETED_FUNCTION(sink(sink const&))
+    BOOST_LOG_DELETED_FUNCTION(sink& operator= (sink const&))
 };
 
 } // namespace sinks

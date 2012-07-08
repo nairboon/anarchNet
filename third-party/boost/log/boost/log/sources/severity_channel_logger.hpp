@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -301,5 +301,16 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif // _MSC_VER
+
+//! The macro allows to put a record with a specific channel name into log
+#define BOOST_LOG_STREAM_CHANNEL_SEV(logger, chan, lvl)\
+    BOOST_LOG_STREAM_WITH_PARAMS((logger), (::boost::log::keywords::channel = (chan))(::boost::log::keywords::severity = (lvl)))
+
+#ifndef BOOST_LOG_NO_SHORTHAND_NAMES
+
+//! An equivalent to BOOST_LOG_STREAM_CHANNEL_SEV(logger, chan, lvl)
+#define BOOST_LOG_CHANNEL_SEV(logger, chan, lvl) BOOST_LOG_STREAM_CHANNEL_SEV(logger, chan, lvl)
+
+#endif // BOOST_LOG_NO_SHORTHAND_NAMES
 
 #endif // BOOST_LOG_SOURCES_SEVERITY_CHANNEL_LOGGER_HPP_INCLUDED_

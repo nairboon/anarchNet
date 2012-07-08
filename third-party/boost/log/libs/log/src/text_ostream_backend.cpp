@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -85,13 +85,14 @@ BOOST_LOG_EXPORT void basic_text_ostream_backend< CharT >::auto_flush(bool f)
 
 //! The method writes the message to the sink
 template< typename CharT >
-BOOST_LOG_EXPORT void basic_text_ostream_backend< CharT >::do_consume(
-    record_type const& record, target_string_type const& message)
+BOOST_LOG_EXPORT void basic_text_ostream_backend< CharT >::consume(
+    record_type const&, target_string_type const& message)
 {
     typename string_type::const_pointer const p = message.data();
     typename string_type::size_type const s = message.size();
-    typename implementation::ostream_sequence::const_iterator it = m_pImpl->m_Streams.begin();
-    for (; it != m_pImpl->m_Streams.end(); ++it)
+    typename implementation::ostream_sequence::const_iterator
+        it = m_pImpl->m_Streams.begin(), end = m_pImpl->m_Streams.end();
+    for (; it != end; ++it)
     {
         register stream_type* const strm = it->get();
         if (strm->good())
@@ -102,6 +103,20 @@ BOOST_LOG_EXPORT void basic_text_ostream_backend< CharT >::do_consume(
             if (m_pImpl->m_fAutoFlush)
                 strm->flush();
         }
+    }
+}
+
+//! The method flushes the associated streams
+template< typename CharT >
+BOOST_LOG_EXPORT void basic_text_ostream_backend< CharT >::flush()
+{
+    typename implementation::ostream_sequence::const_iterator
+        it = m_pImpl->m_Streams.begin(), end = m_pImpl->m_Streams.end();
+    for (; it != end; ++it)
+    {
+        register stream_type* const strm = it->get();
+        if (strm->good())
+            strm->flush();
     }
 }
 

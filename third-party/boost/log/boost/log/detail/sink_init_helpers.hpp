@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -91,15 +91,15 @@ inline typename enable_if<
 }
 
 // The function installs filter into the sink, if provided in the arguments pack
-template< typename BackendT, typename ArgsT >
-inline void setup_formatter(BackendT&, ArgsT const&, mpl::true_)
+template< typename SinkT, typename ArgsT >
+inline void setup_formatter(SinkT&, ArgsT const&, mpl::true_)
 {
 }
 
-template< typename BackendT, typename ArgsT >
-inline void setup_formatter(BackendT& backend, ArgsT const& args, mpl::false_)
+template< typename SinkT, typename ArgsT >
+inline void setup_formatter(SinkT& s, ArgsT const& args, mpl::false_)
 {
-    backend.set_formatter(aux::acquire_formatter(args[keywords::format]));
+    s.set_formatter(aux::acquire_formatter(args[keywords::format]));
 }
 
 } // namespace aux

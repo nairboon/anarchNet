@@ -18,14 +18,23 @@
  * along with anarchNet.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+#include <iostream>
+#include <fstream>
+
 #include <boost/log/common.hpp>
 #include <boost/log/formatters.hpp>
 #include <boost/log/filters.hpp>
 
+#include <boost/log/attributes.hpp>
+#include <boost/log/sinks.hpp>
+#include <boost/log/sources/logger.hpp>
+#include <boost/log/utility/empty_deleter.hpp>
+
 #include <boost/log/utility/init/to_file.hpp>
 #include <boost/log/utility/init/to_console.hpp>
 #include <boost/log/utility/init/common_attributes.hpp>
-
+#include <boost/log/core/core.hpp>
 #include <boost/log/attributes/timer.hpp>
 #include "logger.h"
 
@@ -40,7 +49,7 @@ namespace keywords = boost::log::keywords;
 
 using boost::shared_ptr;
 
-/*
+
 namespace an
 {
 	namespace log {
@@ -67,28 +76,52 @@ namespace an
 		{
 			BOOST_LOG_SEV(_logger,lvl) << msg;
 		}
-	bool Logger::init(const std::string& logfile) {
-		//logging::init_log_to_console(std::cout, keywords::format = "%TimeStamp%: %_%");
-
-		// One can also use lambda expressions to setup filters and formatters
-		logging::init_log_to_file
-		(
-		 logfile,
-		 keywords::filter = flt::attr< severity_level >("Severity", std::nothrow) >= INFO,
-		 keywords::format = fmt::format("%1% [%2%] <%3%> %4%")
-		 % fmt::date_time("TimeStamp", std::nothrow)
-		 % fmt::time_duration("Uptime", std::nothrow)
-		 % fmt::attr< severity_level >("Severity", std::nothrow)
-		 % fmt::message()
-		 );
-
-		// Also let's add some commonly used attributes, like timestamp and record counter.
-		logging::add_common_attributes();
-		_logger.add_attribute("Uptime", attrs::timer());
-		BOOST_LOG_SEV(_logger,INFO) << "logger started";
-
-		return true;
-	}
+		bool Logger::init(const std::string& logfile,severity_level file_lvl, severity_level console_lvl) {
+		  typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
+		  shared_ptr< text_sink > fileSink(new text_sink);
+		  {
+		    
+		    text_sink::locked_backend_ptr pBackend = fileSink->locked_backend();
+		    
+		    shared_ptr< std::ofstream > pStream2(new std::ofstream(logfile));
+		    assert(pStream2->is_open());
+		    pBackend->add_stream(pStream2);
+		  }
+		  shared_ptr< text_sink > cSink(new text_sink);
+		  {
+		    
+		    text_sink::locked_backend_ptr pBackend = cSink->locked_backend();
+		    
+		    
+		    shared_ptr< std::ostream > pStream(&std::clog, logging::empty_deleter());
+		    pBackend->add_stream(pStream);
+		  }
+		  logging::core::get()->add_sink(cSink);
+		  cSink->set_filter(
+		    flt::attr< severity_level >("Severity", std::nothrow) >= console_lvl);
+		  logging::core::get()->add_sink(fileSink);
+		  fileSink->set_filter(
+		    flt::attr< severity_level >("Severity", std::nothrow) >= file_lvl);
+		  
+		 
+		  fmt::fmt_format<char> fmtr = fmt::format("%1% @ %2% >%4%< Scope: %5%: %6%")
+		    % fmt::attr("RecordID")
+		    % fmt::date_time< boost::posix_time::ptime >("TimeStamp", "%d.%m.%Y %H:%M:%S.%f")
+		    % fmt::attr< std::string >("Tag")
+		    % fmt::named_scope("Scope", keywords::iteration = fmt::reverse, keywords::depth = 2)
+		    % fmt::message();
+		   cSink->set_formatter(fmtr);
+		     fileSink->set_formatter(fmtr);
+		    attrs::counter< unsigned int > RecordID(0);
+		    
+		    logging::core::get()->add_global_attribute("RecordID", RecordID);
+		    attrs::local_clock TimeStamp;
+		    logging::core::get()->add_global_attribute("TimeStamp", TimeStamp);
+		    
+		    attrs::named_scope Scope;
+		    logging::core::get()->add_thread_attribute("Scope", Scope);
+		  BOOST_LOG_SEV(_logger,INFO) << "Logger started";
+		  return true;
+		}
 	}
 }
-*/

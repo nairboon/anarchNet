@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2011.
+ *          Copyright Andrey Semashev 2007 - 2012.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -45,13 +45,13 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
-#include <boost/compatibility/cpp_c_headers/ctime>
-#include <boost/compatibility/cpp_c_headers/cctype>
-#include <boost/compatibility/cpp_c_headers/cwctype>
-#include <boost/compatibility/cpp_c_headers/ctime>
-#include <boost/compatibility/cpp_c_headers/cstdio>
-#include <boost/compatibility/cpp_c_headers/cstdlib>
-#include <boost/compatibility/cpp_c_headers/cstddef>
+#include <ctime>
+#include <cctype>
+#include <cwctype>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
+#include <cstddef>
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_assign_actor.hpp>
 #include <boost/log/detail/snprintf.hpp>
@@ -1165,7 +1165,7 @@ BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::auto_flush(bool f)
 
 //! The method writes the message to the sink
 template< typename CharT >
-BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::do_consume(
+BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::consume(
     record_type const& record, target_string_type const& formatted_message)
 {
     typedef file_char_traits< typename target_string_type::value_type > traits_t;
@@ -1195,7 +1195,7 @@ BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::do_consume(
             filesystem_error err(
                 "Failed to open file for writing",
                 m_pImpl->m_FileName,
-                system::error_code(system::errc::io_error, system::get_generic_category()));
+                system::error_code(system::errc::io_error, system::generic_category()));
             BOOST_THROW_EXCEPTION(err);
         }
 
@@ -1211,6 +1211,14 @@ BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::do_consume(
     m_pImpl->m_CharactersWritten += formatted_message.size() + 1;
 
     if (m_pImpl->m_AutoFlush)
+        m_pImpl->m_File.flush();
+}
+
+//! The method flushes the currently open log file
+template< typename CharT >
+BOOST_LOG_EXPORT void basic_text_file_backend< CharT >::flush()
+{
+    if (m_pImpl->m_File.is_open())
         m_pImpl->m_File.flush();
 }
 
@@ -1417,7 +1425,7 @@ BOOST_LOG_EXPORT void basic_text_multifile_backend< CharT >::set_file_name_compo
 
 //! The method writes the message to the sink
 template< typename CharT >
-BOOST_LOG_EXPORT void basic_text_multifile_backend< CharT >::do_consume(
+BOOST_LOG_EXPORT void basic_text_multifile_backend< CharT >::consume(
     record_type const& record, target_string_type const& formatted_message)
 {
     typedef file_char_traits< typename target_string_type::value_type > traits_t;
