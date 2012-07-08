@@ -1,3 +1,0 @@
-[submodule "frontend/parannus"]
-	path = frontend/parannus
-	url = git@gitorious.org/anarchnet/parannus-trunk.git
