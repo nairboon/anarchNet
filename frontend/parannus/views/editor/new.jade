@@ -1,0 +1,9 @@
+form(method="post",action="/edit/create")
+        p
+          label(for="type") Type:
+             input(type="text", name="type")
+        p
+         label(for="content") Data:
+            textarea(type="text",rows="20", name="content")
+        p.buttons
+          input(type="submit", value="Save")

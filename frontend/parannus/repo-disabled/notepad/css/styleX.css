@@ -1,0 +1,84 @@
+html {
+	background: url(../img/bg.jpg) center top repeat;
+}
+
+body { font:13px/150% Verdana, Tahoma, sans-serif;
+	padding-right: 100px;
+	padding-bottom: 50px;
+	padding-left: 100px;
+}
+
+.box {
+-moz-border-radius: 5px;
+border-radius: 5px;
+-moz-box-shadow: 0 0 5px 5px #888;
+-webkit-box-shadow: 0 0 5px 5px rgba(136,136,136,0.30);
+box-shadow: 0 0 5px 5px rgba(136,136,136,0.30);
+background: rgba(136,136,136,0.40);
+}
+
+#ssl-yes {
+	color: green;
+	display: none;
+	font-weight: bold;
+}
+
+#ssl-no { color: red;
+	display: none;
+}
+
+h3 {
+	color: black;
+}
+#login{
+	margin: 0 auto;
+	width: 180px;
+	height: 200px;
+	text-align: center;
+}
+#register {
+	float: right;
+	width: 300px;
+}
+#about {
+	width: 300px;
+	font-family: "Courier New", Courier, mono;
+	color: #fff;
+}
+input {
+	border: solid 1px #E5E5E5;
+	outline: 0;
+	font: normal 13px/100% Verdana, Tahoma, sans-serif;
+	width: 150px;
+	background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
+	background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	padding: 2px;
+}
+
+input:hover, textarea:hover,
+input:focus, textarea:focus { 
+	border-color: #63a8d7; 
+	-webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;
+	}
+
+.form label { 
+	margin-left: 10px; 
+	color: #d4d4d4;
+	font-family: "Courier New", Courier, mono;
+}
+
+.submit input {
+	width: auto;
+	background: #617798;
+	border: 0;
+	font-size: 14px;
+	color: #FFFFFF;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-top: -10px;
+}

@@ -1,0 +1,6 @@
+._*
+lib-cov
+filestore/*
+*~
+.DS_Store
+.AppleDouble

@@ -1,0 +1,27 @@
+!!! 5
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+     header
+        #app_topmenu
+        nav
+           ul
+             - if(session && session.auth)
+                  li 
+                   a(href='/auth/logout') logout
+                  li
+                   a(href='/edit/list') editor
+             - else
+                  li
+                   a(href='/auth/login') login
+                  li
+                   a(href='/auth/register') register
+             li
+                a(href='#') myaccount
+             
+    #content
+      != body
+    footer Parannus v0.0.2
+

@@ -1,0 +1,53 @@
+/* @override http://nd.local:3000/stylesheets/style.css */
+body {
+  min-width: 600px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00B7FF;
+  text-decoration: none;
+}
+header {
+  height: 40px;
+  margin-bottom: 30px;
+}
+footer {
+  text-align: center;
+  margin-top: 10px;
+}
+#content {
+  min-height: 350px;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding-left: 5px;
+  border: 1px dashed black;
+  padding-right: 5px;
+  height: auto;
+}
+nav {
+  width: 300px;
+  height: 40px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #f3f3f3;
+  border: 1px solid #cccccc;
+  float: right;
+}
+nav ul {
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin: 0 auto;
+}
+nav ul li {
+  float: right;
+}
+nav ul li a {
+  margin-right: 20px;
+  display: block;
+  line-height: 40px;
+}

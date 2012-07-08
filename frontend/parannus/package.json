@@ -1,0 +1,40 @@
+{
+   "name": "parannus",
+   "version": "0.0.5",
+   "description": "Anarchnet frontend",
+   "homepage"      : "http://rbose.org/wiki/Parannus",
+   "keywords": ["anarchnet","p2p"],
+   "author": "Nairboon <nairboon@moubou.com>",
+   "maintainers": [
+       {
+           "name": "Nairboon",
+           "email": "nairboon@moubou.com",
+           "web": "http://nairboon.moubou.com" 
+       } 
+   ],
+   "licenses": [
+       {
+           "type": "GPLv3",
+           "url": "http://www.gnu.org/licenses/gpl-3.0.html" 
+       } 
+   ],
+   "engines": {"node":">=0.4.9"},
+   "repository": { "type": "git","url": "git://gitorious.org/anarchnet/parannus-trunk.git"},
+   "bugs" : { "url" : "http://pms.rbose.org/projects/parannus" },
+   "directories" : { "lib": "./lib", "models" : "./models", "test" : "./test", "repo" : "./repo" },
+   "dependencies": {
+       "jade": ">=0.10",
+       "less": ">=1.0",
+       "express": ">=2.2.0",
+       "express-resource": ">=0.2.0",
+       "express-form": ">=0.5.0",
+       "express-namespace": ">=0.0.3",
+       "googlediff": ">=0.0.90",
+       "share": ">=0.3",
+       "socket.io": ">=0.6.0",
+       "node-static": ">=0.5",
+       "async": ">=0.1.15",
+	"connect": ">=2.3.6",
+	"hashlib2": ">=1.0.3"
+   }
+}
