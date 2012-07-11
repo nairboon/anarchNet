@@ -1,6 +1,7 @@
 #ifndef PLG_FLATFILESTORE_H
 #define PLG_FLATFILESTORE_H
 
+#include "storage.h"
 #include "plugins/localstorage.h"
 
 #define PLG_FLATFILESTORE_VERSION 1

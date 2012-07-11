@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, 2011 Remo Hertig (nairboon)
+ * Copyright (C) 2010, 2011, 2012 Remo Hertig
  * https://launchpad.net/anarchNet
  *
  * This file is part of anarchNet.
@@ -36,7 +36,8 @@ namespace an {
 		class Generic;
 
 	}
-	
+	typedef std::string fid_t;
+	class block;
 			
 	  struct KV_Stat {
 	    std::string key;
@@ -86,6 +87,10 @@ public:
 	      		boost::signals2::signal<bool (const std::string& key),
               res_check<bool> > kv_remove;
 	      		// binary file storage
+	      
+	      		boost::signals2::signal<bool (const fid_t& id, boost::shared_ptr<block>&),
+              res_check<bool> > get_block;
+	      
 		boost::signals2::signal<bool (const std::string& path, std::string& res),
               res_check<bool> > store_file;
 		boost::signals2::signal<bool (const std::string& id,std::string& res),
@@ -93,8 +98,8 @@ public:
 		boost::signals2::signal<bool (const std::string& id),
               res_check<bool> > remove_file;
 	      
-		boost::signals2::signal<bool (const log::severity_level&, const std::string&),
-              res_check<bool> > log;
+		//boost::signals2::signal<bool (const an::log::severity_level&, const std::string&),
+           //   res_check<bool> > log;
 		
 		bool bootstrapFromPeer(const std::string&ip,int port);
 		bool bootstrapFromHostlist(const std::string&url);

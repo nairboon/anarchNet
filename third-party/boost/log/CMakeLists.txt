@@ -54,3 +54,4 @@ endif()
 
 
 add_library(boost_log ${SOURCES} ${PF_SOURCES})
+target_link_libraries(boost_log rt)

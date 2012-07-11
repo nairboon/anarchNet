@@ -58,13 +58,15 @@ public_file::~public_file() {
 
 bool Blockstore::initialise() {
   
-    an::ModuleManager::instance().kv_get.connect(boost::bind(&Blockstore::kv_get,this,_1,_2));
-  an::ModuleManager::instance().kv_put.connect(boost::bind(&Blockstore::kv_put,this,_1,_2));
-  an::ModuleManager::instance().kv_remove.connect(boost::bind(&Blockstore::kv_remove,this,_1));
+//    an::ModuleManager::instance().kv_get.connect(boost::bind(&Blockstore::kv_get,this,_1,_2));
+//  an::ModuleManager::instance().kv_put.connect(boost::bind(&Blockstore::kv_put,this,_1,_2));
+//  an::ModuleManager::instance().kv_remove.connect(boost::bind(&Blockstore::kv_remove,this,_1));
 
   an::ModuleManager::instance().store_file.connect(boost::bind(&Blockstore::store_file,this,_1,_2));
   an::ModuleManager::instance().get_file.connect(boost::bind(&Blockstore::get_file,this,_1,_2));
   an::ModuleManager::instance().remove_file.connect(boost::bind(&Blockstore::remove_file,this,_1));
+
+    an::ModuleManager::instance().get_block.connect(boost::bind(&Blockstore::get_block,this,_1,_2));
 
 
   if(!get_config()) {
@@ -124,7 +126,19 @@ bool Blockstore::initialise() {
 
 void Blockstore::shutdown() {}
 
-smart_block Blockstore::load_block(id& bid)
+	bool Blockstore::get_block(const an::fid_t& id, an::smart_block& res)
+	{
+	  try {
+	    res = load_block(id);
+	  }
+	  catch(...)
+	  {
+	    LOG(ERROR) << "get_block: " << id;
+	    return false;
+	  }
+	  return true;
+	}
+an::smart_block Blockstore::load_block(id& bid)
 {
   try {
     fs::ifstream ifile(_unique_dir+hash_to_path(bid),std::ios::in|std::ios::binary|std::ios::ate);
@@ -143,7 +157,7 @@ smart_block Blockstore::load_block(id& bid)
     
    // LOG(INFO) << "read: " << buffer;
     
-    return smart_block(new block(buffer,size));
+    return an::smart_block(new an::block(buffer,size));
   }
   catch (const fs::filesystem_error& ex) {
     LOG(ERROR) << "fs error: "<< ex.what();
@@ -428,7 +442,7 @@ bool Blockstore::kv_get(const std::string& _key,an::KV_ResPtr& res)
   res = an::KV_ResPtr(new an::KV_ResMap);
   
   try {
-    smart_block block = (*_block_cache)(key);
+    an::smart_block block = (*_block_cache)(key);
     std::string cont = std::string(block.get()->data,block.get()->size);
     res->insert(std::make_pair(an::crypto::toHex(an::crypto::Hash(cont)),cont));
     return true;

@@ -92,7 +92,6 @@ int main(int argc, char* argv[])
 		}
 
 		g_daemon = new an::anDaemon();
-		LOG(INFO) << "initializing daemon";
 		
 		std::string directory;
 		std::string directory_path = vm["directory"].as<string>();

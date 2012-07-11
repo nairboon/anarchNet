@@ -20,9 +20,13 @@
 
 #include "singleton.h"
 #include <iostream>
-//#include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/attributes/clock.hpp>
+#include <boost/log/attributes/counter.hpp>
+#include <boost/log/formatters.hpp>
+
 
 #ifndef SRC_DAEMON_LOGGER_H_
 #define SRC_DAEMON_LOGGER_H_
@@ -48,8 +52,12 @@ namespace an
 		bool init(const std::string& logfile,severity_level file_lvl = severity_level::INFO, severity_level console_lvl= severity_level::WARNING);
 		boost::log::sources::severity_logger_mt< severity_level >& get() { return _logger; }
 		void log(const std::string& msg, severity_level lvl);
+	protected:
+	    Logger() : RecordID(0) {}
 	 private:
 		boost::log::sources::severity_logger_mt< severity_level > _logger;
+		 boost::log::attributes::local_clock TimeStamp;
+		 boost::log::attributes::counter< unsigned int > RecordID;
 	};
 }
 /*#define LOG(lvl)\

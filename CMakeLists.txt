@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 2.6)
 GET_FILENAME_COMPONENT(CMAKE_BUILD_TYPE_DIR ${CMAKE_BINARY_DIR} NAME)
 SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_DIR})
 #set(CMAKE_CXX_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
-set(CMAKE_CXX_FLAGS "-std=c++0x")
+set(CMAKE_CXX_FLAGS "-std=c++0x -D_FILE_OFFSET_BITS=64")
 
 set(ROOT_DIR  ${CMAKE_SOURCE_DIR})
 set(SOURCE_DIR  "${CMAKE_SOURCE_DIR}/src")
@@ -41,6 +41,7 @@ find_library(CRYPTOPP NAMES cryptopp REQUIRED PATH)
 #set(LITESQL ${LSQL} ${LSQLUTIL})
 #find_library(UDT NAMES udt_d REQUIRED)
 #find_library(ARCHIVE NAMES libarchive archive REQUIRED)
+find_library(FUSE NAMES fuse REQUIRED)
 find_library(BOOST_LOG NAMES libboost_log boost_log PATHS "${CMAKE_SOURCE_DIR}/third-party/boost/log/")
 
 set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0")
@@ -62,6 +63,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/third-party/boost/log"
 	"${CMAKE_SOURCE_DIR}/third-party/diff_match_patch-stl"
 	"${CMAKE_SOURCE_DIR}/third-party/libb64/include"
+	"${CMAKE_SOURCE_DIR}/third-party/fusekit-0.6.3/include"
 	"/usr/local/include"
 	"/sw/include"
  )
@@ -69,6 +71,7 @@ set( LIB
 	${Boost_LIBRARIES}
 	${CRYPTOPP}
 	${BOOST_LOG}
+	${FUSE}
 	)
 set( TEST_LIB
 	${GCOV}
@@ -118,6 +121,7 @@ add_dependencies(rpc util logger)
 
 set(LOGGER_SRC "${SOURCE_DIR}/daemon/logger.h" "${SOURCE_DIR}/daemon/logger.cc")
 add_library(logger ${LOGGER_SRC})
+target_link_libraries(logger ${PLATFORM_LIB})
 
 ################################################################################
 # Daemon
@@ -126,6 +130,9 @@ set(DAEMON_SRC  "${SOURCE_DIR}/daemon/anarchNet.h"
 		"${SOURCE_DIR}/daemon/config.h"
 		"${SOURCE_DIR}/daemon/exception.h"
 		"${SOURCE_DIR}/daemon/singleton.h"
+		"${SOURCE_DIR}/daemon/lru_cache.h"
+		"${SOURCE_DIR}/daemon/storage.h"
+		"${SOURCE_DIR}/daemon/storage.cc"
 		"${SOURCE_DIR}/daemon/version.h"
 		"${SOURCE_DIR}/daemon/config_manager.h"
 		"${SOURCE_DIR}/daemon/db_manager.h"
@@ -157,7 +164,7 @@ add_library(anDaemonInternal STATIC ${DAEMON_SRC})
 add_executable(anDaemon "${SOURCE_DIR}/daemon/main.cc")
 add_dependencies(anDaemon anDaemonInternal util logger rpc)
 target_link_libraries(anDaemonInternal ${LIB} ${PLATFORM_LIB})
-target_link_libraries(anDaemon anDaemonInternal ${LIB} ${PLATFORM_LIB} an util logger rpc)
+target_link_libraries(anDaemon anDaemonInternal ${LIB} an util logger rpc ${PLATFORM_LIB})
 
 configure_file(${ROOT_DIR}/scripts/startDaemon.sh ${BIN_DIR}/startDaemon.sh)
 configure_file(${ROOT_DIR}/scripts/stopDaemon.sh ${BIN_DIR}/stopDaemon.sh)

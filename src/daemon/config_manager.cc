@@ -67,6 +67,7 @@ namespace an {
 	_port = _pt.get("daemon.port", ANARCHNET_PORT);
 	_rpc_port = _pt.get("daemon.rpc_port", ANARCHNET_RPC_PORT);
 	_threads = _pt.get("daemon.threads", ANARCHNET_THREADS);
+	_bs = _pt.get("daemon.blocksize", ANARCHNET_BLOCKSIZE);
 	_dir = _pt.get("daemon.dir", "~/.anarchNet");
 	_data_dir = _pt.get("daemon.datadir", "~/.anarchNet/data");
 	_log_dir = _pt.get("daemon.logdir", "~/.anarchNet/log");

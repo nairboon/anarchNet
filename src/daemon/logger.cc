@@ -26,16 +26,14 @@
 #include <boost/log/formatters.hpp>
 #include <boost/log/filters.hpp>
 
-#include <boost/log/attributes.hpp>
+
 #include <boost/log/sinks.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/utility/empty_deleter.hpp>
 
 #include <boost/log/utility/init/to_file.hpp>
 #include <boost/log/utility/init/to_console.hpp>
-#include <boost/log/utility/init/common_attributes.hpp>
 #include <boost/log/core/core.hpp>
-#include <boost/log/attributes/timer.hpp>
 #include "logger.h"
 
 
@@ -76,7 +74,8 @@ namespace an
 		{
 			BOOST_LOG_SEV(_logger,lvl) << msg;
 		}
-		bool Logger::init(const std::string& logfile,severity_level file_lvl, severity_level console_lvl) {
+		bool Logger::init(const std::string& logfile,severity_level file_lvl, severity_level console_lvl) 
+{
 		  typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 		  shared_ptr< text_sink > fileSink(new text_sink);
 		  {
@@ -93,7 +92,7 @@ namespace an
 		    text_sink::locked_backend_ptr pBackend = cSink->locked_backend();
 		    
 		    
-		    shared_ptr< std::ostream > pStream(&std::clog, logging::empty_deleter());
+		    shared_ptr< std::ostream > pStream(&std::cerr, logging::empty_deleter());
 		    pBackend->add_stream(pStream);
 		  }
 		  logging::core::get()->add_sink(cSink);
@@ -102,25 +101,23 @@ namespace an
 		  logging::core::get()->add_sink(fileSink);
 		  fileSink->set_filter(
 		    flt::attr< severity_level >("Severity", std::nothrow) >= file_lvl);
-		  
 		 
-		  fmt::fmt_format<char> fmtr = fmt::format("%1% @ %2% >%4%< Scope: %5%: %6%")
+		   		    logging::core::get()->add_global_attribute("RecordID", RecordID);
+		    logging::core::get()->add_global_attribute("TimeStamp", TimeStamp);
+
+		  		 boost::log::formatters::fmt_format<char> fmtr = fmt::format("%1% %2% [%3%] %4%")
 		    % fmt::attr("RecordID")
 		    % fmt::date_time< boost::posix_time::ptime >("TimeStamp", "%d.%m.%Y %H:%M:%S.%f")
-		    % fmt::attr< std::string >("Tag")
-		    % fmt::named_scope("Scope", keywords::iteration = fmt::reverse, keywords::depth = 2)
+		    % fmt::attr< severity_level >("Severity", std::nothrow)
+		   // % fmt::attr< std::string >("Tag")
+		   // % fmt::named_scope("Scope", keywords::iteration = fmt::reverse, keywords::depth = 2)
 		    % fmt::message();
-		   cSink->set_formatter(fmtr);
+		    cSink->set_formatter(fmtr);
 		     fileSink->set_formatter(fmtr);
-		    attrs::counter< unsigned int > RecordID(0);
-		    
-		    logging::core::get()->add_global_attribute("RecordID", RecordID);
-		    attrs::local_clock TimeStamp;
-		    logging::core::get()->add_global_attribute("TimeStamp", TimeStamp);
-		    
-		    attrs::named_scope Scope;
-		    logging::core::get()->add_thread_attribute("Scope", Scope);
-		  BOOST_LOG_SEV(_logger,INFO) << "Logger started";
+		     
+
+		     BOOST_LOG_SEV(_logger,INFO) << "Logger ready";
+
 		  return true;
 		}
 	}

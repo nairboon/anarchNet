@@ -56,7 +56,9 @@ namespace an {
 #define ANARCHNET_RPC_PORT 23666
 #define ANARCHNET_PORT 23555
 #define ANARCHNET_THREADS 4
+#define ANARCHNET_BLOCKSIZE 1024
 
+#define AN_ID_LENGTH 64 //hash size 512
 
 #if defined( __WIN32__ ) || defined( _WIN32 )
 #   define ANARCHNET_PLATFORM_WIN32

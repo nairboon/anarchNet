@@ -31,15 +31,17 @@
 #include "db_manager.h"
 #include "plugin_manager.h"
 #include "net_manager.h"
+#include "storage.h"
 
 
 namespace an {
-	
-	bool anDaemon::init(const std::string& directory)
+bool anDaemon::init(const std::string& directory)
 {
 	
-	LOG(INFO) << "load config_manager in " << directory;
 	if(!ConfigManager::instance().init(directory))
+		return false;
+	
+	if(!log::Logger::instance().init("ad.log",log::severity_level::DEBUG,log::severity_level::DEBUG))
 		return false;
 	
 	LOG(INFO) << "load plugin_manager";
@@ -48,6 +50,10 @@ namespace an {
 	
 	LOG(INFO) << "load module_manager";
 	if(!ModuleManager::instance().init())
+		return false;
+
+	LOG(INFO) << "load storage_manager";
+	if(!StorageManager::instance().init(""))
 		return false;
 	
 	LOG(INFO) << "load net_manager";

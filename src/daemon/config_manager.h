@@ -36,6 +36,7 @@ class ConfigManager : public Singleton<ConfigManager> {
 		const std::set<std::string>& modules() { return _modules; }
 		int port() { return _port; }
 		int threads() { return _threads; }
+		int blocksize() { return _bs; }
 		int rpc_port() { return _rpc_port; }
 		std::string datadir() { return _data_dir; }
 		std::string logdir() { return _log_dir; }
@@ -45,6 +46,7 @@ class ConfigManager : public Singleton<ConfigManager> {
 		int _port;
 		int _rpc_port;
 		int _threads;
+		int _bs;
 		std::string _data_dir;
 		std::string _log_dir;
 		std::string _dir;
