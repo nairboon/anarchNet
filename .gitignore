@@ -9,3 +9,4 @@ cmake_install.cmake
 Makefile
 .svn*
 build/*
+third-party/fusekit-0.6.3
