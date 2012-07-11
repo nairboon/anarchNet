@@ -65,7 +65,7 @@ namespace an {
   
   class file {
   public:
-    file() : size(0), read_offset(0), write_offset(0) {}
+    file() : size(0), read_offset(0), write_offset(0), _current_block_id(0) {}
     bool add_block(smart_block b);
     bool store();
     fid_t id;
@@ -77,10 +77,12 @@ namespace an {
     std::vector<fid_t> block_ids;
     std::vector<smart_block> data_blocks;
     std::vector<smart_block> header_blocks;
+    void reset_offset() { write_offset = 0; _block_offset = 0; _current_block_id=0; _current_block= data_blocks.front(); }
+    void next_block() { _current_block = data_blocks[++_current_block_id]; _block_offset = 0; }
   private:
     long _block_offset;
     smart_block _current_block;
-    
+    int _current_block_id;
   };
   typedef boost::shared_ptr<file> smart_file;
   class file_request {

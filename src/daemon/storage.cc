@@ -123,6 +123,7 @@ void StorageManager::run() {
 	       size+=b->size;
 	       LOG(INFO) << "added block:" << b->size;
 	       _current_block = b;
+	       _current_block_id = data_blocks.size()-1;
 	       return true;
 	     }
 	     bool file::store() // write new version of masterfile to disk
@@ -169,6 +170,7 @@ void StorageManager::run() {
 		  f.sf->write(buff.c_str(),t_read);
 		   LOG(DEBUG) << "sent to file: " << t_read;
 	       }
+	       f.sf->reset_offset();
 		 /*
 		 LOG(INFO) << "write req: " << f.fn;
 		 char *buff = new char[BLOCKSIZE+1];
@@ -198,29 +200,48 @@ void StorageManager::run() {
 
 		 }
 		 
-		     bool file::write(const char *data, long size)
-		     {
-		       LOG(DEBUG) << "file::write: " << size;
+		 bool file::write(const char *data, long size)
+		 {
+		   LOG(DEBUG) << "file::write: " << size;
+		   
+		   if(size <= BLOCKSIZE)
+		   {
+		     if(data_blocks.size() == 0) // new file, no blocks
+			    {
+			      add_block(smart_block(new block(data,size)));
+			    }
+			    else
+			    {
+			      memcpy(_current_block->data,data,size);
+			      _current_block->size = size;
+			    }
+		   }
+		   else {
+		     long rsize = BLOCKSIZE; 
+		     int i = 0;
+		     while(size > 0) {
+		       if(size < BLOCKSIZE)
+			 rsize = size;
+		       
 		       if(data_blocks.size() == 0) // new file, no blocks
-		       {
-			 if(size <= BLOCKSIZE)
-			   add_block(smart_block(new block(data,size)));
-			 else {
-			   long rsize = BLOCKSIZE; 
-			   int i = 0;
-			   while(size > 0) {
-			      if(size < BLOCKSIZE)
-				rsize = size;
-			     add_block(smart_block(new block( data+i,rsize)));
-			     i += rsize;
-			     size -= rsize;  
-			  }
-			  _block_offset = rsize;
-			 }
-		       }
-		       else // existing file
-		       {
-			 LOG(DEBUG) << "FILE EXISTS";
-		       }
+			    {
+			      add_block(smart_block(new block( data+i,rsize)));
+			    }
+			    else{
+			      if(_block_offset > 0)
+				LOG(ERROR) << "in-block write";
+			      else
+			       memcpy(_current_block->data+_block_offset,data,rsize);
+			      _current_block->size = rsize;
+			      next_block();
+			    }
+			    
+			    i += rsize;
+		       size -= rsize;  
 		     }
+		     _block_offset = rsize;
+		   }
+		   
+		   
+		 }
 }
