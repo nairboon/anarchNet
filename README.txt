@@ -1,3 +1,7 @@
+
+This project is continued as AnEvoNet
+
+===
 see doc/API.txt, TODO.txt
 
 == How to build == 
